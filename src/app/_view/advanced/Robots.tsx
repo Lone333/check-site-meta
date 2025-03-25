@@ -37,28 +37,30 @@ export async function RobotsSummary(
       <MetadataRow data={{ label: 'robots.txt', }}>
         <div className="leading-none flex flex-col gap-2 mt-1">
           <Suspense fallback="Loading...">
-            {getRobots(props.metadata.general.rawUrl.value).then(({ parsed }) => {
-              return (
-                <>
-                  <div className="font-medium flex items-center gap-1">
-                    {parsed ? <>
-                      <MaterialSymbolsCheckCircle />
-                      Present
-                    </> : <>
-                      <MaterialSymbolsCircleOutline />
-                      Not Found
-                    </>
-                    }
-                  </div>
-                  {parsed && (
-                    <>
-                      <div>{Object.keys(parsed._rules).length} rules found</div>
-                      <div>{Object.keys(parsed._sitemaps).length} sitemaps found</div>
-                    </>
-                  )}
-                </>
-              )
-            }).catch(err => <div>Failed to retrieve robots.txt</div>)}
+            {(async () => getRobots(props.metadata.general.rawUrl.value)
+              .then(({ parsed }) => {
+                return (
+                  <>
+                    <div className="font-medium flex items-center gap-1">
+                      {parsed ? <>
+                        <MaterialSymbolsCheckCircle />
+                        Present
+                      </> : <>
+                        <MaterialSymbolsCircleOutline />
+                        Not Found
+                      </>
+                      }
+                    </div>
+                    {parsed && (
+                      <>
+                        <div>{Object.keys(parsed).length} rules found</div>
+                        <div>{Object.keys(parsed).length} sitemaps found</div>
+                      </>
+                    )}
+                  </>
+                )
+              })
+              .catch(err => <div>Failed to retrieve robots.txt</div>))()}
           </Suspense>
         </div>
       </MetadataRow>
@@ -76,70 +78,40 @@ export function MaterialSymbolsCircleOutline(props: SVGProps<SVGSVGElement>) {
 }
 
 
-export async function RobotsDetails({ url, ...props }: ComponentProps<"div"> & { url: string }) {
+export async function RobotsDetails({ data }: { data: Awaited<ReturnType<typeof getRobots>> }) {
 
-  try {
-    const { parsed, raw } = await getRobots(url)
+  const { parsed, raw } = data
+  return (
+    <div className={cn("flex flex-col")}>
+      <CardHeader>
+        <CardHeaderTitle>
+          Robots.txt
+        </CardHeaderTitle>
+        <CardHeaderSubtitle>
+          Rules for search engine crawlers
+        </CardHeaderSubtitle>
+      </CardHeader>
+      <TabsWithContent
+        id="robots-rules"
+        className="self-start tab-item:py-1 tab-item:px-3.5 mb-3 mt-4 p-0.5 rounded-lg tab-background:rounded-md text-sm tab-item:font-semibold"
+        tabs={[
+          tab("Parsed",
+            <div key="p" className="fadeBlurIn-0">
+              <RobotsClientDetails uaRules={parsed} />
+            </div>
+          ),
+          tab("Raw",
+            <div key="r" className="fadeBlurIn-0">
+              <pre className="text-xs p-2 border border-border rounded-md bg-background">
+                {raw}
+              </pre>
+            </div>
+          ),
+        ]}
+      />
+    </div>
+  )
 
-    const rules = Object.entries(parsed._rules).map(([key, value]) => ({ userAgent: key, rule: value }))
-    const ruleCount = rules.length
-
-
-    return (
-      <div {...props} className={cn("flex flex-col", props.className)}>
-        <CardHeader>
-          <CardHeaderTitle>
-            Robots.txt
-          </CardHeaderTitle>
-          <CardHeaderSubtitle>
-            Rules for search engine crawlers
-          </CardHeaderSubtitle>
-        </CardHeader>
-        <TabsWithContent
-          id="robots-rules"
-          className="self-start tab-item:py-1 tab-item:px-3.5 mb-3 mt-4 p-0.5 rounded-lg tab-background:rounded-md text-sm tab-item:font-semibold"
-          tabs={[
-            tab("Parsed",
-              <div className="fadeBlurIn-0">
-                <RobotsClientDetails uaRules={rules} />
-              </div>
-            ),
-            tab("Raw", <pre className="fadeBlurIn-0 text-sm p-2 border border-border rounded-md">{raw}</pre>),
-          ]}
-        />
-
-
-      </div>
-    )
-  } catch (error) {
-
-    const parsedError = parseError(error)
-
-    return <>
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
-          <MaterialSymbolsInfoRounded className="w-7 h-7 text-foreground-muted" />
-          <div className="flex flex-col">
-            <div className="font-semibold text-[1rem]">{parsedError.summary}</div>
-            <div>{parsedError.detail}</div>
-          </div>
-        </div>
-
-
-        <div className="text-foreground-body max-w-screen-sm flex flex-col gap-2">
-          <p>
-            Robots.txt file is used to control search engine crawlers. It is a text file that tells web robots which pages on your site to crawl. It also tells web robots which pages not to crawl.
-          </p>
-          <p>
-            To get started, you can create a robots.txt file and place it in the root directory of your website.
-          </p>
-        </div>
-
-
-        <ExpandableErrorStack stack={parsedError.stack!} />
-      </div>
-    </>
-  }
 }
 
 

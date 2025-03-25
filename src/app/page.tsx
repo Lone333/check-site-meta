@@ -1,9 +1,9 @@
-import { Fragment, Suspense, type ComponentProps, type ReactNode } from "react";
+import { cache, Fragment, Suspense, type ComponentProps, type ReactNode } from "react";
 import { getMetadataValues, fetchRoot } from "./lib/get-metadata";
 import { parseUrlFromQuery } from "./lib/parse-url";
 import type { SearchParamsContext } from "./lib/next-types";
 import { getResolvedMetadata } from "./lib/get-metadata-field-data";
-import { MetaCard, MetaInfoPanel } from "./_view/MetaInfo";
+import { MetaInfoPanel } from "./_view/MetaInfo";
 import { cn } from "lazy-cn";
 import { getVersion } from "./lib/version";
 import { ThemeSwitcher } from "./theme-switch";
@@ -36,7 +36,21 @@ export default async function Home(context: SearchParamsContext) {
   const query = await context.searchParams;
   const hideHome = !!query.url
   const searchId = Math.random()
-  const settings = await getUserSettings()
+
+  const SummarySection = async () =>
+    !!query.url && getPageData(query.url)
+      .then(metadata => <MetaInfoPanel metadata={metadata} />)
+      .catch(err => <ErrorCard error={err} className="card" />)
+
+  const LinkPreviewSection = async () =>
+    !!query.url && getPageData(query.url)
+      .then(metadata => <LinkPreviewPanel metadata={metadata} />)
+      .catch(() => null)
+
+  const AdvancedSection = async () =>
+    !!query.url && getPageData(query.url)
+      .then(metadata => <AdvancedPanel metadata={metadata} />)
+      .catch(() => null)
 
   return (
     <>
@@ -45,39 +59,30 @@ export default async function Home(context: SearchParamsContext) {
         "px-8 lg:px-12 xl:px-24 pb-40",
         "lg:grid lg:grid-cols-2 gap-x-8"
       )}>
-        {/* Primary Panel */}
+
         <div className="flex flex-col min-h-80 py-12">
           <Header hidden={hideHome} />
           <InputForm
             query={query}
-            settings={settings} />
+            settings={await getUserSettings()} />
           <RecentSuggestions hidden={hideHome} />
           <div className="flex flex-col gap-8 pt-8">
             <Suspense key={searchId + 'sum'} fallback={<Loading />}>
-              {(async () => !!query.url && getSiteMetadata(query.url)
-                .then(metadata => <MetaInfoPanel metadata={metadata} />)
-                .catch(err => <ErrorCard error={err} className="card" />))()}
+              <SummarySection />
             </Suspense>
           </div>
         </div>
 
-        {/* Secondary Panel */}
         <div className="flex flex-col items-center gap-8 pt-15 pb-12">
           <Changelog hidden={hideHome} />
           <Suspense key={searchId + 'lp'}>
-            {(async () => !!query.url && getSiteMetadata(query.url)
-              .then(metadata => <LinkPreviewPanel metadata={metadata} />)
-              .catch(err => null)
-            )()}
+            <LinkPreviewSection />
           </Suspense>
         </div>
 
         <div className="col-span-2 flex flex-col">
           <Suspense key={searchId}>
-            {(async () => query.url && getSiteMetadata(query.url)
-              .then(metadata => <AdvancedPanel metadata={metadata} />)
-              .catch(err => null)
-            )()}
+            <AdvancedSection />
           </Suspense>
         </div>
 
@@ -89,21 +94,17 @@ export default async function Home(context: SearchParamsContext) {
 
 // Data Getter -----------------------------
 
-async function getSiteMetadata(query: string | string[]) {
+const getPageData = cache(async function getPageData(query: string | string[]) {
   const url = parseUrlFromQuery(query)
   const { root, html } = await fetchRoot(url.toString())
   const metadata = getMetadataValues(root, url.toString())
   const resolved = getResolvedMetadata(metadata)
   return { resolved, html, root }
-}
-export type SiteMetadata = Awaited<ReturnType<typeof getSiteMetadata>>
-
-
+})
+export type SiteMetadata = Awaited<ReturnType<typeof getPageData>>
 
 
 // Components -----------------------------
-
-
 
 
 function Header(props: {

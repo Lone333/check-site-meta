@@ -8,10 +8,27 @@ import { getSitemap } from "@/app/lib/get-sitemap";
 import { Suspense, type ReactNode, type SVGProps } from "react";
 import type { ParsedError } from "@/app/module/error/ErrorCard";
 import { ExpandableErrorStack } from "@/app/module/error/Error.client";
+import { getRobots } from "@/app/lib/get-robots";
 
 export function AdvancedPanel(props: {
   metadata: SiteMetadata
 }) {
+
+  const Robots = async () =>
+    getRobots(props.metadata.resolved.general.rawUrl.value)
+      .then(res => <RobotsDetails data={res} />)
+      .catch(err => <AdvancedPanelErrorCard err={err}>
+        <div className="text-foreground-body max-w-screen-sm flex flex-col gap-2">
+          <p>Robots.txt file is used to control search engine crawlers. It is a text file that tells web robots which pages on your site to crawl. It also tells web robots which pages not to crawl.  </p>
+          <p>To get started, you can create a robots.txt file and place it in the root directory of your website.</p>
+        </div>
+      </AdvancedPanelErrorCard>)
+
+  const Sitemap = async () =>
+    getSitemap(props.metadata.resolved.general.rawUrl.value)
+      .then(res => <SitemapDetails data={res} url={props.metadata.resolved.general.rawUrl.value} />)
+      .catch(err => <AdvancedPanelErrorCard err={err} />)
+
   return (
     <TabsWithContent
       className="self-start mb-8"
@@ -27,7 +44,9 @@ export function AdvancedPanel(props: {
         tab("Robots",
           <MetaCard>
             <div key="r" className="card-content fadeBlurIn-100">
-              <RobotsDetails url={props.metadata.resolved.general.rawUrl.value} />
+              <Suspense>
+                <Robots />
+              </Suspense>
             </div>
           </MetaCard>
         ),
@@ -35,9 +54,7 @@ export function AdvancedPanel(props: {
           <MetaCard>
             <div key="sm" className="card-content fadeBlurIn-100">
               <Suspense fallback="Loading...">
-                {(async () => getSitemap(props.metadata.resolved.general.rawUrl.value)
-                  .then((res) => <SitemapDetails data={res} />)
-                  .catch(err => <AdvancedPanelErrorCard err={err} />))()}
+                <Sitemap />
               </Suspense>
             </div>
           </MetaCard>

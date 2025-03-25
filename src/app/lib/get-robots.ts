@@ -11,9 +11,26 @@ export const getRobots = cache(async function getRobots(url: string) {
     throw new AppError(null, 'parse', 'Invalid robots.txt', 'robots.txt must start with a comment or a user-agent directive')
   }
   try {
-    const parsedRobot = robotsParser(url, text)
+    const parsedRobotRaw = robotsParser(url, text)
+
+    const parsedRobot = Object.entries(
+      (JSON.parse(JSON.stringify(parsedRobotRaw)) as ParsedRobotRaw)._rules
+    ).map(([userAgent, rule]) => {
+      return {
+        userAgent,
+        rule
+      }
+    }) as ParsedRobotRules
+
+    // get crawldelay for each ua
+    parsedRobot.forEach((ua) => {
+      const cawlDelay = parsedRobotRaw.getCrawlDelay(ua.userAgent)
+      ua.crawlDelay = cawlDelay
+    })
+
     return {
-      parsed: JSON.parse(JSON.stringify(parsedRobot)) as ParsedRobotRaw,
+      parsed: parsedRobot,
+      sitemaps: parsedRobotRaw.getSitemaps(),
       raw: text
     }
   } catch (error) {
@@ -34,6 +51,7 @@ type ParsedRobotRaw = {
 
 export type ParsedRobotRules = {
   userAgent: string;
+  crawlDelay?: number;
   rule: {
     pattern: string;
     allow: boolean;

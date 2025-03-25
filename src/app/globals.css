@@ -11,6 +11,9 @@ body {
 /* Tokens ----------------------------- */
 
 @theme inline {
+
+  /* Foregrounds */
+
   --color-foreground: light-dark(
     var(--color-gray-800),
     var(--color-neutral-300)
@@ -36,6 +39,8 @@ body {
     var(--color-neutral-400)
   );
 
+  /* Backgrounds */
+
   --color-background: light-dark(
     var(--color-gray-50),
     var(--color-neutral-900)
@@ -46,6 +51,9 @@ body {
     --alpha(var(--color-neutral-700) / 0.5)
   );
   --color-background-card: light-dark(#fff, #232424);
+
+  --color-background-card-input: light-dark(var(--color-gray-50),#292A2A);
+
 
   --color-border: light-dark(#e6eaf2, #2f3030);
   --color-focus: light-dark(var(--color-slate-200), var(--color-neutral-800));
@@ -295,7 +303,7 @@ body {
 
   /* Meta Row */
   > div {
-    @apply  py-1 -mx-[var(--padding)] px-[var(--padding)] grid grid-cols-[10rem_1fr];
+    @apply py-1 -mx-[var(--padding)] px-[var(--padding)] grid grid-cols-[10rem_1fr];
   }
   .meta-mute {
     @apply text-foreground-muted-3;

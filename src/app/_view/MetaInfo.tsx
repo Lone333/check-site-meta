@@ -246,57 +246,60 @@ function IconMetadata(props: {
       <MetadataRow data={{ label: "icon", value: undefined }}
         putInfoBesideLabel
         contentProps={{ className: "col-span-2 col-span-2 row-start-[10] mt-2 grid grid-cols-1 gap-2" }}>
-        {(async () => {
-          if (!props.data.general.favicons.values.length) return <div className="opacity-40">-</div>
+        <Suspense fallback="Loading...">
+          {(async () => {
+            if (!props.data.general.favicons.values.length) return <div className="opacity-40">-</div>
 
-          const rawFavicons = props.data.general.favicons.values
+            const rawFavicons = props.data.general.favicons.values
 
-          const favicons: {
-            source: string,
-            size: string,
-            resolvedSize: number | null,
-            value: string,
-            type: string,
-            resolvedUrl: string,
-          }[] = []
+            const favicons: {
+              source: string,
+              size: string,
+              resolvedSize: number | null,
+              value: string,
+              type: string,
+              resolvedUrl: string,
+            }[] = []
 
-          for (const f of rawFavicons) {
-            const validUrl = await isValidIcon(f.resolvedUrl)
-            if (validUrl) {
-              const resolvedSize = f ? parseInt(f.sizes ?? "") : NaN
-              favicons.push({
-                source: f.source ?? "?",
-                size: f.sizes ?? "size undefined",
-                value: f.value ?? "value undefined (huh?)",
-                type: f.type ?? "type undefined",
-                resolvedSize: isNaN(resolvedSize) ? null : resolvedSize,
-                resolvedUrl: validUrl
-              })
-              continue
+            for (const f of rawFavicons) {
+              const validUrl = await isValidIcon(f.resolvedUrl)
+              if (validUrl) {
+                const resolvedSize = f ? parseInt(f.sizes ?? "") : NaN
+                favicons.push({
+                  source: f.source ?? "?",
+                  size: f.sizes ?? "size undefined",
+                  value: f.value ?? "value undefined (huh?)",
+                  type: f.type ?? "type undefined",
+                  resolvedSize: isNaN(resolvedSize) ? null : resolvedSize,
+                  resolvedUrl: validUrl
+                })
+                continue
+              }
             }
-          }
 
-          return <>{favicons.map((item, i) => {
-            const { source, size, value, resolvedUrl, resolvedSize, type } = item
-            return <div key={i} className="flex gap-2 items-start flex-wrap">
-              <FaviconPreview
-                imgProps1={{ style: { height: resolvedSize ? px(resolvedSize) : undefined, width: resolvedSize ? px(resolvedSize) : undefined } }}
-                imgProps2={{ style: { height: resolvedSize ? px(resolvedSize) : undefined, width: resolvedSize ? px(resolvedSize) : undefined } }}
-                src={resolvedUrl} />
-              <div className="text-xs meta-info-field-value break-words min-w-40 basis-0 grow">
-                {source}<br />
+            return <>{favicons.map((item, i) => {
+              const { source, size, value, resolvedUrl, resolvedSize, type } = item
+              return <div key={i} className="flex gap-2 items-start flex-wrap">
+                <FaviconPreview
+                  imgProps1={{ style: { height: resolvedSize ? px(resolvedSize) : undefined, width: resolvedSize ? px(resolvedSize) : undefined } }}
+                  imgProps2={{ style: { height: resolvedSize ? px(resolvedSize) : undefined, width: resolvedSize ? px(resolvedSize) : undefined } }}
+                  src={resolvedUrl} />
+                <div className="text-xs meta-info-field-value break-words min-w-40 basis-0 grow">
+                  {source}<br />
 
-                <a className={cn("link-underline block leading-snug", value.startsWith('data:') && "line-clamp-3")} target="_blank" href={resolvedUrl}>
-                  {value} <ExternalIcon />
-                </a>
+                  <a className={cn("link-underline block leading-snug", value.startsWith('data:') && "line-clamp-3")} target="_blank" href={resolvedUrl}>
+                    {value} <ExternalIcon />
+                  </a>
 
-                {size ?? "size undefined"}<br />
-                {type ?? "size undefined"}<br />
+                  {size ?? "size undefined"}<br />
+                  {type ?? "size undefined"}<br />
+                </div>
               </div>
-            </div>
-          })}
-          </>
-        })()}
+            })}
+            </>
+          })()}
+        </Suspense>
+
       </MetadataRow>
       <hr />
       <IconListPreviewMetadataItem data={props.data.icons.appleTouchIcons} />
