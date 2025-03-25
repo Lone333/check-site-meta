@@ -29,6 +29,7 @@ import { AdvancedPanel } from "./_view/advanced/AdvancedPanel";
 //   ↓             ↓
 //  fields       previews
 // 
+type Query = Record<string, string | string[] | undefined>
 
 export default async function Home(context: SearchParamsContext) {
 
@@ -52,11 +53,10 @@ export default async function Home(context: SearchParamsContext) {
             settings={settings} />
           <RecentSuggestions hidden={hideHome} />
           <div className="flex flex-col gap-8 pt-8">
-            <Suspense key={searchId} fallback={<Loading />}>
-              {query.url && getSiteMetadata(query.url)
+            <Suspense key={searchId + 'sum'} fallback={<Loading />}>
+              {(async () => !!query.url && getSiteMetadata(query.url)
                 .then(metadata => <MetaInfoPanel metadata={metadata} />)
-                .catch(err => <ErrorCard error={err} />)
-              }
+                .catch(err => <ErrorCard error={err} className="card" />))()}
             </Suspense>
           </div>
         </div>
@@ -64,21 +64,20 @@ export default async function Home(context: SearchParamsContext) {
         {/* Secondary Panel */}
         <div className="flex flex-col items-center gap-8 pt-15 pb-12">
           <Changelog hidden={hideHome} />
-          <Suspense key={searchId}>
-            {query.url && getSiteMetadata(query.url)
+          <Suspense key={searchId + 'lp'}>
+            {(async () => !!query.url && getSiteMetadata(query.url)
               .then(metadata => <LinkPreviewPanel metadata={metadata} />)
               .catch(err => null)
-            }
+            )()}
           </Suspense>
         </div>
 
         <div className="col-span-2 flex flex-col">
-
           <Suspense key={searchId}>
-            {query.url && getSiteMetadata(query.url)
+            {(async () => query.url && getSiteMetadata(query.url)
               .then(metadata => <AdvancedPanel metadata={metadata} />)
-              .catch(err => <ErrorCard error={err} />)
-            }
+              .catch(err => null)
+            )()}
           </Suspense>
         </div>
 
@@ -103,6 +102,8 @@ export type SiteMetadata = Awaited<ReturnType<typeof getSiteMetadata>>
 
 
 // Components -----------------------------
+
+
 
 
 function Header(props: {

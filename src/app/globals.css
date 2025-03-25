@@ -244,7 +244,7 @@ body {
   }
 }
 
-@custom-variant tab-background (&>.tab-background);
+@custom-variant tab-background (& .tab-background);
 @utility tab-background {
   @apply absolute top-0 left-0 w-full h-full
   pointer-events-none -z-10 
@@ -295,7 +295,7 @@ body {
 
   /* Meta Row */
   > div {
-    @apply py-1 -mx-[var(--padding)] px-[var(--padding)] grid grid-cols-[10rem_1fr];
+    @apply  py-1 -mx-[var(--padding)] px-[var(--padding)] grid grid-cols-[10rem_1fr];
   }
   .meta-mute {
     @apply text-foreground-muted-3;

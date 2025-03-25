@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "commander": "^13.1.0",
+    "fast-xml-parser": "^5.0.9",
     "image-size": "^2.0.1",
     "lazy-cn": "^1.0.0",
     "next": "15.2.3",

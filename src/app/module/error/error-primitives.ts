@@ -8,7 +8,7 @@ export type ErrorInfo = {
 
 export function createError(
   type: ErrorInfo["type"],
-  summary: string,
+  summary: string,  
   detail?: string,
   context?: string[],
 ): ErrorInfo {

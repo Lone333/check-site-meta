@@ -2,6 +2,12 @@ import { tab } from "@/app/module/tab/tab-primitives";
 import { TabsWithContent } from "@/app/module/tab/Tabs";
 import type { SiteMetadata } from "@/app/page";
 import { MetaCard } from "../MetaInfo";
+import { RobotsDetails } from "./Robots";
+import { SitemapDetails } from "./Sitemap";
+import { getSitemap } from "@/app/lib/get-sitemap";
+import { Suspense, type ReactNode, type SVGProps } from "react";
+import type { ParsedError } from "@/app/module/error/ErrorCard";
+import { ExpandableErrorStack } from "@/app/module/error/Error.client";
 
 export function AdvancedPanel(props: {
   metadata: SiteMetadata
@@ -13,24 +19,57 @@ export function AdvancedPanel(props: {
       tabs={[
         tab("Raw",
           <MetaCard>
-            {/* <div className="pt-4">raw HTML</div> */}
-            <pre key="r" className="card-content fadeBlurIn-100 overflow-auto text-xs text-foreground-body">
+            <pre key="h" className="card-content fadeBlurIn-100 overflow-auto text-xs text-foreground-body">
               {`Only <head> is shown: \n\n`}{props.metadata.html?.split('<body')[0].replaceAll('/><', '/>\n<').replaceAll(/<style[^>]*>[\s\S]*?<\/style>/g, '<style>...</style>')}
             </pre>
           </MetaCard>
         ),
-        tab("Sitemap", 
+        tab("Robots",
           <MetaCard>
-            Coming Soon
+            <div key="r" className="card-content fadeBlurIn-100">
+              <RobotsDetails url={props.metadata.resolved.general.rawUrl.value} />
+            </div>
           </MetaCard>
         ),
-        tab("JSON-LD", 
+        tab("Sitemap",
           <MetaCard>
-            Coming Soon
+            <div key="sm" className="card-content fadeBlurIn-100">
+              <Suspense fallback="Loading...">
+                {(async () => getSitemap(props.metadata.resolved.general.rawUrl.value)
+                  .then((res) => <SitemapDetails data={res} />)
+                  .catch(err => <AdvancedPanelErrorCard err={err} />))()}
+              </Suspense>
+            </div>
           </MetaCard>
-        )
+        ),
       ]}
     >
     </TabsWithContent>
+  )
+}
+
+
+function AdvancedPanelErrorCard({ err, children }: { err: ParsedError, children?: ReactNode }) {
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
+        <MaterialSymbolsInfoRounded className="w-7 h-7 text-foreground-muted" />
+        <div className="flex flex-col">
+          <div className="font-semibold text-[1rem]">{err.summary}</div>
+          <div>{err.detail}</div>
+        </div>
+      </div>
+      <div className="text-foreground-body max-w-screen-sm flex flex-col gap-2">
+        {children}
+      </div>
+      <ExpandableErrorStack stack={err.stack!} />
+    </div>
+  )
+}
+
+
+export function MaterialSymbolsInfoRounded(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}>{/* Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE */}<path fill="currentColor" d="M12 17q.425 0 .713-.288T13 16v-4q0-.425-.288-.712T12 11t-.712.288T11 12v4q0 .425.288.713T12 17m0-8q.425 0 .713-.288T13 8t-.288-.712T12 7t-.712.288T11 8t.288.713T12 9m0 13q-2.075 0-3.9-.788t-3.175-2.137T2.788 15.9T2 12t.788-3.9t2.137-3.175T8.1 2.788T12 2t3.9.788t3.175 2.137T21.213 8.1T22 12t-.788 3.9t-2.137 3.175t-3.175 2.138T12 22"></path></svg>
   )
 }

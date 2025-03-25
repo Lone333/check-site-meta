@@ -151,6 +151,9 @@ export function getMetadataValues(root: HTMLElement, rawUrl: string) {
             throw new AppError(error, "parse", "JSON Parse Failed", error instanceof Error ? error.message : "Unknown Error")
           }
         })
+      },
+      crawler: {
+        robots: root.querySelector("meta[name=robots]")?.getAttribute("content"),
       }
     }
   } catch (error) {

@@ -64,7 +64,7 @@ export async function PreviewGoogle({ metadata, className, ...props }: Component
                     </div>
                   </div>
                   <div className="overflow-hidden max-w-[22rem]">
-                    <div className="leading-[20px] text-(--text-site-name)">
+                    <div className="leading-[20px] text-(--text-site-name) line-clamp-1">
                       {data.site}
                     </div>
                     <div className="text-px-12 text-(--text-url) line-clamp-1">

@@ -6,7 +6,8 @@ import type { ComponentProps, SVGProps } from "react";
 
 export type PreviewMessages = [
   level: 'error' | 'warn' | 'info',
-  text: string
+  text: string,
+  source?: string
 ][]
 
 export function MessageList(props: { messages: PreviewMessages }) {

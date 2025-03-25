@@ -1,0 +1,150 @@
+import { appFetch } from "@/app/lib/fetch"
+import robotsParser from "robots-parser"
+import { MetadataRow, Separator } from "../MetadataRow"
+import { getRobots } from "@/app/lib/get-robots"
+import { Suspense, type ComponentProps, type SVGProps } from "react"
+import { cn } from "lazy-cn"
+import ErrorCard, { ErrorCardMini, parseError, StackTrace } from "@/app/module/error/ErrorCard"
+import { ExpandableErrorStack } from "@/app/module/error/Error.client"
+import { TabsWithContent } from "@/app/module/tab/Tabs"
+import { tab } from "@/app/module/tab/tab-primitives"
+import type { ResoledMetadata } from "@/app/lib/get-metadata-field-data"
+import { CardHeader, CardHeaderSubtitle, CardHeaderTitle } from "../Card"
+import { RobotsClientDetails } from "./Robots.client"
+
+export async function Robots(
+  props: { url: string }
+) {
+  // delay 200ms
+  await new Promise(resolve => setTimeout(resolve, 500))
+  const res = await appFetch(new URL('/robots.txt', props.url).toString())
+  const text = await res.text()
+  const parsedRobot = robotsParser(props.url, text)
+  return (
+    <div>
+      <pre>{JSON.stringify(parsedRobot, null, 2)}</pre>
+    </div>
+  )
+}
+
+
+export async function RobotsSummary(
+  props: { metadata: ResoledMetadata }
+) {
+  return (
+    <>
+      <MetadataRow data={props.metadata.general.robots} />
+      <MetadataRow data={{ label: 'robots.txt', }}>
+        <div className="leading-none flex flex-col gap-2 mt-1">
+          <Suspense fallback="Loading...">
+            {getRobots(props.metadata.general.rawUrl.value).then(({ parsed }) => {
+              return (
+                <>
+                  <div className="font-medium flex items-center gap-1">
+                    {parsed ? <>
+                      <MaterialSymbolsCheckCircle />
+                      Present
+                    </> : <>
+                      <MaterialSymbolsCircleOutline />
+                      Not Found
+                    </>
+                    }
+                  </div>
+                  {parsed && (
+                    <>
+                      <div>{Object.keys(parsed._rules).length} rules found</div>
+                      <div>{Object.keys(parsed._sitemaps).length} sitemaps found</div>
+                    </>
+                  )}
+                </>
+              )
+            }).catch(err => <div>Failed to retrieve robots.txt</div>)}
+          </Suspense>
+        </div>
+      </MetadataRow>
+    </>
+  )
+}
+
+
+
+export function MaterialSymbolsCheckCircle(props: SVGProps<SVGSVGElement>) {
+  return (<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}>{/* Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE */}<path fill="currentColor" d="m10.6 16.6l7.05-7.05l-1.4-1.4l-5.65 5.65l-2.85-2.85l-1.4 1.4zM12 22q-2.075 0-3.9-.788t-3.175-2.137T2.788 15.9T2 12t.788-3.9t2.137-3.175T8.1 2.788T12 2t3.9.788t3.175 2.137T21.213 8.1T22 12t-.788 3.9t-2.137 3.175t-3.175 2.138T12 22"></path></svg>)
+}
+export function MaterialSymbolsCircleOutline(props: SVGProps<SVGSVGElement>) {
+  return (<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}>{/* Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE */}<path fill="currentColor" d="M12 22q-2.075 0-3.9-.788t-3.175-2.137T2.788 15.9T2 12t.788-3.9t2.137-3.175T8.1 2.788T12 2t3.9.788t3.175 2.137T21.213 8.1T22 12t-.788 3.9t-2.137 3.175t-3.175 2.138T12 22m0-2q3.35 0 5.675-2.325T20 12t-2.325-5.675T12 4T6.325 6.325T4 12t2.325 5.675T12 20m0-8"></path></svg>)
+}
+
+
+export async function RobotsDetails({ url, ...props }: ComponentProps<"div"> & { url: string }) {
+
+  try {
+    const { parsed, raw } = await getRobots(url)
+
+    const rules = Object.entries(parsed._rules).map(([key, value]) => ({ userAgent: key, rule: value }))
+    const ruleCount = rules.length
+
+
+    return (
+      <div {...props} className={cn("flex flex-col", props.className)}>
+        <CardHeader>
+          <CardHeaderTitle>
+            Robots.txt
+          </CardHeaderTitle>
+          <CardHeaderSubtitle>
+            Rules for search engine crawlers
+          </CardHeaderSubtitle>
+        </CardHeader>
+        <TabsWithContent
+          id="robots-rules"
+          className="self-start tab-item:py-1 tab-item:px-3.5 mb-3 mt-4 p-0.5 rounded-lg tab-background:rounded-md text-sm tab-item:font-semibold"
+          tabs={[
+            tab("Parsed",
+              <div className="fadeBlurIn-0">
+                <RobotsClientDetails uaRules={rules} />
+              </div>
+            ),
+            tab("Raw", <pre className="fadeBlurIn-0 text-sm p-2 border border-border rounded-md">{raw}</pre>),
+          ]}
+        />
+
+
+      </div>
+    )
+  } catch (error) {
+
+    const parsedError = parseError(error)
+
+    return <>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
+          <MaterialSymbolsInfoRounded className="w-7 h-7 text-foreground-muted" />
+          <div className="flex flex-col">
+            <div className="font-semibold text-[1rem]">{parsedError.summary}</div>
+            <div>{parsedError.detail}</div>
+          </div>
+        </div>
+
+
+        <div className="text-foreground-body max-w-screen-sm flex flex-col gap-2">
+          <p>
+            Robots.txt file is used to control search engine crawlers. It is a text file that tells web robots which pages on your site to crawl. It also tells web robots which pages not to crawl.
+          </p>
+          <p>
+            To get started, you can create a robots.txt file and place it in the root directory of your website.
+          </p>
+        </div>
+
+
+        <ExpandableErrorStack stack={parsedError.stack!} />
+      </div>
+    </>
+  }
+}
+
+
+export function MaterialSymbolsInfoRounded(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}>{/* Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE */}<path fill="currentColor" d="M12 17q.425 0 .713-.288T13 16v-4q0-.425-.288-.712T12 11t-.712.288T11 12v4q0 .425.288.713T12 17m0-8q.425 0 .713-.288T13 8t-.288-.712T12 7t-.712.288T11 8t.288.713T12 9m0 13q-2.075 0-3.9-.788t-3.175-2.137T2.788 15.9T2 12t.788-3.9t2.137-3.175T8.1 2.788T12 2t3.9.788t3.175 2.137T21.213 8.1T22 12t-.788 3.9t-2.137 3.175t-3.175 2.138T12 22"></path></svg>
+  )
+}

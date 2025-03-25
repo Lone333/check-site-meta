@@ -10,6 +10,8 @@ import { cn } from "lazy-cn";
 import { getImageSizeFromResponse } from "../lib/image-size";
 import type { SiteMetadata } from "../page";
 import { OpengraphMetadata } from "./categories/OpenGraph";
+import { Robots, RobotsSummary } from "./advanced/Robots";
+import { SitemapSummary } from "./advanced/Sitemap";
 
 export async function MetaInfoPanel(props: {
   metadata: SiteMetadata,
@@ -60,7 +62,9 @@ export async function MetaInfoPanel(props: {
           "Robots",
           <MetaCard>
             <MetaCardContent key="r">
-              <MetadataRow data={metadata.general.robots} />
+              <RobotsSummary metadata={metadata} />
+              <Separator />
+              <SitemapSummary metadata={metadata} />
             </MetaCardContent>
           </MetaCard>
         )
