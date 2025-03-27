@@ -1,13 +1,11 @@
 "use client"
 
-import { Fragment, useActionState, useState, useTransition, type ComponentProps, type ReactNode, type SVGProps } from "react"
-import { CollapsibleColumn, CollapsibleRow } from "@/app/lib/Collapsible"
+import { useState, useTransition, type ComponentProps, type ReactNode, type SVGProps } from "react"
+import { CollapsibleRow } from "@/app/lib/Collapsible"
 import { ExpandableCard, MaterialSymbolsExpandMoreRounded } from "@/app/lib/Collapsible.client"
 import { cn } from "lazy-cn"
 import { getSitemapAction, type GetSitemapActionResponse } from "./Sitemap.action"
-import type { GetSitemapResponse } from "@/app/lib/get-sitemap"
-import { FormButton, MaterialSymbolsOpenInNew } from "../inputs/InputForm"
-import { ExternalIcon } from "../MetadataRow"
+import { MaterialSymbolsOpenInNew } from "../inputs/InputForm"
 import { useAppNavigation } from "@/app/lib/searchParams"
 
 export function SitemapCategoryCollapsible(
