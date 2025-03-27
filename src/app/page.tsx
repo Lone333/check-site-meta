@@ -36,7 +36,7 @@ export default async function Home(context: SearchParamsContext) {
   const query = await context.searchParams;
   const hideHome = !!query.url
   // const searchId = Math.random()
-  const searchId = query.url+''
+  const searchId = query.url + ''
 
   const SummarySection = async () =>
     !!query.url && getPageData(query.url)
@@ -55,39 +55,41 @@ export default async function Home(context: SearchParamsContext) {
 
   return (
     <>
-      <main className={cn(
-        "container-sm lg:container-2xl font-medium font-sans",
-        "px-8 lg:px-12 xl:px-24 pb-40",
-        "lg:grid lg:grid-cols-2 gap-x-8"
-      )}>
+      <div className="min-h-screen">
+        <main className={cn(
+          "container-sm lg:container-2xl font-medium font-sans",
+          "px-8 lg:px-12 xl:px-24 pb-40",
+          "lg:grid lg:grid-cols-2 gap-x-8",
+        )}>
 
-        <div className="flex flex-col min-h-80 py-12">
-          <Header hidden={hideHome} />
-          <InputForm
-            query={query}
-            settings={await getUserSettings()} />
-          <RecentSuggestions hidden={hideHome} />
-          <div className="flex flex-col gap-8 pt-8">
-            <Suspense key={searchId + 'sum'} fallback={<Loading />}>
-              <SummarySection />
-            </Suspense>
+          <div className="flex flex-col min-h-80 py-12">
+            <Header hidden={hideHome} />
+            <InputForm
+              query={query}
+              settings={await getUserSettings()} />
+            <RecentSuggestions hidden={hideHome} />
+            <div className="flex flex-col gap-8 pt-8">
+              <Suspense key={searchId + 'sum'} fallback={<Loading />}>
+                <SummarySection />
+              </Suspense>
+            </div>
           </div>
-        </div>
 
-        <div className="flex flex-col items-center gap-8 pt-15 pb-12">
+          <div className="flex flex-col items-center gap-8 pt-15 pb-12">
           <Changelog hidden={hideHome} />
           <Suspense key={searchId + 'lp'}>
             <LinkPreviewSection />
           </Suspense>
         </div>
 
-        <div className="col-span-2 flex flex-col">
-          <Suspense key={searchId}>
-            <AdvancedSection />
-          </Suspense>
-        </div>
+          <div className="col-span-2 flex flex-col">
+            <Suspense key={searchId}>
+              <AdvancedSection />
+            </Suspense>
+          </div>
 
-      </main>
+        </main>
+      </div>
       <Footer />
     </>
   );
@@ -129,7 +131,7 @@ function Header(props: {
 
 function Footer(props: ComponentProps<"footer">) {
   return (
-    <footer {...props} className={cn(" w-full col-span-2 pb-[100vh] pt-10 border-t border-border bg-background shadow-2xl", props.className)}>
+    <footer {...props} className={cn("w-full min-h-[50vh] col-span-2 pb-40 pt-10 border-t border-border bg-background shadow-2xl", props.className)}>
       <div className="container-md lg:container-2xl px-8 lg:px-12 xl:px-24 text-foreground-body flex flex-wrap gap-y-8">
         <div className="flex flex-col grow font-mono">
           <div className="text-[1rem] font-semibold tracking-tight leading-none ">
