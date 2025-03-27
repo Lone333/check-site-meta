@@ -35,7 +35,8 @@ export default async function Home(context: SearchParamsContext) {
 
   const query = await context.searchParams;
   const hideHome = !!query.url
-  const searchId = Math.random()
+  // const searchId = Math.random()
+  const searchId = query.url+''
 
   const SummarySection = async () =>
     !!query.url && getPageData(query.url)

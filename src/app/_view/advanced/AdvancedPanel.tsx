@@ -24,11 +24,6 @@ export function AdvancedPanel(props: {
         </div>
       </AdvancedPanelErrorCard>)
 
-  const Sitemap = async () =>
-    getSitemap(props.metadata.resolved.general.rawUrl.value)
-      .then(res => <SitemapDetails data={res} url={props.metadata.resolved.general.rawUrl.value} />)
-      .catch(err => <AdvancedPanelErrorCard err={err} />)
-
   return (
     <TabsWithContent
       className="self-start mb-8"
@@ -54,7 +49,7 @@ export function AdvancedPanel(props: {
           <MetaCard>
             <div key="sm" className="card-content fadeBlurIn-100">
               <Suspense fallback="Loading...">
-                <Sitemap />
+                <SitemapDetails url={props.metadata.resolved.general.rawUrl.value} />
               </Suspense>
             </div>
           </MetaCard>

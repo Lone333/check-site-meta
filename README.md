@@ -50,3 +50,11 @@ pnpx check-site-meta --no-analytics
 - **GitHub**: [alfonsusac/check-site-meta](https://github.com/alfonsusac/check-site-meta)
 
 For feedback or issues, please open an issue on GitHub or contact me on X ([alfonsusac](https://x.com/alfonsusac))
+
+<a href="https://www.star-history.com/#alfonsusac/check-site-meta&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=alfonsusac/check-site-meta&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=alfonsusac/check-site-meta&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=alfonsusac/check-site-meta&type=Date" />
+ </picture>
+</a>

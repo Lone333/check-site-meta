@@ -1,71 +1,49 @@
-import { appFetch } from "@/app/lib/fetch"
-import robotsParser from "robots-parser"
-import { MetadataRow, Separator } from "../MetadataRow"
+import { MetadataRow } from "../MetadataRow"
 import { getRobots } from "@/app/lib/get-robots"
-import { Suspense, type ComponentProps, type SVGProps } from "react"
+import { Suspense, type SVGProps } from "react"
 import { cn } from "lazy-cn"
-import ErrorCard, { ErrorCardMini, parseError, StackTrace } from "@/app/module/error/ErrorCard"
-import { ExpandableErrorStack } from "@/app/module/error/Error.client"
 import { TabsWithContent } from "@/app/module/tab/Tabs"
 import { tab } from "@/app/module/tab/tab-primitives"
 import type { ResoledMetadata } from "@/app/lib/get-metadata-field-data"
 import { CardHeader, CardHeaderSubtitle, CardHeaderTitle } from "../Card"
 import { RobotsClientDetails } from "./Robots.client"
 
-export async function Robots(
-  props: { url: string }
-) {
-  // delay 200ms
-  await new Promise(resolve => setTimeout(resolve, 500))
-  const res = await appFetch(new URL('/robots.txt', props.url).toString())
-  const text = await res.text()
-  const parsedRobot = robotsParser(props.url, text)
-  return (
-    <div>
-      <pre>{JSON.stringify(parsedRobot, null, 2)}</pre>
-    </div>
-  )
-}
 
+export async function RobotsSummary(props: {
+  metadata: ResoledMetadata
+}) {
+  return <>
+    <MetadataRow data={props.metadata.general.robots} />
+    <MetadataRow data={{ label: 'robots.txt', }}>
+      <div className="leading-none flex flex-col gap-2 mt-1">
+        <Suspense fallback="Loading...">
+          <RobotsSummaryData />
+        </Suspense>
+      </div>
+    </MetadataRow>
+  </>
 
-export async function RobotsSummary(
-  props: { metadata: ResoledMetadata }
-) {
-  return (
-    <>
-      <MetadataRow data={props.metadata.general.robots} />
-      <MetadataRow data={{ label: 'robots.txt', }}>
-        <div className="leading-none flex flex-col gap-2 mt-1">
-          <Suspense fallback="Loading...">
-            {(async () => getRobots(props.metadata.general.rawUrl.value)
-              .then(({ parsed }) => {
-                return (
-                  <>
-                    <div className="font-medium flex items-center gap-1">
-                      {parsed ? <>
-                        <MaterialSymbolsCheckCircle />
-                        Present
-                      </> : <>
-                        <MaterialSymbolsCircleOutline />
-                        Not Found
-                      </>
-                      }
-                    </div>
-                    {parsed && (
-                      <>
-                        <div>{Object.keys(parsed).length} rules found</div>
-                        <div>{Object.keys(parsed).length} sitemaps found</div>
-                      </>
-                    )}
-                  </>
-                )
-              })
-              .catch(err => <div>Failed to retrieve robots.txt</div>))()}
-          </Suspense>
-        </div>
-      </MetadataRow>
-    </>
-  )
+  async function RobotsSummaryData() {
+    try {
+      const { parsed, sitemaps } = await getRobots(props.metadata.general.rawUrl.value)
+      return (
+        <>
+          <div className="font-medium flex items-center gap-1">
+            {parsed
+              ? <><MaterialSymbolsCheckCircle /> Present</>
+              : <><MaterialSymbolsCircleOutline /> Not Found</>
+            }
+          </div>
+          {parsed && <>
+            <div>{Object.keys(parsed).length} rules found</div>
+            <div>{Object.keys(sitemaps).length} sitemaps found</div>
+          </>}
+        </>
+      )
+    } catch (error) {
+      return <div>Failed to retrieve robots.txt</div>
+    }
+  }
 }
 
 
@@ -79,7 +57,6 @@ export function MaterialSymbolsCircleOutline(props: SVGProps<SVGSVGElement>) {
 
 
 export async function RobotsDetails({ data }: { data: Awaited<ReturnType<typeof getRobots>> }) {
-
   const { parsed, raw } = data
   return (
     <div className={cn("flex flex-col")}>
@@ -111,12 +88,9 @@ export async function RobotsDetails({ data }: { data: Awaited<ReturnType<typeof 
       />
     </div>
   )
-
 }
 
 
 export function MaterialSymbolsInfoRounded(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}>{/* Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE */}<path fill="currentColor" d="M12 17q.425 0 .713-.288T13 16v-4q0-.425-.288-.712T12 11t-.712.288T11 12v4q0 .425.288.713T12 17m0-8q.425 0 .713-.288T13 8t-.288-.712T12 7t-.712.288T11 8t.288.713T12 9m0 13q-2.075 0-3.9-.788t-3.175-2.137T2.788 15.9T2 12t.788-3.9t2.137-3.175T8.1 2.788T12 2t3.9.788t3.175 2.137T21.213 8.1T22 12t-.788 3.9t-2.137 3.175t-3.175 2.138T12 22"></path></svg>
-  )
+  return (<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}>{/* Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE */}<path fill="currentColor" d="M12 17q.425 0 .713-.288T13 16v-4q0-.425-.288-.712T12 11t-.712.288T11 12v4q0 .425.288.713T12 17m0-8q.425 0 .713-.288T13 8t-.288-.712T12 7t-.712.288T11 8t.288.713T12 9m0 13q-2.075 0-3.9-.788t-3.175-2.137T2.788 15.9T2 12t.788-3.9t2.137-3.175T8.1 2.788T12 2t3.9.788t3.175 2.137T21.213 8.1T22 12t-.788 3.9t-2.137 3.175t-3.175 2.138T12 22"></path></svg>)
 }

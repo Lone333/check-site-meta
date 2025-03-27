@@ -10,7 +10,7 @@ import { cn } from "lazy-cn";
 import { getImageSizeFromResponse } from "../lib/image-size";
 import type { SiteMetadata } from "../page";
 import { OpengraphMetadata } from "./categories/OpenGraph";
-import { Robots, RobotsSummary } from "./advanced/Robots";
+import { RobotsSummary } from "./advanced/Robots";
 import { SitemapSummary } from "./advanced/Sitemap";
 
 export async function MetaInfoPanel(props: {
@@ -74,7 +74,7 @@ export async function MetaInfoPanel(props: {
 }
 
 export function MetaCard({ className, ...props }: ComponentProps<"section">) {
-  return (<section className={cn("card fadeIn-0 overflow-hidden", className)} {...props} />)
+  return (<section className={cn("card fadeIn-0 overflow-clip", className)} {...props} />)
 }
 function MetaCardContent({ className, ...props }: ComponentProps<"div">) {
   return (<div className={cn("card-content meta-info-grid fadeBlurIn-100", className)} {...props} />)
