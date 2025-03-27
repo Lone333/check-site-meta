@@ -64,7 +64,6 @@ export function SitemapFileCard(props: {
       priority: key === "priority" ? (sorts.priority === "asc" ? "desc" : sorts.priority === "desc" ? null : "asc") : null,
     })
   }
-
   const processedUrls = sitemapData?.validated.res.urls
     ?.filter(a => search ? (
       a.loc.includes(search)
@@ -83,8 +82,7 @@ export function SitemapFileCard(props: {
       if (sorts.priority === "desc") return (b.priority ?? 0) - (a.priority ?? 0)
       return 0
     })
-  const processedUrlsTotal = processedUrls?.length
-
+  // const processedUrlsTotal = processedUrls?.length
 
   const processedSitemaps = sitemapData?.validated.res.sitemaps
     ?.filter(a => search ? (a.loc.includes(search) || a.lastmod?.includes(search)) : true)
@@ -95,10 +93,27 @@ export function SitemapFileCard(props: {
       if (sorts.lastmod === "desc") return b.lastmod?.localeCompare(a.lastmod ?? b.lastmod) ?? 0
       return 0
     })
-  const processedSitemapsTotal = processedSitemaps?.length
+  // const processedSitemapsTotal = processedSitemaps?.length
 
+  const entries = processedUrls ?? processedSitemaps ?? []
+  const entriesCount = entries.length
+
+  // Limits and Paginations
   const LIMIT = 20
+  const [page, setPage] = useState(1)
+  const hasNextPage = page * LIMIT < entries.length;
+  const hasPrevPage = page > 1;
+  const nextPage = () => {
+    if (hasNextPage) setPage((prev) => prev + 1);
+  };
+  const prevPage = () => {
+    if (hasPrevPage) setPage((prev) => prev - 1);
+  };
+  const paginatedSitemaps = processedSitemaps?.slice((page - 1) * LIMIT, page * LIMIT) ?? []
+  const paginatedURLs = processedUrls?.slice((page - 1) * LIMIT, page * LIMIT) ?? []
+  // const paginatedEntries = entries.slice((page - 1) * LIMIT, page * LIMIT)
 
+  // Messages
   const messages = sitemapData?.validated.messages ?? []
   const errors = sitemapData?.validated.messages.filter(a => a[0] === "error") ?? []
   const warns = sitemapData?.validated.messages.filter(a => a[0] === "warn") ?? []
@@ -187,21 +202,29 @@ export function SitemapFileCard(props: {
 
         <CollapsibleRow data-opened={!!sitemapData} className="opacity-0 opened:opacity-100">
           <div className="flex gap-1 p-2 ">
-            <button
+            <CardDetailButton
               disabled={isPending}
               onClick={() => {
-                startTransition(async function () {
+                startTransition(async () => {
                   const res = await getSitemapAction(props.fullUrl)
                   startTransition(() => {
                     if (res.data) setSitemapData(res.data)
                     if (res.error) console.error(res.error)
                   })
                 })
-              }}
-              className={cn("grow text-nowrap text-xs bg-background-card-button hover:bg-background-card-button-hover p-2 px-4 flex items-center gap-1 rounded-lg text-foreground-muted")}>
+              }}>
               <MaterialSymbolsSearchRounded className="size-4" />
               {isPending ? "Refreshing..." : "Refresh"}
-            </button>
+            </CardDetailButton>
+            <CardDetailButton onClick={() => prevPage()} className="px-3">
+              ◀
+            </CardDetailButton>
+            <CardDetailButton className="pointer-events-none bg-transparent px-3">
+              {page} / {Math.ceil(entriesCount / LIMIT)}
+            </CardDetailButton>
+            <CardDetailButton onClick={() => nextPage()} className="px-3">
+              ▶
+            </CardDetailButton>
             <div className={cn("w-full transition-all duration-500",)}>
               <input
                 value={search}
@@ -223,8 +246,8 @@ export function SitemapFileCard(props: {
               <div className="text-foreground-muted-2 px-1 rounded-full ">
                 {sitemapData?.validated.res.sitemaps?.length} Sitemaps
               </div>
-              {(processedSitemapsTotal ?? 0) > LIMIT && (
-                <div className=" px-1 text-foreground-muted-2">Only {LIMIT} entries is shown out of {processedSitemapsTotal}</div>
+              {(entriesCount ?? 0) > LIMIT && (
+                <div className=" px-1 text-foreground-muted-2">Only {LIMIT} entries is shown out of {entriesCount}</div>
               )}
             </>
               : <>
@@ -234,8 +257,8 @@ export function SitemapFileCard(props: {
                 <div className="text-foreground-muted px-1 rounded-full ">
                   {sitemapData?.validated.res.urls?.length} URLs
                 </div>
-                {(processedUrlsTotal ?? 0) > LIMIT && (
-                  <div className=" px-1 text-foreground-muted-2">Only {LIMIT} entries is shown out of {processedUrlsTotal}</div>
+                {(entriesCount ?? 0) > LIMIT && (
+                  <div className=" px-1 text-foreground-muted-2">Only {LIMIT} entries is shown out of {entriesCount}</div>
                 )}
               </>
             }
@@ -256,22 +279,19 @@ export function SitemapFileCard(props: {
             )}
           </div>
 
-          <div className="px-3 flex flex-col gap-1 pt-1 bg-background-tooltip text-foreground-muted-2 py-2">
-            {messages.map((message, i) => {
-              return (
-                <div key={i} className={cn(
-                  "rounded-md ",
-                )}>
-                  {message[0]}: {message[1]}
-                </div>
-              )
-            })}
-          </div>
+          {/* Error Messages Goes Here */}
+          {messages.length > 0 && (
+            <div className="px-3 flex flex-col gap-1 pt-1 bg-background-tooltip text-foreground-muted-2 py-2">
+              {messages.map((message, i) => {
+                return <div key={i} className={cn("rounded-md ")}>{message[0]}: {message[1]}</div>
+              })}
+            </div>
+          )}
+
 
           {processedSitemaps !== undefined && (
             <div className="p-2 flex flex-col gap-1">
-              {processedSitemaps
-                .slice(0, LIMIT)
+              {paginatedSitemaps
                 .map((sitemaps, i) => {
                   return (
                     <SitemapFileCard key={i}
@@ -289,14 +309,14 @@ export function SitemapFileCard(props: {
 
           {processedUrls !== undefined && (
             <div className="overflow-x-auto relative">
-              <div className="px-4 pt-2 pb-1 *:grid *:grid-cols-[2rem_4fr_10rem_1fr_1fr] *:gap-x-2 items-end *:*:min-w-0 *:*:overflow-ellipsis *:*:text-nowrap *:*:overflow-hidden top-0 min-w-200">
+              <div className="px-4 pt-2 pb-1 *:grid *:grid-cols-[2rem_4fr_9rem_0.5fr_0.5fr] *:gap-x-2 items-end *:*:min-w-0 *:*:overflow-ellipsis *:*:text-nowrap *:*:overflow-hidden top-0 min-w-200">
                 <div className="bg-background-tooltip text-foreground-muted rounded-t-xl -mx-2 px-2 *:pt-2 *:pb-1.5 sticky">
                   <div className=""></div>
                   <button onClick={() => toggleSort('url')} className="flex gap-2 items-center rounded-none text-xs font-semibold text-start">
                     URL
                     <SortIconTableHeader status={sorts.url} />
                   </button>
-                  <button onClick={() => toggleSort('lastmod')} className="flex gap-2 items-center rounded-none text-xs font-semibold text-start">
+                  <button onClick={() => toggleSort('lastmod')} className="flex gap-2 items-center rounded-none text-xs font-semibold place-self-center">
                     Last Modified
                     <SortIconTableHeader status={sorts.lastmod} />
                   </button>
@@ -309,8 +329,7 @@ export function SitemapFileCard(props: {
                     <SortIconTableHeader status={sorts.priority} />
                   </button>
                 </div>
-                {processedUrls
-                  .slice(0, LIMIT)
+                {paginatedURLs
                   .map((url, i) => {
                     return (
                       <div key={i} className="hover:bg-background-card-input -mx-2 px-2 py-1">
@@ -329,7 +348,7 @@ export function SitemapFileCard(props: {
                         <div className="">
                           {url.loc.split(props.fullUrl.split('://')[1])[1] || url.loc}
                         </div>
-                        <div className="grid grid-cols-[6rem_4rem] overflow-hidden">
+                        <div className="grid grid-cols-[5rem_4rem] overflow-hidden">
                           <div className="overflow-hidden">
                             {!!url.lastmod && new Intl.DateTimeFormat('en-US', {
                               dateStyle: 'medium',
@@ -370,6 +389,23 @@ function SortIconTableHeader(props: {
     {props.status === "desc" && <MdiSortVariant />}
   </>
 }
+
+
+function CardDetailButton(props: ComponentProps<"button">) {
+  return (
+    <button
+      {...props}
+      className={cn(
+        "text-nowrap text-xs text-foreground-muted bg-background-card-button hover:bg-background-card-button-hover p-2 px-4 flex items-center gap-1 rounded-lg", props.className
+      )}
+    />
+  )
+}
+
+
+
+
+
 
 
 
