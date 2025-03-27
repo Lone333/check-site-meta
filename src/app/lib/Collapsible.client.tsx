@@ -41,7 +41,7 @@ export function ExpandableCard({ expanded, toggleExpanse, Label, Content, header
 }) {
   return (
     <div {...props} className={cn("border border-border rounded-md overflow-clip", props.className)}>
-      <div {...headerProps} className={cn("bg-background flex", headerProps?.className)} >
+      <div {...headerProps} className={cn("bg-background-card-box flex", headerProps?.className)} >
         <button className="flex items-start gap-2 p-2 pl-3 grow leading-none"
           onClick={() => toggleExpanse?.()}
         >

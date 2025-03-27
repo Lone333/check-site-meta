@@ -34,13 +34,11 @@ export function InputForm(props: {
   return <Form
     id="lookup_url"
     onSubmit={() => logCheckButton()}
-    // scroll={true}
     onKeyDown={(event) => {
       if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) event.currentTarget.requestSubmit()
     }}
     action="/"
     autoComplete="off"
-    // className="h-(--h)"
     style={{
       '--h': 'calc(var(--spacing) * 11)',
     }}
@@ -103,7 +101,10 @@ export function InputForm(props: {
 
 
 export function FormButton(props: ComponentProps<"button">) {
-  return <button {...props} className={cn`button p-2 rounded-full text-foreground-muted hover:bg-background-muted-2 ${ props.className }`} />
+  return <button {...props} className={cn(
+    `button p-2 rounded-full text-foreground-muted hover:bg-foreground-muted/8`,
+    props.className
+  )} />
 }
 
 

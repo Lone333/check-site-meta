@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { cn } from "lazy-cn";
 import "./globals.css";
+import { ThemeSwitcherDev } from "./theme-switch";
 
 
 // Metadata -----------------------------
@@ -41,6 +42,7 @@ export default function RootLayout(props: {
         mono.variable,
         `subpixel-antialiased bg-background`
       )}>
+        <ThemeSwitcherDev />
         {props.children}
       </body>
     </html>

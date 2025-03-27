@@ -160,7 +160,7 @@ export function SitemapFileCard(props: {
             </div>
           </div>
           {props.lastModified && (
-            <div className="text-[0.7rem] text-foreground-muted-2 font-normal">
+            <div className="text-xxs text-foreground-muted-2 font-normal">
               Last updated: {new Intl.DateTimeFormat('en-US', {
                 dateStyle: 'medium',
                 timeStyle: 'short',
@@ -208,25 +208,25 @@ export function SitemapFileCard(props: {
           </div>
           <div className="flex gap-2 px-2">
             {sitemapData?.validated.isIndex ? <>
-              <div className="text-purple-500 px-1 py-0.5 rounded-full text-[0.7rem]">
+              <div className="text-purple-500 px-1 py-0.5 rounded-full text-xxs">
                 Sitemap Index
               </div>
-              <div className="text-foreground-muted-2 px-1 py-0.5 rounded-full text-[0.7rem]">
+              <div className="text-foreground-muted-2 px-1 py-0.5 rounded-full text-xxs">
                 {sitemapData?.validated.res.sitemaps?.length} Sitemaps
               </div>
               {(processedSitemapsTotal ?? 0) > LIMIT && (
-                <div className="text-[0.7rem] px-1 py-0.5 text-foreground-muted-2">Only {LIMIT} entries is shown out of {processedSitemapsTotal}</div>
+                <div className="text-xxs px-1 py-0.5 text-foreground-muted-2">Only {LIMIT} entries is shown out of {processedSitemapsTotal}</div>
               )}
             </>
               : <>
-                <div className="text-orange-500 px-1 py-0.5 rounded-full text-[0.7rem]">
+                <div className="text-orange-500 px-1 py-0.5 rounded-full text-xxs">
                   Sitemap
                 </div>
-                <div className="text-foreground-muted-2 px-1 py-0.5 rounded-full text-[0.7rem]">
+                <div className="text-foreground-muted-2 px-1 py-0.5 rounded-full text-xxs">
                   {sitemapData?.validated.res.urls?.length} URLs
                 </div>
                 {(processedUrlsTotal ?? 0) > LIMIT && (
-                  <div className="text-[0.7rem] px-1 py-0.5 text-foreground-muted-2">Only {LIMIT} entries is shown out of {processedUrlsTotal}</div>
+                  <div className="text-xxs px-1 py-0.5 text-foreground-muted-2">Only {LIMIT} entries is shown out of {processedUrlsTotal}</div>
                 )}
               </>
             }

@@ -62,7 +62,7 @@ export function RobotsClientDetails(props: {
                   <span className="text-foreground-muted-2">({rule.rule.length} rules)</span>
                 </div>
                 {!!rule.crawlDelay && (
-                  <div className="py-0.5 flex gap-2 items-center text-[0.7rem] text-foreground-muted-3">
+                  <div className="py-0.5 flex gap-2 items-center text-xxs text-foreground-muted-3">
                     <div className={cn("uppercase")}>
                       <MaterialSymbolsAlarm />
                     </div> {rule.crawlDelay} seconds

@@ -11,7 +11,6 @@ body {
 /* Tokens ----------------------------- */
 
 @theme inline {
-
   /* Foregrounds */
 
   --color-foreground: light-dark(
@@ -50,10 +49,19 @@ body {
     var(--color-gray-100),
     --alpha(var(--color-neutral-700) / 0.5)
   );
+  
+  
   --color-background-card: light-dark(#fff, #232424);
+  
+  --color-background-card-box: light-dark(#F4F6F9, #1c1d1d);
 
-  --color-background-card-input: light-dark(var(--color-gray-50),#292A2A);
+  --color-background-tooltip: light-dark(
+    --alpha(var(--color-background-muted) / 0.5),
+    --alpha(var(--color-foreground-muted-2) / 0.1)
+  );
 
+
+  --color-background-card-input: light-dark(var(--color-gray-50), #292a2a);
 
   --color-border: light-dark(#e6eaf2, #2f3030);
   --color-focus: light-dark(var(--color-slate-200), var(--color-neutral-800));
@@ -63,10 +71,7 @@ body {
   );
 
   /* Component Colors */
-  --color-background-tooltip: light-dark(
-    --alpha(var(--color-background-muted) / 0.5),
-    --alpha(var(--color-foreground-muted-2) / 0.1)
-  );
+
 
   /* Accent Colors */
   --color-warning: light-dark(
@@ -89,6 +94,7 @@ body {
 
   --text-sm: 0.8rem;
   --text-xs: 0.75rem;
+  --text-xxs: 0.7rem;
   --text-base: 0.85rem;
 }
 
@@ -229,17 +235,17 @@ body {
 /* Badges */
 
 @utility badge-gray {
-  @apply text-nowrap bg-foreground-muted-2/10 border border-foreground-muted-2/20 text-foreground-muted 
+  @apply text-nowrap bg-foreground-muted-2/10 border border-foreground-muted-2/20 text-foreground-muted;
 }
 @utility badge-blue {
-  @apply text-nowrap bg-blue-500/10 border border-blue-500/20 text-blue-500
+  @apply text-nowrap bg-blue-500/10 border border-blue-500/20 text-blue-500;
 }
 
 @utility badge-orange {
-  @apply text-nowrap bg-orange-500/10 border border-orange-500/20 text-orange-500
+  @apply text-nowrap bg-orange-500/10 border border-orange-500/20 text-orange-500;
 }
 @utility badge-purple {
-  @apply text-nowrap bg-purple-500/10 border border-purple-500/20 text-purple-500
+  @apply text-nowrap bg-purple-500/10 border border-purple-500/20 text-purple-500;
 }
 
 /* Tabs */
@@ -248,9 +254,7 @@ body {
   @apply flex w-full sm:w-auto 
   flex-wrap p-1.5 rounded-xl text-sm select-none isolate
   bg-background-muted;
-  /* background: light-dark(var(--color-background-muted), var(--color-background-muted)); */
 }
-
 @custom-variant tab-item (& .tab-item);
 @utility tab-item {
   @apply px-5 p-2
@@ -258,8 +262,6 @@ body {
   font-medium
   text-nowrap 
   cursor-pointer group-data-active:cursor-auto
-
-  /* outline outline-red-500 */
 
   hover:text-foreground;
 
@@ -274,8 +276,6 @@ body {
   pointer-events-none -z-10 
   rounded-lg shadow-xs
   bg-background-card;
-
-  /* background: light-dark(var(--color-background-card), var(--color-background-card)) */
 }
 
 /* Card */
