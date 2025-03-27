@@ -99,6 +99,11 @@ export function SitemapFileCard(props: {
 
   const LIMIT = 20
 
+  const messages = sitemapData?.validated.messages ?? []
+  const errors = sitemapData?.validated.messages.filter(a => a[0] === "error") ?? []
+  const warns = sitemapData?.validated.messages.filter(a => a[0] === "warn") ?? []
+  const infos = sitemapData?.validated.messages.filter(a => a[0] === "info") ?? []
+
 
   return <ExpandableCard
     toggleExpanse={() => {
@@ -209,30 +214,58 @@ export function SitemapFileCard(props: {
               />
             </div>
           </div>
-          <div className="flex gap-2 px-2">
+
+          <div className="flex gap-2 px-2 text-xxs py-0.5">
             {sitemapData?.validated.isIndex ? <>
-              <div className="text-purple-500 px-1 py-0.5 rounded-full text-xxs">
+              <div className="text-purple-500 px-1 rounded-full ">
                 Sitemap Index
               </div>
-              <div className="text-foreground-muted-2 px-1 py-0.5 rounded-full text-xxs">
+              <div className="text-foreground-muted-2 px-1 rounded-full ">
                 {sitemapData?.validated.res.sitemaps?.length} Sitemaps
               </div>
               {(processedSitemapsTotal ?? 0) > LIMIT && (
-                <div className="text-xxs px-1 py-0.5 text-foreground-muted-2">Only {LIMIT} entries is shown out of {processedSitemapsTotal}</div>
+                <div className=" px-1 text-foreground-muted-2">Only {LIMIT} entries is shown out of {processedSitemapsTotal}</div>
               )}
             </>
               : <>
-                <div className="text-orange-500 px-1 py-0.5 rounded-full text-xxs">
+                <div className="text-orange-500 px-1 rounded-full ">
                   Sitemap
                 </div>
-                <div className="text-foreground-muted px-1 py-0.5 rounded-full text-xxs">
+                <div className="text-foreground-muted px-1 rounded-full ">
                   {sitemapData?.validated.res.urls?.length} URLs
                 </div>
                 {(processedUrlsTotal ?? 0) > LIMIT && (
-                  <div className="text-xxs px-1 py-0.5 text-foreground-muted-2">Only {LIMIT} entries is shown out of {processedUrlsTotal}</div>
+                  <div className=" px-1 text-foreground-muted-2">Only {LIMIT} entries is shown out of {processedUrlsTotal}</div>
                 )}
               </>
             }
+            {errors.length > 0 && (
+              <div className="text-red-500 px-1 rounded-full ">
+                {errors.length} Errors
+              </div>
+            )}
+            {warns.length > 0 && (
+              <div className="text-amber-500 px-1 rounded-full ">
+                {warns.length} Warnings
+              </div>
+            )}
+            {infos.length > 0 && (
+              <div className="text-slate-500 px-1 rounded-full ">
+                {warns.length} Infos
+              </div>
+            )}
+          </div>
+
+          <div className="px-3 flex flex-col gap-1 pt-1 bg-background-tooltip text-foreground-muted-2 py-2">
+            {messages.map((message, i) => {
+              return (
+                <div key={i} className={cn(
+                  "rounded-md ",
+                )}>
+                  {message[0]}: {message[1]}
+                </div>
+              )
+            })}
           </div>
 
           {processedSitemaps !== undefined && (
