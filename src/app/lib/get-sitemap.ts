@@ -59,11 +59,6 @@ export function validateSitemap(input: object) {
 
 
   // Check for XML declaration
-
-
-
-
-
   if ('?xml' in input === false) {
     messages.push(["warn", "XML declaration not found.", "root.xml"])
   } else {
@@ -90,204 +85,140 @@ export function validateSitemap(input: object) {
     if (!isPropInObject('sitemapindex', input)) {
       messages.push(["error", "Sitemap root element is missing. Sitemap requires one <urlset> or <sitemapindex> tag.", "root"])
       return { messages, res, isIndex }
-    } else {
-      isIndex = true
-      res.sitemaps = []
-      const sitemapindex = input.sitemapindex
-      if (!isPropInObject('sitemap', sitemapindex)) {
-        messages.push(["error", "Sitemap Index is missing <sitemap> entries. Sitemap Index <sitemapindex> requires at least one <sitemap> tag.", "root.sitemapindex.sitemap"])
-      } else {
-        let sitemaps = []
-        if (!Array.isArray(sitemapindex.sitemap)) {
-          if (typeof sitemapindex.sitemap !== 'object') {
-            messages.push(['error', 'Sitemap Index sitemap entries are invalid. Sitemap Index <sitemapindex> requires at least one <sitemap> tag.', 'root.sitemapindex.sitemap'])
-          } else {
-            sitemaps = [sitemapindex.sitemap]
-          }
-        } else {
-          sitemaps = sitemapindex.sitemap
-        }
-        if (!Array.isArray(sitemaps)) {
-          messages.push(["error", "Sitemap Index sitemap entries are invalid. Sitemap Index requires sitemap entries to be an array.", "root.sitemapindex.sitemap"])
-        }
-        if (sitemaps.length === 0) {
-          messages.push(["error", "Sitemap Index sitemap entries are empty. Sitemap Index requires at least one sitemap entry.", "root.sitemapindex.sitemap"])
-        } else {
-          for (let i = 0; i < sitemaps.length; i++) {
-            const sitemap = sitemaps[i]
-            if (!isPropInObject('loc', sitemap)) {
-              messages.push(["error", `Sitemap Index sitemap entry #${ i + 1 } is missing loc attribute. Sitemap Index requires loc attribute to be set to the URL of the sitemap.`, `root.sitemapindex.sitemap[${ i }].loc`])
-            } else {
-              const loc = sitemap['loc']
-              if (Array.isArray(loc)) {
-                messages.push(["error", `Sitemap Index sitemap entry loc attribute #${ i + 1 } is invalid. There can only be one loc per sitemap`, `root.sitemapindex.sitemap[${ i }].loc`])
-              } else {
-                if (typeof loc !== 'string') {
-                  messages.push(["error", `Sitemap Index sitemap entry loc attribute #${ i + 1 } is invalid. Sitemap Index requires loc attribute to be a string.`, `root.sitemapindex.sitemap[${ i }].loc`])
-                } else {
-                  res.sitemaps[i] = { loc }
-                  if (loc.length === 0) {
-                    messages.push(["error", `Sitemap Index sitemap entry loc attribute #${ i + 1 } is empty. Sitemap Index requires loc attribute to be set to the URL of the sitemap.`, `root.sitemapindex.sitemap[${ i }].loc`])
-                  }
-                  if (loc.length === 12) {
-                    messages.push(["error", `Sitemap Index sitemap entry loc attribute #${ i + 1 } is empty. Sitemap Index requires loc attribute to be set to the URL of the sitemap.`, `root.sitemapindex.sitemap[${ i }].loc`])
-                  }
-                  if (loc.length > 2048) {
-                    messages.push(["warn", `Sitemap Index sitemap entry loc attribute #${ i + 1 } is too long. Sitemap Index requires loc attribute to be less than 2048 characters.`, `root.sitemapindex.sitemap[${ i }].loc`])
-                  }
-                  if (!['https', 'http', 'ftp'].includes(loc.split('://')[0])) {
-                    messages.push(["warn", `Sitemap Index sitemap entry loc attribute #${ i + 1 } is invalid. Sitemap Index requires loc attribute to start with 'http://', 'https://', or 'ftp://'`, `root.sitemapindex.sitemap[${ i }].loc`])
-                  }
-                  // check if string has non-ASCII characters
-                  if (/[^\x00-\x7F]/.test(loc)) {
-                    messages.push(["warn", `Sitemap Index sitemap entry loc attribute #${ i + 1 } is invalid. The loc attribute must only contain ASCII characters. Non-ASCII characters are not allowed in sitemap URLs.`, `root.sitemapindex.sitemap[${ i }].loc`])
-                  }
-                }
-              }
-            }
+    }
 
-            // Lastmod Property
-            if (isPropInObject('lastmod', sitemap)) {
-              const lastmod = sitemap['lastmod']
-              if (Array.isArray(lastmod)) {
-                messages.push(["error", `Sitemap Index sitemap entry lastmod attribute #${ i + 1 } is invalid. There can only be one lastmod per sitemap`, `root.sitemapindex.sitemap[${ i }].lastmod`])
-              } else {
-                if (typeof lastmod !== 'string') {
-                  messages.push(["error", `Sitemap Index sitemap entry lastmod attribute #${ i + 1 } is invalid. Sitemap Index requires lastmod attribute to be a string.`, `root.sitemapindex.sitemap[${ i }].lastmod`])
-                } else {
-                  res.sitemaps[i].lastmod = lastmod
-                  if (lastmod.length === 0) {
-                    messages.push(["error", `Sitemap Index sitemap entry lastmod attribute #${ i + 1 } is empty. Sitemap Index requires lastmod attribute to be set to the date of last modification of the sitemap.`, `root.sitemapindex.sitemap[${ i }].lastmod`])
-                  }
-                  if (lastmod.length < 10) {
-                    messages.push(["warn", `Sitemap Index sitemap entry lastmod attribute #${ i + 1 } is too long. Sitemap Index requires lastmod attribute to be in atleast YYYY-MM-DD format.`, `root.sitemapindex.sitemap[${ i }].lastmod`])
-                  }
-                  // ensure in YYYY-MM-DD format
-                  if (!/^\d{4}-\d{2}-\d{2}([Tt]\d{2}:\d{2}:\d{2}([+-]\d{2}:\d{2})?)?$/.test(lastmod) || isNaN(new Date(lastmod).getTime())) {
-                    messages.push(["warn", `Sitemap Index sitemap entry lastmod attribute #${ i + 1 } is invalid. Sitemap Index requires lastmod attribute to be in YYYY-MM-DD or YYYY-MM-DDThh:mm:ss±hh:mm format.`, `root.sitemapindex.sitemap[${ i }].lastmod`])
-                  }
-                }
-              }
-            }
-          }
+    const { cause, value: sitemapindex } = validateRootTags(input.sitemapindex, 'sitemapindex')
+    if (cause === 'not_object') messages.push(["error", "Received invalid sitemapindex in parsed XML object. Contact developer if this occurs.", "root.sitemapindex"])
+    if (cause === 'missing_xmlns') messages.push(["error", "<sitemapindex> is missing xmlns attribute. Sitemap requires xmlns attribute to be set to 'http://www.sitemaps.org/schemas/sitemap/0.9' ", "root.sitemapindex.xmlns"])
+    if (cause === 'missing_entries') messages.push(["error", "<sitemapindex> is missing URL entries. Sitemap requires at least one <url> tag.", "root.sitemapindex.url"])
+    if (cause === 'entries_not_object') messages.push(["error", "<sitemapindex> is missing URL entries. Sitemap requires at least one <url> tag. (invalid type)", "root.sitemapindex.url"])
+    if (cause === 'entries_empty') messages.push(["error", "<sitemapindex> URL entries are empty. At least one URL entry is required.", "root.sitemapindex.url"])
+    if (!sitemapindex) return { messages, res, isIndex }
+
+    if (sitemapindex.___xmlns !== 'http://www.sitemaps.org/schemas/sitemap/0.9') messages.push(["error", "xmlns attribute is invalid. Please set it to 'http://www.sitemaps.org/schemas/sitemap/0.9' ", "root.urlset.xmlns"])
+
+    isIndex = true
+    res.sitemaps = []
+
+    const sitemaps = sitemapindex.entries
+
+    for (let i = 0; i < sitemaps.length; i++) {
+
+      const { cause, value: sitemap } = validateUrlEntryOrSitemapEntry(sitemaps[i])
+      if (cause === 'not_object') messages.push(["error", `Sitemap entry #${ i + 1 } is invalid. Sitemap requires Sitemap entries to be an object.`, `root.Sitemapset.url[${ i }]`])
+      if (cause === 'missing_loc') messages.push(["error", `Sitemap entry #${ i + 1 } is missing loc attribute. Sitemap requires loc attribute to be set to the URL of the page.`, `root.urlset.url[${ i }]`])
+      if (!sitemap) continue
+
+      res.sitemaps.push({ loc: "" })
+      const currentResSitemap = res.sitemaps[res.sitemaps.length - 1]
+      const currentResSitemapIndex = res.sitemaps.length - 1
+
+      const ctx = `Sitemap entry #${ currentResSitemapIndex }`
+
+      // Lastmod Property
+      if (isPropInObject('loc', sitemap)) {
+        const { cause, value } = validateLoc(sitemap.loc)
+        const prefix = `${ ctx } loc attribute is invalid.`
+        if (cause === 'is_array') messages.push(['error', `${ prefix } There can only be one <loc> per sitemap entry`])
+        if (cause === 'not_string') messages.push(['error', `${ prefix } Sitemap loc must be a string. Received: "${ sitemap.loc }"`])
+        if (cause === 'too_short') messages.push(['error', `${ prefix } Sitemap loc must be at least 12 characters long. Received: "${ sitemap.loc }"`])
+        if (cause === 'too_long') messages.push(['error', `${ prefix } Sitemap loc must be less than 2048 characters long. Received: "${ sitemap.loc }"`])
+        if (cause === 'invalid_protocol') messages.push(['error', `${ prefix } Sitemap loc must start with 'http://', 'https://', or 'ftp://'. Received: "${ sitemap.loc }"`])
+        if (cause === 'non_ascii') messages.push(['error', `${ prefix } Sitemap loc must only contain ASCII characters. Received: "${ sitemap.loc }"`])
+        if (value) currentResSitemap.loc = value
+      }
+
+      // Lastmod Property
+      if (isPropInObject('lastmod', sitemap)) {
+        const { cause, value } = validateLastmod(sitemap.lastmod)
+        const prefix = `${ ctx } lastmod attribute is invalid.`
+        if (cause === 'is_array') messages.push(['error', `${ prefix } There can only be one <lastmod> per sitemap`])
+        if (cause === 'not_string') messages.push(['error', `${ prefix } Sitemap lastmod must be a string. Received: "${ sitemap.lastmod }"`])
+        if (cause === 'invalid_format') messages.push(['error', `${ prefix } Sitemap lastmod must be in W3C date format. Received: "${ sitemap.lastmod }"`])
+        if (cause === 'invalid_date') messages.push(['error', `${ prefix } Sitemap lastmod must be a valid, parseable date. Received: "${ sitemap.lastmod }"`])
+        if (!cause) {
+          currentResSitemap.lastmod = value
+          if (value.length === 4 || value.length === 7) messages.push(['warn', `${ prefix } Sitemap lastmod is too generic. Using a more precise date format (e.g., YYYY-MM-DD or a full timestamp) is recommended. Received: "${ sitemap.lastmod }"`])
         }
       }
     }
+
     return { messages, res, isIndex }
   }
 
-  res.urls = []
 
-  const urlset = input.urlset
-
-  function validateUrlset(input: unknown) {
-    if (!isObject(input)) return { value: undefined, cause: 'not_object' as const }
-    if (!isPropInObject('___xmlns', input)) return { value: undefined, cause: 'missing_xmlns' as const }
-    if (!isPropInObject('url', input)) return { value: undefined, cause: 'missing_url' as const }
-    return { value: input }
-  }
-
-  const { cause, value } = validateUrlset(urlset)
+  const { cause, value: urlset } = validateRootTags(input.urlset, 'urlset')
   if (cause === 'not_object') messages.push(["error", "Received invalid urlset in parsed XML object. Contact developer if this occurs.", "root.urlset"])
   if (cause === 'missing_xmlns') messages.push(["error", "<urlset> is missing xmlns attribute. Sitemap requires xmlns attribute to be set to 'http://www.sitemaps.org/schemas/sitemap/0.9' ", "root.urlset.xmlns"])
-  if (cause === 'missing_url') messages.push(["error", "<urlset> is missing URL entries. Sitemap requires at least one <url> tag.", "root.urlset.url"])
+  if (cause === 'missing_entries') messages.push(["error", "<urlset> is missing URL entries. Sitemap requires at least one <url> tag.", "root.urlset.url"])
+  if (cause === 'entries_not_object') messages.push(["error", "<urlset> is missing URL entries. Sitemap requires at least one <url> tag. (invalid type)", "root.urlset.url"])
+  if (cause === 'entries_empty') messages.push(["error", "<urlset> URL entries are empty. At least one URL entry is required.", "root.urlset.url"])
+  if (!urlset) return { messages, res, isIndex }
 
+  if (urlset.___xmlns !== 'http://www.sitemaps.org/schemas/sitemap/0.9') messages.push(["error", "xmlns attribute is invalid. Please set it to 'http://www.sitemaps.org/schemas/sitemap/0.9' ", "root.urlset.xmlns"])
 
-  if (!isPropInObject('___xmlns', urlset)) {
-    messages.push(["error", "<urlset> is missing xmlns attribute. Sitemap requires xmlns attribute to be set to 'http://www.sitemaps.org/schemas/sitemap/0.9' ", "root.urlset.xmlns"])
-  } else {
-    if (urlset.___xmlns !== 'http://www.sitemaps.org/schemas/sitemap/0.9')
-      messages.push(["error", "xmlns attribute is invalid. Please set it to 'http://www.sitemaps.org/schemas/sitemap/0.9' ", "root.urlset.xmlns"])
-  }
+  res.urls = []
 
+  const urls = urlset.entries
+  for (let i = 0; i < urls.length; i++) {
 
-  if (!isPropInObject('url', urlset)) {
-    messages.push(["error", "<urlset> is missing URL entries. Sitemap requires at least one <url> tag.", "root.urlset.url"])
-  } else {
-    let urls: unknown[] = []
-    if (!Array.isArray(urlset.url)) {
-      if (typeof urlset.url !== 'object') {
-        messages.push(['error', '<urlset> URL entries are invalid. Sitemap requires URL entries to be an array.', 'root.urlset.url'])
-      } else {
-        urls = [urlset.url]
-      }
-    } else {
-      urls = urlset.url
+    const { cause, value: url } = validateUrlEntryOrSitemapEntry(urls[i])
+    if (cause === 'not_object') messages.push(["error", `URL entry #${ i + 1 } is invalid. Sitemap requires URL entries to be an object.`, `root.urlset.url[${ i }]`])
+    if (cause === 'missing_loc') messages.push(["error", `URL entry #${ i + 1 } is missing loc attribute. Sitemap requires loc attribute to be set to the URL of the page.`, `root.urlset.url[${ i }]`])
+    if (!url) continue
+
+    res.urls.push({ loc: "" })
+    const currentResUrl = res.urls[res.urls.length - 1]
+    const currentResUrlIndex = res.urls.length - 1
+
+    const ctx = `URL entry #${ currentResUrlIndex }`
+
+    if (isPropInObject('loc', url)) {
+      const { cause, value } = validateLoc(url.loc)
+      const prefix = `${ ctx } loc attribute is invalid.`
+      if (cause === 'is_array') messages.push(['error', `${ prefix } There can only be one <loc> per url`])
+      if (cause === 'not_string') messages.push(['error', `${ prefix } Sitemap loc must be a string. Received: "${ url.loc }"`])
+      if (cause === 'too_short') messages.push(['error', `${ prefix } Sitemap loc must be at least 12 characters long. Received: "${ url.loc }"`])
+      if (cause === 'too_long') messages.push(['error', `${ prefix } Sitemap loc must be less than 2048 characters long. Received: "${ url.loc }"`])
+      if (cause === 'invalid_protocol') messages.push(['error', `${ prefix } Sitemap loc must start with 'http://', 'https://', or 'ftp://'. Received: "${ url.loc }"`])
+      if (cause === 'non_ascii') messages.push(['error', `${ prefix } Sitemap loc must only contain ASCII characters. Received: "${ url.loc }"`])
+      if (value) currentResUrl.loc = value
     }
 
-
-    if (urls.length === 0) {
-      messages.push(["error", "<urlset> URL entries are empty. At least one URL entry is required.", "root.urlset.url"])
-    } else {
-
-      for (let i = 0; i < urls.length; i++) {
-
-        const { cause, value } = validateUrl(urls[i])
-        if (cause === 'not_object') messages.push(["error", `URL entry #${ i + 1 } is invalid. Sitemap requires URL entries to be an object.`, `root.urlset.url[${ i }]`])
-        if (cause === 'missing_loc') messages.push(["error", `URL entry #${ i + 1 } is missing loc attribute. Sitemap requires loc attribute to be set to the URL of the page.`, `root.urlset.url[${ i }]`])
-        if (!value) continue
-
-        const url = value
-        res.urls.push({ loc: "" })
-        const currentResUrl = res.urls[res.urls.length - 1]
-        const currentResUrlIndex = res.urls.length - 1
-
-
-
-        const ctx = `URL entry #${ currentResUrlIndex }`
-
-        if (isPropInObject('loc', url)) {
-          const { cause, value } = validateLoc(url.loc)
-          const prefix = `${ ctx } loc attribute is invalid.`
-          if (cause === 'is_array') messages.push(['error', `${ prefix } There can only be one <loc> per url`])
-          if (cause === 'not_string') messages.push(['error', `${ prefix } Sitemap loc must be a string. Received: "${ url.loc }"`])
-          if (cause === 'too_short') messages.push(['error', `${ prefix } Sitemap loc must be at least 12 characters long. Received: "${ url.loc }"`])
-          if (cause === 'too_long') messages.push(['error', `${ prefix } Sitemap loc must be less than 2048 characters long. Received: "${ url.loc }"`])
-          if (cause === 'invalid_protocol') messages.push(['error', `${ prefix } Sitemap loc must start with 'http://', 'https://', or 'ftp://'. Received: "${ url.loc }"`])
-          if (cause === 'non_ascii') messages.push(['error', `${ prefix } Sitemap loc must only contain ASCII characters. Received: "${ url.loc }"`])
-          if (value) currentResUrl.loc = value
-        }
-
-        // Lastmod Property
-        if (isPropInObject('lastmod', url)) {
-          const { cause, value } = validateLastmod(url.lastmod)
-          const prefix = `${ ctx } lastmod attribute is invalid.`
-          if (cause === 'is_array') messages.push(['error', `${ prefix } There can only be one <lastmod> per url`])
-          if (cause === 'not_string') messages.push(['error', `${ prefix } Sitemap lastmod must be a string. Received: "${ url.lastmod }"`])
-          if (cause === 'invalid_format') messages.push(['error', `${ prefix } Sitemap lastmod must be in W3C date format. Received: "${ url.lastmod }"`])
-          if (cause === 'invalid_date') messages.push(['error', `${ prefix } Sitemap lastmod must be a valid, parseable date. Received: "${ url.lastmod }"`])
-          if (!cause) {
-            currentResUrl.lastmod = value
-            if (value.length === 4 || value.length === 7) messages.push(['warn', `${ prefix } Sitemap lastmod is too generic. Using a more precise date format (e.g., YYYY-MM-DD or a full timestamp) is recommended. Received: "${ url.lastmod }"`])
-          }
-        }
-
-        // ChangeFreq Property
-        if (isPropInObject('changefreq', url)) {
-          const { cause, value } = validateChangefreq(url.changefreq)
-          const prefix = `${ ctx } changefreq attribute is invalid.`
-          if (cause === 'is_array') messages.push(['error', `${ prefix } There can only be one <changefreq> per url`])
-          if (cause === 'not_string') messages.push(['error', `${ prefix } Sitemap changefreq must be a string. Received: "${ url.changefreq }"`])
-          if (cause === 'not_included') messages.push(['error', `${ prefix } Sitemap changefreq must be one of: 'always', 'hourly', 'daily', 'weekly', 'monthly', 'yearly', 'never'. Received: "${ url.changefreq }"`])
-          if (!cause) currentResUrl.changefreq = value
-        }
-
-        // Priority Property
-        if (isPropInObject('priority', url)) {
-          const { cause, value } = validatePriority(url.priority)
-          const prefix = `${ ctx } priority attribute is invalid.`
-          if (cause === 'is_array') messages.push(['error', `${ prefix } There can only be one <priority> per url`])
-          if (cause === 'not_numeric') messages.push(['error', `${ prefix } Sitemap priority must be a number. Received: "${ url.priority }"`])
-          if (cause === 'out_of_range') messages.push(['error', `${ prefix } Sitemap priority must be a number between 0 and 1. Received: "${ url.priority }"`])
-          if (!cause) currentResUrl.priority = value
-        }
-
-
+    // Lastmod Property
+    if (isPropInObject('lastmod', url)) {
+      const { cause, value } = validateLastmod(url.lastmod)
+      const prefix = `${ ctx } lastmod attribute is invalid.`
+      if (cause === 'is_array') messages.push(['error', `${ prefix } There can only be one <lastmod> per url`])
+      if (cause === 'not_string') messages.push(['error', `${ prefix } Sitemap lastmod must be a string. Received: "${ url.lastmod }"`])
+      if (cause === 'invalid_format') messages.push(['error', `${ prefix } Sitemap lastmod must be in W3C date format. Received: "${ url.lastmod }"`])
+      if (cause === 'invalid_date') messages.push(['error', `${ prefix } Sitemap lastmod must be a valid, parseable date. Received: "${ url.lastmod }"`])
+      if (!cause) {
+        currentResUrl.lastmod = value
+        if (value.length === 4 || value.length === 7) messages.push(['warn', `${ prefix } Sitemap lastmod is too generic. Using a more precise date format (e.g., YYYY-MM-DD or a full timestamp) is recommended. Received: "${ url.lastmod }"`])
       }
     }
+
+    // ChangeFreq Property
+    if (isPropInObject('changefreq', url)) {
+      const { cause, value } = validateChangefreq(url.changefreq)
+      const prefix = `${ ctx } changefreq attribute is invalid.`
+      if (cause === 'is_array') messages.push(['error', `${ prefix } There can only be one <changefreq> per url`])
+      if (cause === 'not_string') messages.push(['error', `${ prefix } Sitemap changefreq must be a string. Received: "${ url.changefreq }"`])
+      if (cause === 'not_included') messages.push(['error', `${ prefix } Sitemap changefreq must be one of: 'always', 'hourly', 'daily', 'weekly', 'monthly', 'yearly', 'never'. Received: "${ url.changefreq }"`])
+      if (!cause) currentResUrl.changefreq = value
+    }
+
+    // Priority Property
+    if (isPropInObject('priority', url)) {
+      const { cause, value } = validatePriority(url.priority)
+      const prefix = `${ ctx } priority attribute is invalid.`
+      if (cause === 'is_array') messages.push(['error', `${ prefix } There can only be one <priority> per url`])
+      if (cause === 'not_numeric') messages.push(['error', `${ prefix } Sitemap priority must be a number. Received: "${ url.priority }"`])
+      if (cause === 'out_of_range') messages.push(['error', `${ prefix } Sitemap priority must be a number between 0 and 1. Received: "${ url.priority }"`])
+      if (!cause) currentResUrl.priority = value
+    }
   }
-
-
   return { messages, res, isIndex }
 }
 
@@ -334,9 +265,26 @@ function isValidDate(input: string) {
 }
 
 
+function validateRootTags(input: unknown, mode: 'urlset' | 'sitemapindex') {
+  if (!isObject(input)) return { value: undefined, cause: 'not_object' as const }
+  if (!isPropInObject('___xmlns', input)) return { value: undefined, cause: 'missing_xmlns' as const }
+  const entryName = mode === 'urlset' ? 'url' : 'sitemap'
 
+  if (!isPropInObject(entryName, input)) return { value: undefined, cause: 'missing_entries' as const }
+  if (!isObject(input[entryName])) return { value: undefined, cause: 'entries_not_object' as const }
+  const entries: unknown[] = !Array.isArray(input[entryName])
+    ? [input[entryName]]
+    : input[entryName]
+  if (entries.length === 0) return { value: undefined, cause: 'entries_empty' as const }
+  return {
+    value: {
+      ___xmlns: input.___xmlns,
+      entries
+    }
+  }
+}
 
-function validateUrl(input: unknown) {
+function validateUrlEntryOrSitemapEntry(input: unknown) {
   if (!isObject(input)) return { value: undefined, cause: 'not_object' }
   if (!isPropInObject('loc', input)) return { value: input, cause: 'missing_loc' }
   return { value: input }

@@ -70,7 +70,7 @@ export function SitemapFileCard(props: {
       a.loc.includes(search)
       || a.lastmod?.includes(search)
       || a.changefreq?.includes(search)
-      || a.priority?.includes(search)
+      || String(a.priority)?.includes(search)
     ) : true)
     .toSorted((a, b) => {
       if (sorts.url === "asc") return a.loc.localeCompare(b.loc)
@@ -79,8 +79,8 @@ export function SitemapFileCard(props: {
       if (sorts.lastmod === "desc") return b.lastmod?.localeCompare(a.lastmod ?? b.lastmod) ?? 0
       if (sorts.freq === "asc") return a.changefreq?.localeCompare(b.changefreq ?? a.changefreq) ?? 0
       if (sorts.freq === "desc") return b.changefreq?.localeCompare(a.changefreq ?? b.changefreq) ?? 0
-      if (sorts.priority === "asc") return a.priority?.localeCompare(b.priority ?? a.priority) ?? 0
-      if (sorts.priority === "desc") return b.priority?.localeCompare(a.priority ?? b.priority) ?? 0
+      if (sorts.priority === "asc") return (a.priority ?? 0) - (b.priority ?? 0)
+      if (sorts.priority === "desc") return (b.priority ?? 0) - (a.priority ?? 0)
       return 0
     })
   const processedUrlsTotal = processedUrls?.length
@@ -320,9 +320,9 @@ export function SitemapFileCard(props: {
                           </a>
                           <div
                             onClick={() => {
-
+                              navigation.navigate('url', url.loc)
                             }}
-                            className="underline opacity-60 hover:opacity-100">
+                            className="underline opacity-60 hover:opacity-100 clickable">
                             <MaterialSymbolsSearchRounded className="w-3.5 h-3.5" />
                           </div>
                         </div>
