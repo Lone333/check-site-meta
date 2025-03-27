@@ -58,14 +58,6 @@ export function SitemapDetails(props: {
         <CardHeaderTitle>Sitemaps</CardHeaderTitle>
         <CardHeaderSubtitle>List of sitemap entries</CardHeaderSubtitle>
       </CardHeader>
-      <TabsWithContent
-        id="sitemap"
-        className="self-start p-1 tab-item:py-1 tab-item:text-xs"
-        tabs={[
-          tab("List"),
-          tab("Tree")
-        ]}
-      />
       <div className="rounded-md flex flex-col gap-2">
         <div className="rounded-md flex flex-col gap-2">
           <SitemapCategoryCollapsible header="Direct URLs">

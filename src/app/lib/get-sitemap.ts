@@ -72,8 +72,8 @@ export function validateSitemap(input: object) {
     if (!isPropInObject('___encoding', xml)) {
       messages.push(["warn", "Sitemap XML encoding is missing", "root.xml.encoding"])
     } else {
-      if (xml.___encoding !== 'UTF-8')
-        messages.push(["error", "Sitemap XML encoding is invalid. Please set it to  'UTF-8' ", "root.xml.encoding"])
+      if (String(xml.___encoding).toLowerCase() !== 'utf-8')
+        messages.push(["error", "Sitemap XML encoding is invalid. Please set it to  'utf-8' ", "root.xml.encoding"])
     }
   }
 

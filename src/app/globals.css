@@ -246,8 +246,14 @@ body {
 @utility badge-orange {
   @apply text-nowrap bg-orange-500/10 border border-orange-500/20 text-orange-500;
 }
-@utility badge-purple {
-  @apply text-nowrap bg-purple-500/10 border border-purple-500/20 text-purple-500;
+@utility badge-violet {
+  @apply text-nowrap bg-violet-500/10 border border-violet-500/20 text-violet-500;
+}
+@utility badge-red {
+  @apply text-nowrap bg-red-500/10 border border-red-500/20 text-red-500;
+}
+@utility badge-teal {
+  @apply text-nowrap bg-teal-500/10 border border-teal-500/20 text-teal-500;
 }
 
 /* Tabs */
@@ -256,6 +262,9 @@ body {
   @apply flex w-full sm:w-auto 
   flex-wrap p-1.5 rounded-xl text-sm select-none isolate
   bg-background-muted;
+}
+@utility tab-card {
+  @apply bg-background-muted/80
 }
 @custom-variant tab-item (& .tab-item);
 @utility tab-item {
