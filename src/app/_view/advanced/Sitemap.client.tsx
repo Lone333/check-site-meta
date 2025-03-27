@@ -8,6 +8,7 @@ import { getSitemapAction, type GetSitemapActionResponse } from "./Sitemap.actio
 import type { GetSitemapResponse } from "@/app/lib/get-sitemap"
 import { FormButton, MaterialSymbolsOpenInNew } from "../inputs/InputForm"
 import { ExternalIcon } from "../MetadataRow"
+import { useAppNavigation } from "@/app/lib/searchParams"
 
 export function SitemapCategoryCollapsible(
   props: {
@@ -46,6 +47,7 @@ export function SitemapFileCard(props: {
   depth?: number
   topOffset?: number
 }) {
+  const navigation = useAppNavigation()
   const [isExpanded, setIsExpanded] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [sitemapData, setSitemapData] = useState<GetSitemapActionResponse>()
@@ -172,7 +174,7 @@ export function SitemapFileCard(props: {
       </div>
     }
     Content={
-      <div className="text-xs text-foreground-muted flex flex-col text-start">
+      <div className="text-xs text-foreground-body flex flex-col text-start">
 
         <CollapsibleRow data-opened={isPending && !sitemapData}>
           <div className="p-3 px-4 text-foreground-muted-2 italic">
@@ -181,7 +183,7 @@ export function SitemapFileCard(props: {
         </CollapsibleRow>
 
         <CollapsibleRow data-opened={!!sitemapData} className="opacity-0 opened:opacity-100">
-          <div className="flex gap-1 p-2">
+          <div className="flex gap-1 p-2 ">
             <button
               disabled={isPending}
               onClick={() => {
@@ -193,16 +195,19 @@ export function SitemapFileCard(props: {
                   })
                 })
               }}
-              className={cn("grow text-nowrap text-xs bg-foreground-body/5 hover:bg-foreground-body/20 p-2 px-4 flex items-center gap-1 rounded-lg")}>
+              className={cn("grow text-nowrap text-xs bg-background-card-button hover:bg-background-card-button-hover p-2 px-4 flex items-center gap-1 rounded-lg text-foreground-muted")}>
               <MaterialSymbolsSearchRounded className="size-4" />
               {isPending ? "Refreshing..." : "Refresh"}
             </button>
-            <div className={cn("w-full overflow-hidden transition-all duration-500",)}>
+            <div className={cn("w-full transition-all duration-500",)}>
               <input
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="search..."
-                className={cn("w-full h-full shrink bg-background-card-input rounded-lg px-3 min-w-0",)}
+                className={cn("w-full h-full shrink bg-background-card-input rounded-lg px-3 min-w-0",
+                  "transition-[outline]",
+                  "outline-transparent hover:outline-focus"
+                )}
               />
             </div>
           </div>
@@ -222,7 +227,7 @@ export function SitemapFileCard(props: {
                 <div className="text-orange-500 px-1 py-0.5 rounded-full text-xxs">
                   Sitemap
                 </div>
-                <div className="text-foreground-muted-2 px-1 py-0.5 rounded-full text-xxs">
+                <div className="text-foreground-muted px-1 py-0.5 rounded-full text-xxs">
                   {sitemapData?.validated.res.urls?.length} URLs
                 </div>
                 {(processedUrlsTotal ?? 0) > LIMIT && (
@@ -254,21 +259,21 @@ export function SitemapFileCard(props: {
           {processedUrls !== undefined && (
             <div className="overflow-x-auto relative">
               <div className="px-4 pt-2 pb-1 *:grid *:grid-cols-[2rem_4fr_10rem_1fr_1fr] *:gap-x-2 items-end *:*:min-w-0 *:*:overflow-ellipsis *:*:text-nowrap *:*:overflow-hidden top-0 min-w-200">
-                <div className="bg-background-muted-2 rounded-t-xl -mx-2 px-2 pt-2 pb-1.5 sticky">
+                <div className="bg-background-tooltip text-foreground-muted rounded-t-xl -mx-2 px-2 *:pt-2 *:pb-1.5 sticky">
                   <div className=""></div>
-                  <button onClick={() => toggleSort('url')} className="flex gap-2 items-center rounded-none text-xs font-semibold opacity-40 text-start">
+                  <button onClick={() => toggleSort('url')} className="flex gap-2 items-center rounded-none text-xs font-semibold text-start">
                     URL
                     <SortIconTableHeader status={sorts.url} />
                   </button>
-                  <button onClick={() => toggleSort('lastmod')} className="flex gap-2 items-center rounded-none text-xs font-semibold opacity-40 text-start">
+                  <button onClick={() => toggleSort('lastmod')} className="flex gap-2 items-center rounded-none text-xs font-semibold text-start">
                     Last Modified
                     <SortIconTableHeader status={sorts.lastmod} />
                   </button>
-                  <button onClick={() => toggleSort('freq')} className="flex gap-2 items-center rounded-none text-xs font-semibold opacity-40 place-self-center">
+                  <button onClick={() => toggleSort('freq')} className="flex gap-2 items-center rounded-none text-xs font-semibold place-self-center">
                     Frequency
                     <SortIconTableHeader status={sorts.freq} />
                   </button>
-                  <button onClick={() => toggleSort('priority')} className="flex gap-2 items-center rounded-none text-xs font-semibold opacity-40 place-self-center">
+                  <button onClick={() => toggleSort('priority')} className="flex gap-2 items-center rounded-none text-xs font-semibold place-self-center">
                     Priority
                     <SortIconTableHeader status={sorts.priority} />
                   </button>
