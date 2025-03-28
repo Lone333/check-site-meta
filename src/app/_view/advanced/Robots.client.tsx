@@ -47,7 +47,8 @@ export function RobotsClientDetails(props: {
           </FormButton>
         </div>
       </div>
-      <pre className="text-sm flex flex-col gap-2">
+      {/* --bg: required for <ExpandableAdvancedCard/> to show correctly | may refactor later */}
+      <pre className="text-sm flex flex-col gap-2" style={{ "--bg": "var(--color-background-card)" }}>
         {filteredRules.map((rule, i) => {
           const expanded = isExpanded(i)
           return (

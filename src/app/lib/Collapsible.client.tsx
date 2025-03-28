@@ -41,9 +41,9 @@ export function ExpandableAdvancedCard({ expanded, toggleExpanse, Label, Content
   return (
     <div className="grow">
       <div {...props} className={cn(props.className)}>
-        <div {...headerProps} className={cn("flex sticky top-(--header-offset)", headerProps?.className)}
-          style={{ zIndex }}
-        >
+
+
+        <div {...headerProps} className={cn("flex sticky top-(--header-offset)", headerProps?.className)} style={{ zIndex }}>
           <div className="bg-(--bg) grow pt-2 min-w-0">
             <div className="border-x border-t border-border bg-background-card rounded-t-md">
               {/* Button have py which will be overlapped by Bottom Rounded Piece */}
@@ -58,6 +58,7 @@ export function ExpandableAdvancedCard({ expanded, toggleExpanse, Label, Content
             </div>
           </div>
         </div>
+        
 
         {/* Wrapper to pass background color to child */}
         <div className="border-x  border-border overflow-clip bg-background"
