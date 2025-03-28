@@ -4,7 +4,6 @@ import type { SiteMetadata } from "@/app/page";
 import { MetaCard } from "../MetaInfo";
 import { RobotsDetails } from "./Robots";
 import { SitemapDetails } from "./Sitemap";
-import { getSitemap } from "@/app/lib/get-sitemap";
 import { Suspense, type ReactNode, type SVGProps } from "react";
 import type { ParsedError } from "@/app/module/error/ErrorCard";
 import { ExpandableErrorStack } from "@/app/module/error/Error.client";
@@ -49,7 +48,10 @@ export function AdvancedPanel(props: {
           <MetaCard>
             <div key="sm" className="card-content fadeBlurIn-100">
               <Suspense fallback="Loading...">
-                <SitemapDetails url={props.metadata.resolved.general.rawUrl.value} />
+                <SitemapDetails
+                  url={props.metadata.resolved.general.rawUrl.value}
+                  getRobots={getRobots}
+                />
               </Suspense>
             </div>
           </MetaCard>

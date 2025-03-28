@@ -7,6 +7,10 @@ body {
   font-size: 0.85rem;
   color: var(--color-foreground);
 }
+.flex > * {
+  min-height: 0;
+  min-width: 0;
+}
 
 /* Tokens ----------------------------- */
 
@@ -191,7 +195,7 @@ body {
     @apply clickable;
   }
   button {
-    @apply text-sm rounded-xl font-semibold
+    @apply text-sm rounded-xl font-semibold shrink-0
     clickable transition-all
     active:translate-y-0.5;
     &.normal {
@@ -237,29 +241,29 @@ body {
 /* Badges */
 
 @utility badge-gray {
-  @apply text-nowrap bg-foreground-muted-2/10 border border-foreground-muted-2/20 text-foreground-muted;
+  @apply text-nowrap shrink-0 bg-foreground-muted-2/10 border border-foreground-muted-2/20 text-foreground-muted;
 }
 @utility badge-blue {
-  @apply text-nowrap bg-blue-500/10 border border-blue-500/20 text-blue-500;
+  @apply text-nowrap shrink-0 bg-blue-500/10 border border-blue-500/20 text-blue-500;
 }
 
 @utility badge-orange {
-  @apply text-nowrap bg-orange-500/10 border border-orange-500/20 text-orange-500;
+  @apply text-nowrap shrink-0 bg-orange-500/10 border border-orange-500/20 text-orange-500;
 }
 @utility badge-violet {
-  @apply text-nowrap bg-violet-500/10 border border-violet-500/20 text-violet-500;
+  @apply text-nowrap shrink-0 bg-violet-500/10 border border-violet-500/20 text-violet-500;
 }
 @utility badge-red {
-  @apply text-nowrap bg-red-500/10 border border-red-500/20 text-red-500;
+  @apply text-nowrap shrink-0 bg-red-500/10 border border-red-500/20 text-red-500;
 }
 @utility badge-teal {
-  @apply text-nowrap bg-teal-500/10 border border-teal-500/20 text-teal-500;
+  @apply text-nowrap shrink-0 bg-teal-500/10 border border-teal-500/20 text-teal-500;
 }
 
 /* Tabs */
 
 @utility tab {
-  @apply flex w-full sm:w-auto 
+  @apply flex w-auto 
   flex-wrap p-1.5 rounded-xl text-sm select-none isolate
   bg-background-muted;
 }

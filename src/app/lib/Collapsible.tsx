@@ -25,7 +25,7 @@ export function CollapsibleColumn(props: ComponentProps<"div"> & { 'data-opened'
     )}
       data-opened={props['data-opened'] ? "" : undefined}
     >
-      <div className="min-w-0 min-w-0">
+      <div className="min-w-0 min-h-0">
         {props.children}
       </div>
     </div>

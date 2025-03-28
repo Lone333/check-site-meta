@@ -1,17 +1,18 @@
 import type { ResoledMetadata } from "@/app/lib/get-metadata-field-data";
 import { MetadataRow } from "../MetadataRow";
-import { Suspense, type SVGProps } from "react";
-import { getSitemap, validateSitemap } from "@/app/lib/get-sitemap";
+import { Suspense, type ComponentProps, type ReactNode, type SVGProps } from "react";
 import { MaterialSymbolsCheckCircle, MaterialSymbolsCircleOutline } from "./Robots";
 import { CardHeader, CardHeaderSubtitle, CardHeaderTitle } from "../Card";
-import { getRobots } from "@/app/lib/get-robots";
-import { TabsWithContent } from "@/app/module/tab/Tabs";
-import { tab } from "@/app/module/tab/tab-primitives";
-import { ExpandableCard } from "@/app/lib/Collapsible.client";
 import { SitemapCategoryCollapsible, SitemapFileCard } from "./Sitemap.client";
+import { MaterialSymbolsExpandMoreRounded } from "@/app/lib/Collapsible.client";
+import { cn } from "lazy-cn";
 
 export function SitemapSummary(
-  props: { metadata: ResoledMetadata }
+  props: {
+    metadata: ResoledMetadata,
+    getSitemap: (url: string) => Promise<{ parsed: boolean }>,
+    getRobots: (url: string) => Promise<{ sitemaps: string[] }>
+  }
 ) {
   const baseUrl = props.metadata.general.rawUrl.value
   return <MetadataRow data={{ label: "Sitemap" }}>
@@ -27,7 +28,7 @@ export function SitemapSummary(
 
   async function SitemapPresence() {
     try {
-      const { parsed } = await getSitemap(new URL('/sitemap.xml', baseUrl).href)
+      const { parsed } = await props.getSitemap(new URL('/sitemap.xml', baseUrl).href)
       return <div className="font-medium flex items-center gap-1">
         {parsed
           ? <><MaterialSymbolsCheckCircle /> Present</>
@@ -37,7 +38,7 @@ export function SitemapSummary(
   }
   async function SitemapFromRobots() {
     try {
-      const robots = await getRobots(baseUrl)
+      const robots = await props.getRobots(baseUrl)
       if (!robots.sitemaps) return null
       if (robots.sitemaps.length === 0)
         return "No sitemap found from robots.txt"
@@ -48,8 +49,13 @@ export function SitemapSummary(
 
 
 
+
+
+
+
 export function SitemapDetails(props: {
-  url: string
+  url: string,
+  getRobots: (url: string) => Promise<{ sitemaps: string[] }>
 }) {
   const baseUrl = props.url
   return (
@@ -59,117 +65,74 @@ export function SitemapDetails(props: {
         <CardHeaderSubtitle>List of sitemap entries</CardHeaderSubtitle>
       </CardHeader>
       <div className="rounded-md flex flex-col gap-2">
-        <div className="rounded-md flex flex-col gap-2">
-          <SitemapCategoryCollapsible header="Direct URLs">
-            <div className="flex flex-col gap-1 pl-5">
-              <Suspense fallback="Loading direct /sitemap.xml">
-                <SitemapFileCard title={'/sitemap.xml'} fullUrl={new URL('/sitemap.xml', baseUrl).href} />
-
-                {/* <SitemapInfoDetail fullUrl={new URL('/sitemap.xml', baseUrl).href} title="/sitemap.xml" /> */}
-              </Suspense>
-            </div>
-          </SitemapCategoryCollapsible>
-        </div>
-        <div className="flex flex-col gap-2 py-2">
-          <SitemapCategoryCollapsible header={<>From robots.txt <Suspense><SitemapCountFromRobotBadge /></Suspense></>}>
-            <Suspense fallback="Loading robots.txt">
-              <SitemapsFromRobotsList />
-            </Suspense>
-          </SitemapCategoryCollapsible>
-        </div>
+        <SitemapSourceCategorySuspense
+          header="Direct URLs"
+          fallback="Loading direct /sitemap.xml"
+        >
+          <SitemapsFromDirect />
+        </SitemapSourceCategorySuspense>
+        <SitemapSourceCategorySuspense
+          header={<>From robots.txt <Suspense><SitemapCountFromRobotBadge /></Suspense></>}
+          fallback="Loading robots.txt"
+        >
+          <SitemapsFromRobotsList />
+        </SitemapSourceCategorySuspense>
       </div>
     </div>
   )
   async function SitemapCountFromRobotBadge() {
     try {
-      const { sitemaps } = await getRobots(baseUrl)
+      const { sitemaps } = await props.getRobots(baseUrl)
       return <span className="p-0.5 px-2 rounded-full badge-gray text-[0.6rem] fadeIn-100">
         {sitemaps.length}
       </span>
     } catch { return null }
   }
+  function SitemapSourceCategorySuspense(props: { children: ReactNode, fallback: ReactNode, header: ReactNode }) {
+    return (
+      <div className="flex flex-col -mx-5">
+        <SitemapCategoryCollapsible header={props.header}>
+          <div className="flex flex-col gap-1 px-2 pb-2 bg-(--bg)"
+            style={{
+              '--bg': 'var(--color-background)',
+            }}
+          >
+            <Suspense fallback={props.fallback}>
+              {props.children}
+            </Suspense>
+          </div>
+        </SitemapCategoryCollapsible>
+      </div>
+    )
+  }
+  async function SitemapsFromDirect() {
+    return (<SitemapFileCard title={'/sitemap.xml'} fullUrl={new URL('/sitemap.xml', baseUrl).href} />)
+  }
   async function SitemapsFromRobotsList() {
     try {
-      const { sitemaps } = await getRobots(baseUrl)
-      return <div className="flex flex-col gap-1 pl-5">
+      const { sitemaps } = await props.getRobots(baseUrl)
+      return <div className="flex flex-col gap-1">
         {sitemaps.map((sitemap, i) => <div key={i} className="flex flex-col">
           <Suspense fallback="Loading...">
             <SitemapFileCard title={sitemap} fullUrl={sitemap} />
-            {/* <SitemapInfoDetail key={i} fullUrl={sitemap} title={sitemap} /> */}
           </Suspense>
         </div>)}
       </div>
     } catch { return "Error fetching robots.txt" }
   }
-  // async function SitemapInfoDetail(props: {
-  //   fullUrl: string,
-  //   title: string
-  // }) {
-  //   try {
-  //     const sitemap = await getSitemap(props.fullUrl)
-  //     const res = validateSitemap(sitemap.parsed)
-  //     return <>
-  //       <ExpandableCard
-  //         expanded={true}
-  //         Label={<div className="flex items-start gap-1">
-  //           <TdesignSitemap className="size-4 text-foreground-muted mt-0.25" />
-  //           {/* {res.isIndex &&
-  //           <div className="text-[0.6rem] px-2 py-1 rounded-full font-normal badge-blue fadeIn-0">
-  //             Index
-  //           </div>
-  //         } */}
-  //           <div className="font-normal text-sm text-start">
-  //             {props.title}
-  //           </div>
-  //           {/* {res.res.urls !== undefined &&
-  //           <div className="text-[0.6rem] px-2 py-1 rounded-full font-normal badge-gray fadeIn-100">
-  //             {res.res.urls?.length} URLs
-  //           </div>
-  //         } */}
-  //           {/* <div className="text-[0.6rem] px-2 py-1 rounded-full font-normal badge-gray fadeIn-200">
-  //           {(sitemap.byteSize / 1000).toFixed(2)} KB
-  //         </div> */}
-  //         </div>}
-  //         Content={<>
-  //           <div className="text-xs text-foreground-muted py-1 flex flex-col overflow-visible">
-  //             <Suspense fallback="Loading...">
-  //               <div className="px-4 pt-2 pb-1 grid grid-cols-[4fr_2fr_1fr_1fr] gap-x-2 items-end *:min-w-0 *:overflow-ellipsis *:text-nowrap *:overflow-hidden sticky top-0">
-  //                 <div className="font-medium">URL</div>
-  //                 <div className="font-medium">Last Modified</div>
-  //                 <div className="font-medium">Frequency</div>
-  //                 <div className="font-medium">Priority</div>
-  //               </div>
-  //               {/* <pre>
-  //                   {res.res.urls?.length === 0 && JSON.stringify(sitemap.parsed, null, 2)}
-  //                 </pre> */}
-  //               {res.res.urls?.slice(0, 10).map((url, i) => {
-  //                 if (!url.loc) return null
-  //                 return (
-  //                   <div key={i} className="grid grid-cols-[4fr_2fr_1fr_1fr] gap-x-2 items-start py-2 px-4 hover:bg-background/30 *:min-w-0 *:break-words">
-  //                     <div className="font-medium">
-  //                       {url.loc.split(baseUrl.split('://')[1])[1] || url.loc}
-  //                     </div>
-  //                     <div className="font-medium">{!!url.lastmod && new Date(url.lastmod).toLocaleString()}</div>
-  //                     <div className="font-medium">{url.changefreq}</div>
-  //                     <div className="font-medium">{url.priority}</div>
-  //                   </div>
-  //                 )
-  //               })}
-  //             </Suspense>
-  //           </div>
-  //         </>}
-  //       />
-  //     </>
-  //   } catch (error) { return `Direct URL Sitemap not found (${ props.title })` }
-  // }
-
-
 }
 
 
 
 
-
+export function SourceHeader(props: ComponentProps<"button">) {
+  return (
+    <button {...props} className={cn("font-semibold flex gap-2 items-center py-1 group", props.className)}>
+      <MaterialSymbolsExpandMoreRounded className={cn("w-4 h-4 transition-all -rotate-90 group-opened:rotate-0")} />
+      {props.children}
+    </button>
+  )
+}
 
 
 

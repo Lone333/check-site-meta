@@ -5,7 +5,7 @@ import { cn } from "lazy-cn";
 import { useState, type SVGProps } from "react";
 import { FormButton } from "../inputs/InputForm";
 import { CollapsibleRow } from "@/app/lib/Collapsible";
-import { ExpandableCard, useExpandableList } from "@/app/lib/Collapsible.client";
+import { ExpandableAdvancedCard, useExpandableList } from "@/app/lib/Collapsible.client";
 
 export function RobotsClientDetails(props: {
   uaRules: ParsedRobotRules
@@ -51,7 +51,7 @@ export function RobotsClientDetails(props: {
         {filteredRules.map((rule, i) => {
           const expanded = isExpanded(i)
           return (
-            <ExpandableCard
+            <ExpandableAdvancedCard
               key={i}
               expanded={expanded}
               toggleExpanse={() => toggaleExpanse(i)}

@@ -1,5 +1,5 @@
 import { MetadataRow } from "../MetadataRow"
-import { getRobots } from "@/app/lib/get-robots"
+import { type GetRobotsResult } from "@/app/lib/get-robots"
 import { Suspense, type SVGProps } from "react"
 import { cn } from "lazy-cn"
 import { TabsWithContent } from "@/app/module/tab/Tabs"
@@ -10,7 +10,8 @@ import { RobotsClientDetails } from "./Robots.client"
 
 
 export async function RobotsSummary(props: {
-  metadata: ResoledMetadata
+  metadata: ResoledMetadata,
+  getRobots: (url: string) => Promise<GetRobotsResult>
 }) {
   return <>
     <MetadataRow data={props.metadata.general.robots} />
@@ -25,7 +26,7 @@ export async function RobotsSummary(props: {
 
   async function RobotsSummaryData() {
     try {
-      const { parsed, sitemaps } = await getRobots(props.metadata.general.rawUrl.value)
+      const { parsed, sitemaps } = await props.getRobots(props.metadata.general.rawUrl.value)
       return (
         <>
           <div className="font-medium flex items-center gap-1">
@@ -56,7 +57,10 @@ export function MaterialSymbolsCircleOutline(props: SVGProps<SVGSVGElement>) {
 }
 
 
-export async function RobotsDetails({ data }: { data: Awaited<ReturnType<typeof getRobots>> }) {
+export async function RobotsDetails({ data }: {
+  data: GetRobotsResult,
+
+}) {
   const { parsed, raw } = data
   return (
     <div className={cn("flex flex-col")}>

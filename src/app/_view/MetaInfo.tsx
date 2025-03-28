@@ -12,6 +12,8 @@ import type { SiteMetadata } from "../page";
 import { OpengraphMetadata } from "./categories/OpenGraph";
 import { RobotsSummary } from "./advanced/Robots";
 import { SitemapSummary } from "./advanced/Sitemap";
+import { getSitemap } from "../lib/get-sitemap";
+import { getRobots } from "../lib/get-robots";
 
 export async function MetaInfoPanel(props: {
   metadata: SiteMetadata,
@@ -62,9 +64,16 @@ export async function MetaInfoPanel(props: {
           "Robots",
           <MetaCard>
             <MetaCardContent key="r">
-              <RobotsSummary metadata={metadata} />
+              <RobotsSummary
+                metadata={metadata}
+                getRobots={getRobots}
+              />
               <Separator />
-              <SitemapSummary metadata={metadata} />
+              <SitemapSummary
+                metadata={metadata}
+                getSitemap={getSitemap}
+                getRobots={getRobots}
+              />
             </MetaCardContent>
           </MetaCard>
         )

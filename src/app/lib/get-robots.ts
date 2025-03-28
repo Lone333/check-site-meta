@@ -38,6 +38,8 @@ export const getRobots = cache(async function getRobots(url: string) {
   }
 })
 
+export type GetRobotsResult = Awaited<ReturnType<typeof getRobots>>
+
 type ParsedRobotRaw = {
   _preferredHost: string,
   _sitemaps: string[],

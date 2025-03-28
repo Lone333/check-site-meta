@@ -30,31 +30,58 @@ export function useExpandableList(arr: unknown[]) {
 
 }
 
-
-
-export function ExpandableCard({ expanded, toggleExpanse, Label, Content, headerProps, ...props }: ComponentProps<"div"> & {
+export function ExpandableAdvancedCard({ expanded, toggleExpanse, Label, Content, headerProps, zIndex, ...props }: ComponentProps<"div"> & {
   expanded: boolean,
   toggleExpanse?: () => void,
   Label: ReactNode,
   Content: ReactNode,
-  headerProps?: ComponentProps<"div">
+  headerProps?: ComponentProps<"div">,
+  zIndex?: number,
 }) {
   return (
-    <div {...props} className={cn("border border-border rounded-md overflow-clip", props.className)}>
-      <div {...headerProps} className={cn("bg-background-card-box flex", headerProps?.className)} >
-        <button className="flex items-start gap-2 p-2 pl-3 grow leading-none"
-          onClick={() => toggleExpanse?.()}
+    <div className="grow">
+      <div {...props} className={cn(props.className)}>
+        <div {...headerProps} className={cn("flex sticky top-(--header-offset)", headerProps?.className)}
+          style={{ zIndex }}
         >
-          <MaterialSymbolsExpandMoreRounded className={cn("w-4 h-4 transition-all",
-            expanded ? "rotate-180" : "rotate-0"
-          )} />
-          {Label}
-        </button>
+          <div className="bg-(--bg) grow pt-2 min-w-0">
+            <div className="border-x border-t border-border bg-background-card-box rounded-t-md">
+              {/* Button have py which will be overlapped by Bottom Rounded Piece */}
+              <button className="flex items-start gap-2 py-2 pl-3 grow leading-none min-w-0 w-full text-nowrap overflow-clip **:overflow-hidden **:text-ellipsis"
+                onClick={() => toggleExpanse?.()}
+              >
+                <MaterialSymbolsExpandMoreRounded className={cn("w-4 h-4 transition-all shrink-0",
+                  expanded ? "rotate-180" : "rotate-0"
+                )} />
+                {Label}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Wrapper to pass background color to child */}
+        <div className="border-x  border-border overflow-clip bg-background-car"
+          style={{
+            // "--bg": "var(--color-background-card)",
+          }}
+        >
+          <CollapsibleRow data-opened={expanded}>
+            {Content}
+          </CollapsibleRow>
+        </div>
       </div>
-      <CollapsibleRow data-opened={expanded}>
-        {Content}
-      </CollapsibleRow>
+
+      {/* Bottom Rounded Piece | -mt-2 is required to overlap parent | relative zIndex is required to overlap top piece*/}
+      <div className="relative bg-(--bg)" /** This is required to match background color that overlaps top piece */
+        style={{ zIndex }}>
+        <div className="h-2 grow rounded-b-md border-b border-x border-border -mt-2 transition-[background]"
+          style={{
+            background: expanded ? "var(--color-background)" : "var(--color-background-card-box)",
+          }}
+        />
+      </div>
     </div>
+
   )
 }
 
