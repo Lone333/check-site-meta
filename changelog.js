@@ -1,4 +1,10 @@
 export const changelog = {
+  "0.3.0": [
+    "Added ability to check sitemap and robots.txt: currently in beta",
+    "Fixed comically large padding",
+    "Improve UI colors and layouts",
+    "Added ability to reset user-agent",
+  ],
   "0.2.31": [
     "Added open inserted link in new tab button",
     "Added ability to customize user agent",
