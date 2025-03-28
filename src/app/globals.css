@@ -65,8 +65,8 @@ body {
   );
 
 
-  --color-background-input: light-dark(#EEF1F5, #202121);
-  --color-background-button: light-dark(#EEF1F5, #202121);
+  --color-background-input: light-dark(#fff, #202121);
+  --color-background-button: light-dark(#fff, #202121);
   --color-background-button-hover: light-dark(var(--color-slate-100), var(--color-neutral-800));
 
   --color-border: light-dark(#e6eaf2, #2f3030);
@@ -208,6 +208,11 @@ body {
 }
 
 /* Components ----------------------------- */
+
+@utility button-card {
+  --tw-shadow-color: var(--color-slate-200);
+  @apply rounded-md shadow-sm shadow-slate-200
+}
 
 @utility collapsible-row-grid-* {
   --tw-duration: calc(--value(number) * 1ms);

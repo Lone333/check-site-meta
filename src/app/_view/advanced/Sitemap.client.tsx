@@ -10,6 +10,7 @@ import { useAppNavigation } from "@/app/lib/searchParams"
 import { TabList } from "@/app/module/tab/TabRoot"
 import { tab } from "@/app/module/tab/tab-primitives"
 import { SourceHeader } from "./Sitemap"
+import { TextInputCard, TextInputIconStart } from "../inputs/TextInput"
 
 export function SitemapCategoryCollapsible(
   props: {
@@ -63,7 +64,9 @@ export function SitemapFileCard(props: {
       priority: key === "priority" ? (sorts.priority === "asc" ? "desc" : sorts.priority === "desc" ? null : "asc") : null,
     })
   }
-  const processedUrls = sitemapData?.validated.res.urls
+  const { urls: rawUrls, sitemaps: rawSitemaps } = sitemapData?.validated.res ?? { urls: [], sitemaps: [] }
+
+  const processedUrls = rawUrls
     ?.filter(a => search ? (
       a.loc.includes(search)
       || a.lastmod?.includes(search)
@@ -82,7 +85,7 @@ export function SitemapFileCard(props: {
       return 0
     })
 
-  const processedSitemaps = sitemapData?.validated.res.sitemaps
+  const processedSitemaps = rawSitemaps
     ?.filter(a => search ? (a.loc.includes(search) || a.lastmod?.includes(search)) : true)
     .toSorted((a, b) => {
       if (sorts.url === "asc") return a.loc.localeCompare(b.loc)
@@ -170,7 +173,7 @@ export function SitemapFileCard(props: {
       '--header-offset': `calc((var(--spacing) * ${ 9 }) + (var(--spacing) * ${ props.topOffset ?? 0 }) + ${ props.topOffset ? "(var(--spacing) * 2)" : "0px" })`,
     }}
 
-    
+
     onTransitionEnd={(e) => {
       if (e.target === e.currentTarget?.children[1]?.children[0]) {
         const collapsingElement = e.currentTarget?.children[1]?.children[0] as HTMLDivElement
@@ -244,9 +247,15 @@ export function SitemapFileCard(props: {
           className="opacity-0 opened:opacity-100">
           {largeContentRendered && (
             <div className="flex flex-col gap-2 py-2">
-              <div className="flex gap-1 px-2 items-center">
+              <div className="flex gap-2 px-2 items-center text-xxs">
+                <TabList
+                  className="shrink-0 text-xxs p-1 tab-item:py-0 tab-item:items-center tab-item:flex tab-item:px-3.5 tab-card h-9"
+                  tabNum={isRaw ? 1 : 0}
+                  tabs={[tab("Table"), tab("Raw")]}
+                  onTabChange={(l, i, e) => setIsRaw(i === 1)}
+                />
                 <CardDetailButton
-                  className="h-9"
+                  className="h-7 px-3 button-card"
                   disabled={isPending}
                   onClick={() => {
                     startTransition(async () => {
@@ -257,52 +266,44 @@ export function SitemapFileCard(props: {
                       })
                     })
                   }}>
-                  <MaterialSymbolsSearchRounded className="size-4" />
-                  {isPending ? "Refreshing..." : "Refresh"}
+                  {/* <MaterialSymbolsSearchRounded className="size-4" /> */}
+                  <MaterialSymbolsRefresh className="size-4" />
+                  {/* {isPending ? "Refreshing..." : "Refresh"} */}
                 </CardDetailButton>
 
-                <TabList
-                  className="shrink-0 text-xxs p-1 tab-item:py-0 tab-item:items-center tab-item:flex tab-item:px-3.5 tab-card h-9"
-                  tabNum={isRaw ? 1 : 0}
-                  tabs={[tab("Table"), tab("Raw")]}
-                  onTabChange={(l, i, e) => setIsRaw(i === 1)}
-                />
-
                 {/* Status Bar */}
-                <div className="flex gap-2 px-2 text-xxs items-center">
-                  {sitemapData?.validated.isIndex ? <>
-                    <div className="badge-violet px-3 py-1 rounded-full ">
-                      Sitemap Index
+                {sitemapData?.validated.isIndex ? <>
+                  <div className="badge-violet px-3 py-1 rounded-full ">
+                    Sitemap Index
+                  </div>
+                  <div className="badge-gray px-3 py-1 rounded-full ">
+                    {sitemapData?.validated.res.sitemaps?.length ?? 0} Sitemaps
+                  </div>
+                </>
+                  : <>
+                    <div className="badge-teal px-3 py-1 rounded-full ">
+                      Sitemap
                     </div>
                     <div className="badge-gray px-3 py-1 rounded-full ">
-                      {sitemapData?.validated.res.sitemaps?.length ?? 0} Sitemaps
+                      {sitemapData?.validated.res.urls?.length ?? 0} URLs
                     </div>
                   </>
-                    : <>
-                      <div className="badge-teal px-3 py-1 rounded-full ">
-                        Sitemap
-                      </div>
-                      <div className="badge-gray px-3 py-1 rounded-full ">
-                        {sitemapData?.validated.res.urls?.length ?? 0} URLs
-                      </div>
-                    </>
-                  }
-                  {errors.length > 0 && (
-                    <div className="badge-red px-3 py-1 rounded-full ">
-                      {errors.length} Errors
-                    </div>
-                  )}
-                  {warns.length > 0 && (
-                    <div className="text-amber-500 px-1 rounded-full ">
-                      {warns.length} Warnings
-                    </div>
-                  )}
-                  {infos.length > 0 && (
-                    <div className="text-slate-500 px-1 rounded-full ">
-                      {warns.length} Infos
-                    </div>
-                  )}
-                </div>
+                }
+                {errors.length > 0 && (
+                  <div className="badge-red px-3 py-1 rounded-full ">
+                    {errors.length} Errors
+                  </div>
+                )}
+                {warns.length > 0 && (
+                  <div className="text-amber-500 px-1 rounded-full ">
+                    {warns.length} Warnings
+                  </div>
+                )}
+                {infos.length > 0 && (
+                  <div className="text-slate-500 px-1 rounded-full ">
+                    {warns.length} Infos
+                  </div>
+                )}
 
               </div>
 
@@ -332,18 +333,23 @@ export function SitemapFileCard(props: {
                 <CollapsibleRow data-opened={!isRaw}>
 
                   {/* Search Part */}
-                  <div className="px-2 pb-2">
-                    {entriesCount > 0 && (
-                      <div className={cn("w-full transition-all duration-500",)}>
-                        <input
-                          value={search}
-                          onChange={e => setSearch(e.target.value)}
-                          placeholder="🔎   search..."
-                          className={cn("w-full h-9 shrink bg-background-input rounded-lg px-4 min-w-0",
-                            "transition-[outline]",
-                            "outline-transparent hover:outline-focus"
-                          )}
-                        />
+                  <div className="px-2 pb-2 pt-0.5">
+                    {(rawSitemaps?.length ?? rawSitemaps?.length ?? 0) > 0 && (
+                      <div className={cn("w-full transition-all duration-500 pb-0.5 max-w-xl",)}>
+                        <TextInputCard>
+                          <TextInputIconStart>
+                            <MaterialSymbolsSearchRounded className="w-4 h-4" />
+                          </TextInputIconStart>
+                          <input
+                            autoComplete="offOFFFFFOFOFOFOFFFF"
+                            autoSave="off"
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
+                            placeholder="  search..."
+                            className={cn("w-full h-9 outline-0")}
+                          />
+                        </TextInputCard>
+
                       </div>
                     )}
                   </div>
