@@ -60,7 +60,7 @@ export function ExpandableAdvancedCard({ expanded, toggleExpanse, Label, Content
         </div>
 
         {/* Wrapper to pass background color to child */}
-        <div className="border-x  border-border overflow-clip bg-background-car"
+        <div className="border-x  border-border overflow-clip bg-background"
           style={{
             // "--bg": "var(--color-background-card)",
           }}
