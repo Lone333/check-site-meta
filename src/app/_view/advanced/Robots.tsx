@@ -66,7 +66,7 @@ export async function RobotsDetails({ data }: {
     <div className={cn("flex flex-col")}>
       <CardHeader>
         <CardHeaderTitle>
-          Robots.txt
+          Robots.txt (beta)
         </CardHeaderTitle>
         <CardHeaderSubtitle>
           Rules for search engine crawlers

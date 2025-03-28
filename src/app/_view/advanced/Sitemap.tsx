@@ -61,7 +61,7 @@ export function SitemapDetails(props: {
   return (
     <div className="flex flex-col gap-4">
       <CardHeader>
-        <CardHeaderTitle>Sitemaps</CardHeaderTitle>
+        <CardHeaderTitle>Sitemaps (beta)</CardHeaderTitle>
         <CardHeaderSubtitle>List of sitemap entries</CardHeaderSubtitle>
       </CardHeader>
       <div className="rounded-md flex flex-col gap-2">
