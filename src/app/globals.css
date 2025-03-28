@@ -210,8 +210,9 @@ body {
 /* Components ----------------------------- */
 
 @utility button-card {
-  --tw-shadow-color: var(--color-slate-200);
-  @apply rounded-md shadow-sm shadow-slate-200
+  --tw-shadow-color: light-dark(var(--color-slate-200),var(--color-neutral-900));
+  @apply rounded-md shadow-sm
+   disabled:text-foreground-muted-2/20 disabled:pointer-events-none
 }
 
 @utility collapsible-row-grid-* {

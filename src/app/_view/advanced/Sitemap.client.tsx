@@ -333,8 +333,8 @@ export function SitemapFileCard(props: {
                 <CollapsibleRow data-opened={!isRaw}>
 
                   {/* Search Part */}
-                  <div className="px-2 pb-2 pt-0.5">
-                    {(rawSitemaps?.length ?? rawSitemaps?.length ?? 0) > 0 && (
+                  {(rawSitemaps?.length ?? rawSitemaps?.length ?? 0) > 0 && (
+                    <div className="px-2 pb-2 pt-0.5">
                       <div className={cn("w-full transition-all duration-500 pb-0.5 max-w-xl",)}>
                         <TextInputCard>
                           <TextInputIconStart>
@@ -351,8 +351,8 @@ export function SitemapFileCard(props: {
                         </TextInputCard>
 
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
 
                   {/* Sitemap Indexes */}
                   {processedSitemaps !== undefined && (
