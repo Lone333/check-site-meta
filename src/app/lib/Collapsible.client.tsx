@@ -61,9 +61,9 @@ export function ExpandableAdvancedCard({ expanded, toggleExpanse, Label, Content
         
 
         {/* Wrapper to pass background color to child */}
-        <div className="border-x  border-border overflow-clip bg-background"
+        <div className="border-x  border-border overflow-clip bg-(--bg)"
           style={{
-            // "--bg": "var(--color-background-card)",
+            "--bg": "var(--color-background)",
           }}
         >
           <CollapsibleRow data-opened={expanded}>

@@ -111,7 +111,7 @@ export function SitemapDetails(props: {
   async function SitemapsFromRobotsList() {
     try {
       const { sitemaps } = await props.getRobots(baseUrl)
-      return <div className="flex flex-col gap-1">
+      return <div className="flex flex-col ">
         {sitemaps.map((sitemap, i) => <div key={i} className="flex flex-col">
           <Suspense fallback="Loading...">
             <SitemapFileCard title={sitemap} fullUrl={sitemap} />
