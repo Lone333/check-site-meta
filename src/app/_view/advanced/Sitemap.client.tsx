@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition, type ComponentProps, type ReactNode, type SVGProps } from "react"
+import { useEffect, useState, useTransition, type ComponentProps, type ReactNode, type SVGProps } from "react"
 import { CollapsibleRow } from "@/app/lib/Collapsible"
 import { ExpandableAdvancedCard } from "@/app/lib/Collapsible.client"
 import { cn } from "lazy-cn"
@@ -122,27 +122,44 @@ export function SitemapFileCard(props: {
 
   // Content Render Control
   const [largeContentRendered, setLargeContentRendered] = useState(false)
+  useEffect(() => {
+    if (largeContentRendered) {
+      setIsExpanded(true)
+    }
+  }, [largeContentRendered])
+
+  useEffect(() => {
+    if (!!sitemapData) {
+      setLargeContentRendered(true)
+    }
+  }, [sitemapData])
 
 
   return <ExpandableAdvancedCard
 
     toggleExpanse={() => {
       if (!sitemapData && !isExpanded) {
+        setIsExpanded(true)
         startTransition(async () => {
           const res = await getSitemapAction(props.fullUrl)
           startTransition(() => {
             if (res.data) {
               setSitemapData(res.data)
-              setLargeContentRendered(true)
             }
             if (res.error) console.error(res.error)
           })
         })
       }
-      if (!isExpanded) {
-        setLargeContentRendered(true)
+      // If previously isExpanded is true, then set isExpanded to false | then ontransitionend, setLargeContentRendered to false to hide the content
+      if (isExpanded) {
+        setIsExpanded(false)
+      } else {
+        // If previously isExpanded is false, and data is already fetched, then setLargeContentRendered to true to show the content
+        // But if data is not fetched, then fetch the data and setLargeContentRendered to true but use useEffect to setIsExpanded to true to delay the animation
+        if (sitemapData) {
+          setLargeContentRendered(true)
+        }
       }
-      setIsExpanded(!isExpanded)
     }}
     expanded={isExpanded}
 
@@ -152,6 +169,8 @@ export function SitemapFileCard(props: {
     style={{
       '--header-offset': `calc((var(--spacing) * ${ 9 }) + (var(--spacing) * ${ props.topOffset ?? 0 }) + ${ props.topOffset ? "(var(--spacing) * 2)" : "0px" })`,
     }}
+
+    
     onTransitionEnd={(e) => {
       if (e.target === e.currentTarget?.children[1]?.children[0]) {
         const collapsingElement = e.currentTarget?.children[1]?.children[0] as HTMLDivElement
@@ -221,12 +240,13 @@ export function SitemapFileCard(props: {
         </CollapsibleRow>
 
         <CollapsibleRow
-          data-opened={!!sitemapData}
+          data-opened={!!sitemapData && !!largeContentRendered}
           className="opacity-0 opened:opacity-100">
           {largeContentRendered && (
             <div className="flex flex-col gap-2 py-2">
               <div className="flex gap-1 px-2 items-center">
                 <CardDetailButton
+                  className="h-9"
                   disabled={isPending}
                   onClick={() => {
                     startTransition(async () => {
@@ -241,6 +261,13 @@ export function SitemapFileCard(props: {
                   {isPending ? "Refreshing..." : "Refresh"}
                 </CardDetailButton>
 
+                <TabList
+                  className="shrink-0 text-xxs p-1 tab-item:py-0 tab-item:items-center tab-item:flex tab-item:px-3.5 tab-card h-9"
+                  tabNum={isRaw ? 1 : 0}
+                  tabs={[tab("Table"), tab("Raw")]}
+                  onTabChange={(l, i, e) => setIsRaw(i === 1)}
+                />
+
                 {/* Status Bar */}
                 <div className="flex gap-2 px-2 text-xxs items-center">
                   {sitemapData?.validated.isIndex ? <>
@@ -250,9 +277,6 @@ export function SitemapFileCard(props: {
                     <div className="badge-gray px-3 py-1 rounded-full ">
                       {sitemapData?.validated.res.sitemaps?.length ?? 0} Sitemaps
                     </div>
-                    {(entriesCount ?? 0) > LIMIT && (
-                      <div className=" px-1 text-foreground-muted-2">Only {LIMIT} entries is shown out of {entriesCount}</div>
-                    )}
                   </>
                     : <>
                       <div className="badge-teal px-3 py-1 rounded-full ">
@@ -261,9 +285,6 @@ export function SitemapFileCard(props: {
                       <div className="badge-gray px-3 py-1 rounded-full ">
                         {sitemapData?.validated.res.urls?.length ?? 0} URLs
                       </div>
-                      {(entriesCount ?? 0) > LIMIT && (
-                        <div className=" px-1 text-foreground-muted">Only {LIMIT} entries is shown out of {entriesCount}</div>
-                      )}
                     </>
                   }
                   {errors.length > 0 && (
@@ -295,56 +316,7 @@ export function SitemapFileCard(props: {
                   })}
                 </div>
               )}
-
-              {entriesCount !== 0 && (
-                <div className="flex gap-1 px-2">
-                  {/* Switch */}
-                  <TabList
-                    className="shrink-0 text-xxs p-1 tab-item:py-1 tab-item:px-3.5 tab-card"
-                    tabNum={isRaw ? 1 : 0}
-                    tabs={[
-                      tab("Table"),
-                      tab("Raw")
-                    ]}
-                    onTabChange={(l, i, e) => {
-                      setIsRaw(i === 1)
-                    }}
-                  />
-
-                  <div className="flex gap-1 grow">
-                    {/* Pagination Control */}
-                    {totalPages > 1 && (
-                      <>
-                        <CardDetailButton onClick={() => prevPage()} className="px-3">
-                          ◀
-                        </CardDetailButton>
-                        <CardDetailButton className="pointer-events-none bg-transparent px-3">
-                          {page} / {totalPages}
-                        </CardDetailButton>
-                        <CardDetailButton onClick={() => nextPage()} className="px-3">
-                          ▶
-                        </CardDetailButton>
-                      </>
-                    )}
-                    {entriesCount > 0 && (
-                      <div className={cn("w-full transition-all duration-500",)}>
-                        <input
-                          value={search}
-                          onChange={e => setSearch(e.target.value)}
-                          placeholder="search..."
-                          className={cn("w-full h-full shrink bg-background-card-input rounded-lg px-3 min-w-0",
-                            "transition-[outline]",
-                            "outline-transparent hover:outline-focus"
-                          )}
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
               <div>
-
                 {/* For Raw */}
                 <CollapsibleRow data-opened={isRaw}>
                   <div className="px-2">
@@ -356,10 +328,29 @@ export function SitemapFileCard(props: {
                   </div>
                 </CollapsibleRow>
 
-                {/* For Table */}
+
                 <CollapsibleRow data-opened={!isRaw}>
+
+                  {/* Search Part */}
+                  <div className="px-2 pb-2">
+                    {entriesCount > 0 && (
+                      <div className={cn("w-full transition-all duration-500",)}>
+                        <input
+                          value={search}
+                          onChange={e => setSearch(e.target.value)}
+                          placeholder="🔎   search..."
+                          className={cn("w-full h-9 shrink bg-background-input rounded-lg px-4 min-w-0",
+                            "transition-[outline]",
+                            "outline-transparent hover:outline-focus"
+                          )}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Sitemap Indexes */}
                   {processedSitemaps !== undefined && (
-                    <div className="px-2 flex flex-col gap-1">
+                    <div className="px-2 flex flex-col -mt-2">
                       {paginatedSitemaps
                         .map((sitemaps, i) => {
                           return (
@@ -375,11 +366,16 @@ export function SitemapFileCard(props: {
                         })}
                     </div>
                   )}
+
+                  {/* Sitemap URLS */}
                   {processedUrls !== undefined && (
-                    <div className="overflow-x-auto overflow-y-clip relative">
-                      <div className="px-4 pb-1 items-end  top-0 min-w-200">
+                    <div className="px-2 relative">
+
+                      {/* TABLES CONTAINER */}
+                      <div className="pb-1 items-end top-0  overflow-x-auto overflow-y-clip px-2">
+                        {/* Tables */}
                         <div className={cn(
-                          "bg-background-tooltip text-foreground-muted rounded-t-xl -mx-2 px-2 *:pt-2 *:pb-1.5 sticky",
+                          "bg-background-tooltip text-foreground-muted rounded-t-xl -mx-2 *:pt-2 *:pb-1.5 sticky min-w-200",
                           "grid grid-cols-[2rem_4fr_9rem_0.5fr_0.5fr]",
                           // "*:gap-x-2  *:*:min-w-0 *:*:overflow-ellipsis *:*:text-nowrap *:*:overflow-hidden",
                         )}>
@@ -441,6 +437,25 @@ export function SitemapFileCard(props: {
                             })}
                         </div>
 
+
+                      </div>
+                      <div className="flex gap-1 pt-2 justify-end items-center">
+                        {(entriesCount ?? 0) > LIMIT && (
+                          <div className=" px-1 text-foreground-muted-2">Only {LIMIT} entries are shown out of {entriesCount}</div>
+                        )}
+                        {totalPages > 1 && (
+                          <>
+                            <CardDetailButton onClick={() => prevPage()} className="px-3">
+                              ◀
+                            </CardDetailButton>
+                            <CardDetailButton className="pointer-events-none bg-transparent px-3">
+                              {page} / {totalPages}
+                            </CardDetailButton>
+                            <CardDetailButton onClick={() => nextPage()} className="px-3">
+                              ▶
+                            </CardDetailButton>
+                          </>
+                        )}
                       </div>
                     </div>
                   )}
@@ -477,7 +492,7 @@ function CardDetailButton(props: ComponentProps<"button">) {
     <button
       {...props}
       className={cn(
-        "text-nowrap text-xs text-foreground-muted bg-background-card-button hover:bg-background-card-button-hover p-2 px-4 flex items-center gap-1 rounded-lg", props.className
+        "text-nowrap text-xs text-foreground-muted bg-background-button hover:bg-background-button-hover p-2 px-4 flex items-center gap-1 rounded-lg", props.className
       )}
     />
   )

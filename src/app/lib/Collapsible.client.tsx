@@ -45,7 +45,7 @@ export function ExpandableAdvancedCard({ expanded, toggleExpanse, Label, Content
           style={{ zIndex }}
         >
           <div className="bg-(--bg) grow pt-2 min-w-0">
-            <div className="border-x border-t border-border bg-background-card-box rounded-t-md">
+            <div className="border-x border-t border-border bg-background-card rounded-t-md">
               {/* Button have py which will be overlapped by Bottom Rounded Piece */}
               <button className="flex items-start gap-2 py-2 pl-3 grow leading-none min-w-0 w-full text-nowrap overflow-clip **:overflow-hidden **:text-ellipsis"
                 onClick={() => toggleExpanse?.()}
@@ -76,7 +76,7 @@ export function ExpandableAdvancedCard({ expanded, toggleExpanse, Label, Content
         style={{ zIndex }}>
         <div className="h-2 grow rounded-b-md border-b border-x border-border -mt-2 transition-[background]"
           style={{
-            background: expanded ? "var(--color-background)" : "var(--color-background-card-box)",
+            background: expanded ? "var(--color-background)" : "var(--color-background-card)",
           }}
         />
       </div>

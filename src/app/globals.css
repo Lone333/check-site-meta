@@ -65,9 +65,9 @@ body {
   );
 
 
-  --color-background-card-input: light-dark(var(--color-background-card-box), #292a2a);
-  --color-background-card-button: light-dark(var(--color-background-card-box), #292a2a);
-  --color-background-card-button-hover: light-dark(#e5e9ee, #323535);
+  --color-background-input: light-dark(#EEF1F5, #202121);
+  --color-background-button: light-dark(#EEF1F5, #202121);
+  --color-background-button-hover: light-dark(var(--color-slate-100), var(--color-neutral-800));
 
   --color-border: light-dark(#e6eaf2, #2f3030);
   --color-focus: light-dark(var(--color-slate-200), var(--color-neutral-800));
