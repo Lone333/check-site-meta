@@ -11,6 +11,7 @@ import { TabList } from "@/app/module/tab/TabRoot"
 import { tab } from "@/app/module/tab/tab-primitives"
 import { SourceHeader } from "./Sitemap"
 import { TextInputCard, TextInputIconStart } from "../inputs/TextInput"
+import { formatDate } from "@/app/lib/date"
 
 export function SitemapCategoryCollapsible(
   props: {
@@ -225,10 +226,7 @@ export function SitemapFileCard(props: {
           </div>
           {props.lastModified && (
             <div className="text-xxs text-foreground-muted-2 font-normal">
-              Last updated: {new Intl.DateTimeFormat('en-US', {
-                dateStyle: 'medium',
-                timeStyle: 'short',
-              }).format(new Date(props.lastModified))}
+              Last updated: {formatDate(props.lastModified, 'mediumDate')}
             </div>
           )}
         </div>
@@ -377,13 +375,14 @@ export function SitemapFileCard(props: {
                   {processedUrls !== undefined && (
                     <div className="px-2 relative">
 
+
+
                       {/* TABLES CONTAINER */}
-                      <div className="pb-1 items-end top-0  overflow-x-auto overflow-y-clip px-2">
-                        {/* Tables */}
+                      <div className="items-end top-0  overflow-x-auto overflow-y-clip px-2">
+                        {/* Table */}
                         <div className={cn(
-                          "bg-background-tooltip text-foreground-muted rounded-t-xl -mx-2 *:pt-2 *:pb-1.5 sticky min-w-200",
+                          "bg-background-card text-foreground-muted rounded-t-xl -mx-2 *:pt-2 *:pb-1.5 sticky min-w-200",
                           "grid grid-cols-[2rem_4fr_9rem_0.5fr_0.5fr]",
-                          // "*:gap-x-2  *:*:min-w-0 *:*:overflow-ellipsis *:*:text-nowrap *:*:overflow-hidden",
                         )}>
                           <div className=""></div>
                           <button onClick={() => toggleSort('url')} className="flex gap-2 items-center rounded-none text-xs font-semibold text-start">
@@ -408,15 +407,13 @@ export function SitemapFileCard(props: {
                           {paginatedURLs
                             .map((url, i) => {
                               return (
-                                <div key={i} className="hover:bg-background-card-input -mx-2 px-2 py-1">
+                                <div key={i} className="hover:bg-background-card-input -mx-2 px-2 py-1 bg-background-card">
                                   <div className="flex gap-1">
                                     <a href={url.loc} target="_blank" className="underline opacity-60 hover:opacity-100">
                                       <MaterialSymbolsOpenInNew className="w-3.5 h-3.5" />
                                     </a>
                                     <div
-                                      onClick={() => {
-                                        navigation.navigate('url', url.loc)
-                                      }}
+                                      onClick={() => navigation.navigate('url', url.loc)}
                                       className="underline opacity-60 hover:opacity-100 clickable">
                                       <MaterialSymbolsSearchRounded className="w-3.5 h-3.5" />
                                     </div>
@@ -426,14 +423,10 @@ export function SitemapFileCard(props: {
                                   </div>
                                   <div className="grid grid-cols-[5rem_4rem] overflow-hidden">
                                     <div className="overflow-hidden">
-                                      {!!url.lastmod && new Intl.DateTimeFormat('en-US', {
-                                        dateStyle: 'medium',
-                                      }).format(new Date(url.lastmod))}
+                                      {formatDate(url.lastmod, 'mediumDate')}
                                     </div>
                                     <div className="overflow-hidden place-self-end">
-                                      {!!url.lastmod && new Intl.DateTimeFormat('en-US', {
-                                        timeStyle: 'short',
-                                      }).format(new Date(url.lastmod))}
+                                      {formatDate(url.lastmod, 'shortTime')}
                                     </div>
                                   </div>
                                   <div className="place-self-center">{url.changefreq ?? "-"}</div>
@@ -441,10 +434,11 @@ export function SitemapFileCard(props: {
                                 </div>
                               )
                             })}
+                          <div className="h-2 rounded-b-md -mx-2 bg-background-card" />
                         </div>
-
-
                       </div>
+
+                      {/* PAGINATION */}
                       <div className="flex gap-1 pt-2 justify-end items-center">
                         {(entriesCount ?? 0) > LIMIT && (
                           <div className=" px-1 text-foreground-muted-2">Only {LIMIT} entries are shown out of {entriesCount}</div>
