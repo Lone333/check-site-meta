@@ -5,13 +5,14 @@ import { CollapsibleRow } from "@/app/lib/Collapsible"
 import { ExpandableAdvancedCard } from "@/app/lib/Collapsible.client"
 import { cn } from "lazy-cn"
 import { getSitemapAction, type GetSitemapActionResponse } from "./Sitemap.action"
-import { MaterialSymbolsOpenInNew } from "../inputs/InputForm"
 import { useAppNavigation } from "@/app/lib/searchParams"
 import { TabList } from "@/app/module/tab/TabRoot"
 import { tab } from "@/app/module/tab/tab-primitives"
 import { SourceHeader } from "./Sitemap"
 import { TextInputCard, TextInputIconStart } from "../inputs/TextInput"
 import { formatDate } from "@/app/lib/date"
+import { SitemapUrlList } from "./SitemapUrl.client"
+import { SitemapIndexList } from "./SitemapIndex.client"
 
 export function SitemapCategoryCollapsible(
   props: {
@@ -50,69 +51,10 @@ export function SitemapFileCard(props: {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [sitemapData, setSitemapData] = useState<GetSitemapActionResponse>()
-  const [search, setSearch] = useState('')
-  const [sorts, setSorts] = useState<Record<string, "asc" | "desc" | null>>({
-    url: null,
-    lastmod: null,
-    freq: null,
-    priority: null,
-  })
-  const toggleSort = (key: "url" | "lastmod" | "freq" | "priority") => {
-    setSorts({
-      url: key === "url" ? (sorts.url === "asc" ? "desc" : sorts.url === "desc" ? null : "asc") : null,
-      lastmod: key === "lastmod" ? (sorts.lastmod === "asc" ? "desc" : sorts.lastmod === "desc" ? null : "asc") : null,
-      freq: key === "freq" ? (sorts.freq === "asc" ? "desc" : sorts.freq === "desc" ? null : "asc") : null,
-      priority: key === "priority" ? (sorts.priority === "asc" ? "desc" : sorts.priority === "desc" ? null : "asc") : null,
-    })
-  }
   const { urls: rawUrls, sitemaps: rawSitemaps } = sitemapData?.validated.res ?? { urls: [], sitemaps: [] }
+  const rawEntries = rawUrls?.length ? rawUrls : rawSitemaps?.length ? rawSitemaps : []
 
-  const processedUrls = rawUrls
-    ?.filter(a => search ? (
-      a.loc.includes(search)
-      || a.lastmod?.includes(search)
-      || a.changefreq?.includes(search)
-      || String(a.priority)?.includes(search)
-    ) : true)
-    .toSorted((a, b) => {
-      if (sorts.url === "asc") return a.loc.localeCompare(b.loc)
-      if (sorts.url === "desc") return b.loc.localeCompare(a.loc)
-      if (sorts.lastmod === "asc") return a.lastmod?.localeCompare(b.lastmod ?? a.lastmod) ?? 0
-      if (sorts.lastmod === "desc") return b.lastmod?.localeCompare(a.lastmod ?? b.lastmod) ?? 0
-      if (sorts.freq === "asc") return a.changefreq?.localeCompare(b.changefreq ?? a.changefreq) ?? 0
-      if (sorts.freq === "desc") return b.changefreq?.localeCompare(a.changefreq ?? b.changefreq) ?? 0
-      if (sorts.priority === "asc") return (a.priority ?? 0) - (b.priority ?? 0)
-      if (sorts.priority === "desc") return (b.priority ?? 0) - (a.priority ?? 0)
-      return 0
-    })
-
-  const processedSitemaps = rawSitemaps
-    ?.filter(a => search ? (a.loc.includes(search) || a.lastmod?.includes(search)) : true)
-    .toSorted((a, b) => {
-      if (sorts.url === "asc") return a.loc.localeCompare(b.loc)
-      if (sorts.url === "desc") return b.loc.localeCompare(a.loc)
-      if (sorts.lastmod === "asc") return a.lastmod?.localeCompare(b.lastmod ?? a.lastmod) ?? 0
-      if (sorts.lastmod === "desc") return b.lastmod?.localeCompare(a.lastmod ?? b.lastmod) ?? 0
-      return 0
-    })
-
-  const entries = processedUrls ?? processedSitemaps ?? []
-  const entriesCount = entries.length
-
-  // Limits and Paginations
-  const LIMIT = 20
-  const [page, setPage] = useState(1)
-  const hasNextPage = page * LIMIT < entries.length;
-  const hasPrevPage = page > 1;
-  const totalPages = Math.ceil(entriesCount / LIMIT)
-  const nextPage = () => {
-    if (hasNextPage) setPage((prev) => prev + 1);
-  };
-  const prevPage = () => {
-    if (hasPrevPage) setPage((prev) => prev - 1);
-  };
-  const paginatedSitemaps = processedSitemaps?.slice((page - 1) * LIMIT, page * LIMIT) ?? []
-  const paginatedURLs = processedUrls?.slice((page - 1) * LIMIT, page * LIMIT) ?? []
+  const [search, setSearch] = useState('')
 
   // Messages
   const messages = sitemapData?.validated.messages ?? []
@@ -122,7 +64,6 @@ export function SitemapFileCard(props: {
 
   // Views
   const [isRaw, setIsRaw] = useState(false)
-  const toggleRaw = () => setIsRaw(!isRaw)
 
   // Content Render Control
   const [largeContentRendered, setLargeContentRendered] = useState(false)
@@ -174,11 +115,9 @@ export function SitemapFileCard(props: {
       '--header-offset': `calc((var(--spacing) * ${ 9 }) + (var(--spacing) * ${ props.topOffset ?? 0 }) + ${ props.topOffset ? "(var(--spacing) * 2)" : "0px" })`,
     }}
 
-
     onTransitionEnd={(e) => {
       if (e.target === e.currentTarget?.children[1]?.children[0]) {
         const collapsingElement = e.currentTarget?.children[1]?.children[0] as HTMLDivElement
-        console.log('opened' in collapsingElement.dataset)
         if ('opened' in collapsingElement.dataset === false) {
           setLargeContentRendered(false)
         }
@@ -264,21 +203,22 @@ export function SitemapFileCard(props: {
                       })
                     })
                   }}>
-                  {/* <MaterialSymbolsSearchRounded className="size-4" /> */}
                   <MaterialSymbolsRefresh className="size-4" />
-                  {/* {isPending ? "Refreshing..." : "Refresh"} */}
                 </CardDetailButton>
 
                 {/* Status Bar */}
-                {sitemapData?.validated.isIndex ? <>
-                  <div className="badge-violet px-3 py-1 rounded-full ">
-                    Sitemap Index
-                  </div>
-                  <div className="badge-gray px-3 py-1 rounded-full ">
-                    {sitemapData?.validated.res.sitemaps?.length ?? 0} Sitemaps
-                  </div>
-                </>
-                  : <>
+                {sitemapData?.validated.isIndex
+                  ?
+                  <>
+                    <div className="badge-violet px-3 py-1 rounded-full ">
+                      Sitemap Index
+                    </div>
+                    <div className="badge-gray px-3 py-1 rounded-full ">
+                      {sitemapData?.validated.res.sitemaps?.length ?? 0} Sitemaps
+                    </div>
+                  </>
+                  :
+                  <>
                     <div className="badge-teal px-3 py-1 rounded-full ">
                       Sitemap
                     </div>
@@ -302,7 +242,6 @@ export function SitemapFileCard(props: {
                     {warns.length} Infos
                   </div>
                 )}
-
               </div>
 
 
@@ -331,7 +270,7 @@ export function SitemapFileCard(props: {
                 <CollapsibleRow data-opened={!isRaw}>
 
                   {/* Search Part */}
-                  {(rawSitemaps?.length ?? rawSitemaps?.length ?? 0) > 0 && (
+                  {/* {(rawSitemaps?.length ?? rawSitemaps?.length ?? 0) > 0 && (
                     <div className="px-2 pb-2 pt-0.5">
                       <div className={cn("w-full transition-all duration-500 pb-0.5 max-w-xl",)}>
                         <TextInputCard>
@@ -350,114 +289,121 @@ export function SitemapFileCard(props: {
 
                       </div>
                     </div>
-                  )}
+                  )} */}
 
                   {/* Sitemap Indexes */}
-                  {processedSitemaps !== undefined && (
-                    <div className="px-2 flex flex-col -mt-2">
-                      {paginatedSitemaps
-                        .map((sitemaps, i) => {
-                          return (
-                            <SitemapFileCard key={sitemaps.loc + i}
-                              fullUrl={sitemaps.loc}
-                              title={sitemaps.loc}
-                              lastModified={sitemaps.lastmod}
-                              defaultClosed
-                              depth={(props.depth ?? 0) + 1}
-                              topOffset={(props.topOffset ?? 0) + (props.lastModified ? 12 : 8.5)}
-                            />
-                          )
-                        })}
-                    </div>
+                  {rawSitemaps && rawSitemaps.length > 0 && (
+                    <SitemapIndexList
+                      indexes={rawSitemaps}
+                      depth={(props.depth ?? 0) + 1}
+                      topOffset={(props.topOffset ?? 0) + (props.lastModified ? 12 : 8.5)}
+                      lastModified={props.lastModified}
+                    />
+                    // <div className="px-2 flex flex-col -mt-2">
+                    //   {paginatedEntries
+                    //     .map((sitemaps, i) => {
+                    //       return (
+                    //         <SitemapFileCard key={sitemaps.loc + i}
+                    //           fullUrl={sitemaps.loc}
+                    //           title={sitemaps.loc}
+                    //           lastModified={sitemaps.lastmod}
+                    //           defaultClosed
+                    //           depth={(props.depth ?? 0) + 1}
+                    //           topOffset={(props.topOffset ?? 0) + (props.lastModified ? 12 : 8.5)}
+                    //         />
+                    //       )
+                    //     })}
+                    // </div>
                   )}
 
                   {/* Sitemap URLS */}
-                  {processedUrls !== undefined && (
-                    <div className="px-2 relative">
+                  {rawUrls && rawUrls.length > 0 && (
+                    <SitemapUrlList
+                      urls={rawUrls}
+                      fullUrl={props.fullUrl}
+                    />
+                    // <div className="px-2 relative">
+                    //   {/* TABLES CONTAINER */}
+                    //   <div className="items-end top-0  overflow-x-auto overflow-y-clip px-2">
+                    //     {/* Table */}
+                    //     <div className={cn(
+                    //       "bg-background-card text-foreground-muted rounded-t-xl -mx-2 *:pt-2 *:pb-1.5 sticky min-w-200",
+                    //       "grid grid-cols-[2rem_4fr_9rem_0.5fr_0.5fr]",
+                    //     )}>
+                    //       <div className=""></div>
+                    //       <button onClick={() => toggleSort('url')} className="flex gap-2 items-center rounded-none text-xs font-semibold text-start">
+                    //         URL
+                    //         <SortIconTableHeader status={sorts.loc} />
+                    //       </button>
+                    //       <button onClick={() => toggleSort('lastmod')} className="flex gap-2 items-center rounded-none text-xs font-semibold place-self-center">
+                    //         Last Modified
+                    //         <SortIconTableHeader status={sorts.lastmod} />
+                    //       </button>
+                    //       <button onClick={() => toggleSort('freq')} className="flex gap-2 items-center rounded-none text-xs font-semibold place-self-center">
+                    //         Frequency
+                    //         <SortIconTableHeader status={sorts.freq} />
+                    //       </button>
+                    //       <button onClick={() => toggleSort('priority')} className="flex gap-2 items-center rounded-none text-xs font-semibold place-self-center">
+                    //         Priority
+                    //         <SortIconTableHeader status={sorts.priority} />
+                    //       </button>
+                    //     </div>
 
+                    //     <div className="fadeIn-0 col-span-5 *:grid *:grid-cols-[2rem_4fr_9rem_0.5fr_0.5fr] *:gap-x-2  *:*:min-w-0 *:*:overflow-ellipsis *:*:text-nowrap *:*:overflow-hidden">
+                    //       {paginatedEntries
+                    //         .map((url, i) => {
+                    //           return (
+                    //             <div key={i} className="hover:bg-background-card-input -mx-2 px-2 py-1 bg-background-card">
+                    //               <div className="flex gap-1">
+                    //                 <a href={url.loc} target="_blank" className="underline opacity-60 hover:opacity-100">
+                    //                   <MaterialSymbolsOpenInNew className="w-3.5 h-3.5" />
+                    //                 </a>
+                    //                 <div
+                    //                   onClick={() => navigation.navigate('url', url.loc)}
+                    //                   className="underline opacity-60 hover:opacity-100 clickable">
+                    //                   <MaterialSymbolsSearchRounded className="w-3.5 h-3.5" />
+                    //                 </div>
+                    //               </div>
+                    //               <div className="">
+                    //                 {url.loc.split(props.fullUrl.split('://')[1])[1] || url.loc}
+                    //               </div>
+                    //               <div className="grid grid-cols-[5rem_4rem] overflow-hidden">
+                    //                 <div className="overflow-hidden">
+                    //                   {formatDate(url.lastmod, 'mediumDate')}
+                    //                 </div>
+                    //                 <div className="overflow-hidden place-self-end">
+                    //                   {formatDate(url.lastmod, 'shortTime')}
+                    //                 </div>
+                    //               </div>
+                    //               <div className="place-self-center">{url.changefreq ?? "-"}</div>
+                    //               <div className="place-self-center">{url.priority ?? "-"}</div>
+                    //             </div>
+                    //           )
+                    //         })}
+                    //       <div className="h-2 rounded-b-md -mx-2 bg-background-card" />
+                    //     </div>
+                    //   </div>
 
-
-                      {/* TABLES CONTAINER */}
-                      <div className="items-end top-0  overflow-x-auto overflow-y-clip px-2">
-                        {/* Table */}
-                        <div className={cn(
-                          "bg-background-card text-foreground-muted rounded-t-xl -mx-2 *:pt-2 *:pb-1.5 sticky min-w-200",
-                          "grid grid-cols-[2rem_4fr_9rem_0.5fr_0.5fr]",
-                        )}>
-                          <div className=""></div>
-                          <button onClick={() => toggleSort('url')} className="flex gap-2 items-center rounded-none text-xs font-semibold text-start">
-                            URL
-                            <SortIconTableHeader status={sorts.url} />
-                          </button>
-                          <button onClick={() => toggleSort('lastmod')} className="flex gap-2 items-center rounded-none text-xs font-semibold place-self-center">
-                            Last Modified
-                            <SortIconTableHeader status={sorts.lastmod} />
-                          </button>
-                          <button onClick={() => toggleSort('freq')} className="flex gap-2 items-center rounded-none text-xs font-semibold place-self-center">
-                            Frequency
-                            <SortIconTableHeader status={sorts.freq} />
-                          </button>
-                          <button onClick={() => toggleSort('priority')} className="flex gap-2 items-center rounded-none text-xs font-semibold place-self-center">
-                            Priority
-                            <SortIconTableHeader status={sorts.priority} />
-                          </button>
-                        </div>
-
-                        <div className="fadeIn-0 col-span-5 *:grid *:grid-cols-[2rem_4fr_9rem_0.5fr_0.5fr] *:gap-x-2  *:*:min-w-0 *:*:overflow-ellipsis *:*:text-nowrap *:*:overflow-hidden">
-                          {paginatedURLs
-                            .map((url, i) => {
-                              return (
-                                <div key={i} className="hover:bg-background-card-input -mx-2 px-2 py-1 bg-background-card">
-                                  <div className="flex gap-1">
-                                    <a href={url.loc} target="_blank" className="underline opacity-60 hover:opacity-100">
-                                      <MaterialSymbolsOpenInNew className="w-3.5 h-3.5" />
-                                    </a>
-                                    <div
-                                      onClick={() => navigation.navigate('url', url.loc)}
-                                      className="underline opacity-60 hover:opacity-100 clickable">
-                                      <MaterialSymbolsSearchRounded className="w-3.5 h-3.5" />
-                                    </div>
-                                  </div>
-                                  <div className="">
-                                    {url.loc.split(props.fullUrl.split('://')[1])[1] || url.loc}
-                                  </div>
-                                  <div className="grid grid-cols-[5rem_4rem] overflow-hidden">
-                                    <div className="overflow-hidden">
-                                      {formatDate(url.lastmod, 'mediumDate')}
-                                    </div>
-                                    <div className="overflow-hidden place-self-end">
-                                      {formatDate(url.lastmod, 'shortTime')}
-                                    </div>
-                                  </div>
-                                  <div className="place-self-center">{url.changefreq ?? "-"}</div>
-                                  <div className="place-self-center">{url.priority ?? "-"}</div>
-                                </div>
-                              )
-                            })}
-                          <div className="h-2 rounded-b-md -mx-2 bg-background-card" />
-                        </div>
-                      </div>
-
-                      {/* PAGINATION */}
-                      <div className="flex gap-1 pt-2 justify-end items-center">
-                        {(entriesCount ?? 0) > LIMIT && (
-                          <div className=" px-1 text-foreground-muted-2">Only {LIMIT} entries are shown out of {entriesCount}</div>
-                        )}
-                        {totalPages > 1 && (
-                          <>
-                            <CardDetailButton onClick={() => prevPage()} className="px-3">
-                              ◀
-                            </CardDetailButton>
-                            <CardDetailButton className="pointer-events-none bg-transparent px-3">
-                              {page} / {totalPages}
-                            </CardDetailButton>
-                            <CardDetailButton onClick={() => nextPage()} className="px-3">
-                              ▶
-                            </CardDetailButton>
-                          </>
-                        )}
-                      </div>
-                    </div>
+                    //   {/* PAGINATION */}
+                    //   <div className="flex gap-1 pt-2 justify-end items-center">
+                    //     {(entriesCount ?? 0) > LIMIT && (
+                    //       <div className=" px-1 text-foreground-muted-2">Only {LIMIT} entries are shown out of {entriesCount}</div>
+                    //     )}
+                    //     {totalPages > 1 && (
+                    //       <>
+                    //         <CardDetailButton onClick={() => prevPage()} className="px-3">
+                    //           ◀
+                    //         </CardDetailButton>
+                    //         <CardDetailButton className="pointer-events-none bg-transparent px-3">
+                    //           {page} / {totalPages}
+                    //         </CardDetailButton>
+                    //         <CardDetailButton onClick={() => nextPage()} className="px-3">
+                    //           ▶
+                    //         </CardDetailButton>
+                    //       </>
+                    //     )}
+                    //   </div>
+                    // </div>
                   )}
                 </CollapsibleRow>
               </div>
@@ -470,9 +416,6 @@ export function SitemapFileCard(props: {
       </div>
     }
   />
-
-
-
 }
 
 
@@ -498,11 +441,63 @@ function CardDetailButton(props: ComponentProps<"button">) {
   )
 }
 
+// -- CONTROLSS
 
-
-
-
-
+export function ListSearchInputField(props: {
+  search: string,
+  setSearch: (s: string) => void
+}) {
+  return (
+    <div className="px-2 pb-2 pt-0.5">
+      <div className={cn("w-full transition-all duration-500 pb-0.5 max-w-xl",)}>
+        <TextInputCard>
+          <TextInputIconStart>
+            <MaterialSymbolsSearchRounded className="w-4 h-4" />
+          </TextInputIconStart>
+          <input
+            autoComplete="offOFFFFFOFOFOFOFFFF"
+            autoSave="off"
+            value={props.search}
+            onChange={e => props.setSearch(e.target.value)}
+            placeholder="  search..."
+            className={cn("w-full h-9 outline-0")}
+          />
+        </TextInputCard>
+      </div>
+    </div>
+  )
+}
+export function ListPaginationMenu(props: {
+  entriesCount: number,
+  LIMIT: number,
+  page: number,
+  totalPages: number,
+  nextPage: () => void,
+  prevPage: () => void
+}) {
+  const { entriesCount, LIMIT, page, totalPages, nextPage, prevPage } = props
+  return (
+    <div className="flex gap-1 pt-2 justify-end items-center">
+      {(entriesCount ?? 0) > LIMIT && (
+        <div className=" px-1 text-foreground-muted-2">Only {LIMIT} entries are shown out of {entriesCount}</div>
+      )}
+      {totalPages > 1 && (
+        <>
+          <CardDetailButton onClick={() => prevPage()} className="px-3">
+            ◀
+          </CardDetailButton>
+          <CardDetailButton className="pointer-events-none bg-transparent px-3">
+            {page} / {totalPages}
+          </CardDetailButton>
+          <CardDetailButton onClick={() => nextPage()} className="px-3">
+            ▶
+          </CardDetailButton>
+        </>
+      )}
+    </div>
+  )
+}
+// -- CONTROLSS END
 
 
 
