@@ -1,4 +1,7 @@
 export const changelog = {
+  "0.3.1": [
+    "Improve table sitemap UI",
+  ],
   "0.3.0": [
     "Added ability to check sitemap and robots.txt: currently in beta",
     "Fixed comically large padding",
