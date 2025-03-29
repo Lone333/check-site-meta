@@ -31,7 +31,9 @@ export function SitemapIndexList(props: {
     nextPage,
     prevPage,
     totalPages,
-    page
+    page,
+    hasNextPage,
+    hasPrevPage,
   } = usePagination(LIMIT, sortedEntries)
 
   return (
@@ -53,15 +55,17 @@ export function SitemapIndexList(props: {
               />
             )
           })}
+        <ListPaginationMenu
+          entriesCount={sortedEntries.length}
+          LIMIT={LIMIT}
+          page={page}
+          totalPages={totalPages}
+          nextPage={nextPage}
+          prevPage={prevPage}
+          hasNextPage={hasNextPage}
+          hasPrevPage={hasPrevPage}
+        />
       </div>
-      <ListPaginationMenu
-        entriesCount={sortedEntries.length}
-        LIMIT={LIMIT}
-        page={page}
-        totalPages={totalPages}
-        nextPage={nextPage}
-        prevPage={prevPage}
-      />
     </>
   )
 }

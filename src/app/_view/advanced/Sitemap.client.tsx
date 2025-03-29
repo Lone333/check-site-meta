@@ -13,6 +13,7 @@ import { TextInputCard, TextInputIconStart } from "../inputs/TextInput"
 import { formatDate } from "@/app/lib/date"
 import { SitemapUrlList } from "./SitemapUrl.client"
 import { SitemapIndexList } from "./SitemapIndex.client"
+import { ErrorCardMini, type ParsedError } from "@/app/module/error/ErrorCard"
 
 export function SitemapCategoryCollapsible(
   props: {
@@ -47,14 +48,23 @@ export function SitemapFileCard(props: {
   depth?: number
   topOffset?: number
 }) {
-  const navigation = useAppNavigation()
   const [isExpanded, setIsExpanded] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [sitemapData, setSitemapData] = useState<GetSitemapActionResponse>()
   const { urls: rawUrls, sitemaps: rawSitemaps } = sitemapData?.validated.res ?? { urls: [], sitemaps: [] }
-  const rawEntries = rawUrls?.length ? rawUrls : rawSitemaps?.length ? rawSitemaps : []
-
-  const [search, setSearch] = useState('')
+  function fetchAndSetData() {
+    startTransition(async () => {
+      const res = await getSitemapAction(props.fullUrl)
+      startTransition(() => {
+        if (res.data) setSitemapData(res.data)
+        if (res.error) {
+          console.error(res.error)
+          setError(res.error)
+        }
+      })
+    })
+  }
+  const [error, setError] = useState<ParsedError>()
 
   // Messages
   const messages = sitemapData?.validated.messages ?? []
@@ -68,32 +78,20 @@ export function SitemapFileCard(props: {
   // Content Render Control
   const [largeContentRendered, setLargeContentRendered] = useState(false)
   useEffect(() => {
-    if (largeContentRendered) {
-      setIsExpanded(true)
-    }
+    if (largeContentRendered) setIsExpanded(true)
   }, [largeContentRendered])
-
   useEffect(() => {
-    if (!!sitemapData) {
-      setLargeContentRendered(true)
-    }
+    if (!!sitemapData) setLargeContentRendered(true)
   }, [sitemapData])
 
 
   return <ExpandableAdvancedCard
 
     toggleExpanse={() => {
+
       if (!sitemapData && !isExpanded) {
         setIsExpanded(true)
-        startTransition(async () => {
-          const res = await getSitemapAction(props.fullUrl)
-          startTransition(() => {
-            if (res.data) {
-              setSitemapData(res.data)
-            }
-            if (res.error) console.error(res.error)
-          })
-        })
+        fetchAndSetData()
       }
       // If previously isExpanded is true, then set isExpanded to false | then ontransitionend, setLargeContentRendered to false to hide the content
       if (isExpanded) {
@@ -140,16 +138,11 @@ export function SitemapFileCard(props: {
             )}>
               {props.title}
             </div>
-            <div role="button"
+            <div
+              role="button"
               onClick={e => {
                 e.stopPropagation()
-                startTransition(async () => {
-                  const res = await getSitemapAction(props.fullUrl)
-                  startTransition(() => {
-                    if (res.data) setSitemapData(res.data)
-                    if (res.error) console.error(res.error)
-                  })
-                })
+                fetchAndSetData()
               }}
               className="-my-1 p-1 opacity-0 group-hover:opacity-60 hover:opacity-100 shrink-0">
               <MaterialSymbolsRefresh className="size-4 text-foreground-muted mt-0.25" />
@@ -175,6 +168,11 @@ export function SitemapFileCard(props: {
     Content={
       <div className="text-xs text-foreground-body flex flex-col text-start">
 
+        <CollapsibleRow data-opened={!!error}>
+          <ErrorCardMini error={error} />
+          {/* <div className="p-3 px-4 text-foreground-muted-2 italic animate-pulse">Error: {error?.message}</div> */}
+        </CollapsibleRow>
+
         <CollapsibleRow data-opened={isPending && !sitemapData}>
           <div className="p-3 px-4 text-foreground-muted-2 italic animate-pulse">Fetching {props.fullUrl}...</div>
         </CollapsibleRow>
@@ -194,15 +192,7 @@ export function SitemapFileCard(props: {
                 <CardDetailButton
                   className="h-7 px-3 button-card"
                   disabled={isPending}
-                  onClick={() => {
-                    startTransition(async () => {
-                      const res = await getSitemapAction(props.fullUrl)
-                      startTransition(() => {
-                        if (res.data) setSitemapData(res.data)
-                        if (res.error) console.error(res.error)
-                      })
-                    })
-                  }}>
+                  onClick={() => fetchAndSetData()}>
                   <MaterialSymbolsRefresh className="size-4" />
                 </CardDetailButton>
 
@@ -233,18 +223,16 @@ export function SitemapFileCard(props: {
                   </div>
                 )}
                 {warns.length > 0 && (
-                  <div className="text-amber-500 px-1 rounded-full ">
+                  <div className="text-amber-500 px-1">
                     {warns.length} Warnings
                   </div>
                 )}
                 {infos.length > 0 && (
-                  <div className="text-slate-500 px-1 rounded-full ">
+                  <div className="text-slate-500 px-1">
                     {warns.length} Infos
                   </div>
                 )}
               </div>
-
-
 
               {/* Error Messages Goes Here */}
               {messages.length > 0 && (
@@ -254,6 +242,7 @@ export function SitemapFileCard(props: {
                   })}
                 </div>
               )}
+
               <div>
                 {/* For Raw */}
                 <CollapsibleRow data-opened={isRaw}>
@@ -266,30 +255,7 @@ export function SitemapFileCard(props: {
                   </div>
                 </CollapsibleRow>
 
-
                 <CollapsibleRow data-opened={!isRaw}>
-
-                  {/* Search Part */}
-                  {/* {(rawSitemaps?.length ?? rawSitemaps?.length ?? 0) > 0 && (
-                    <div className="px-2 pb-2 pt-0.5">
-                      <div className={cn("w-full transition-all duration-500 pb-0.5 max-w-xl",)}>
-                        <TextInputCard>
-                          <TextInputIconStart>
-                            <MaterialSymbolsSearchRounded className="w-4 h-4" />
-                          </TextInputIconStart>
-                          <input
-                            autoComplete="offOFFFFFOFOFOFOFFFF"
-                            autoSave="off"
-                            value={search}
-                            onChange={e => setSearch(e.target.value)}
-                            placeholder="  search..."
-                            className={cn("w-full h-9 outline-0")}
-                          />
-                        </TextInputCard>
-
-                      </div>
-                    </div>
-                  )} */}
 
                   {/* Sitemap Indexes */}
                   {rawSitemaps && rawSitemaps.length > 0 && (
@@ -299,21 +265,6 @@ export function SitemapFileCard(props: {
                       topOffset={(props.topOffset ?? 0) + (props.lastModified ? 12 : 8.5)}
                       lastModified={props.lastModified}
                     />
-                    // <div className="px-2 flex flex-col -mt-2">
-                    //   {paginatedEntries
-                    //     .map((sitemaps, i) => {
-                    //       return (
-                    //         <SitemapFileCard key={sitemaps.loc + i}
-                    //           fullUrl={sitemaps.loc}
-                    //           title={sitemaps.loc}
-                    //           lastModified={sitemaps.lastmod}
-                    //           defaultClosed
-                    //           depth={(props.depth ?? 0) + 1}
-                    //           topOffset={(props.topOffset ?? 0) + (props.lastModified ? 12 : 8.5)}
-                    //         />
-                    //       )
-                    //     })}
-                    // </div>
                   )}
 
                   {/* Sitemap URLS */}
@@ -322,97 +273,12 @@ export function SitemapFileCard(props: {
                       urls={rawUrls}
                       fullUrl={props.fullUrl}
                     />
-                    // <div className="px-2 relative">
-                    //   {/* TABLES CONTAINER */}
-                    //   <div className="items-end top-0  overflow-x-auto overflow-y-clip px-2">
-                    //     {/* Table */}
-                    //     <div className={cn(
-                    //       "bg-background-card text-foreground-muted rounded-t-xl -mx-2 *:pt-2 *:pb-1.5 sticky min-w-200",
-                    //       "grid grid-cols-[2rem_4fr_9rem_0.5fr_0.5fr]",
-                    //     )}>
-                    //       <div className=""></div>
-                    //       <button onClick={() => toggleSort('url')} className="flex gap-2 items-center rounded-none text-xs font-semibold text-start">
-                    //         URL
-                    //         <SortIconTableHeader status={sorts.loc} />
-                    //       </button>
-                    //       <button onClick={() => toggleSort('lastmod')} className="flex gap-2 items-center rounded-none text-xs font-semibold place-self-center">
-                    //         Last Modified
-                    //         <SortIconTableHeader status={sorts.lastmod} />
-                    //       </button>
-                    //       <button onClick={() => toggleSort('freq')} className="flex gap-2 items-center rounded-none text-xs font-semibold place-self-center">
-                    //         Frequency
-                    //         <SortIconTableHeader status={sorts.freq} />
-                    //       </button>
-                    //       <button onClick={() => toggleSort('priority')} className="flex gap-2 items-center rounded-none text-xs font-semibold place-self-center">
-                    //         Priority
-                    //         <SortIconTableHeader status={sorts.priority} />
-                    //       </button>
-                    //     </div>
-
-                    //     <div className="fadeIn-0 col-span-5 *:grid *:grid-cols-[2rem_4fr_9rem_0.5fr_0.5fr] *:gap-x-2  *:*:min-w-0 *:*:overflow-ellipsis *:*:text-nowrap *:*:overflow-hidden">
-                    //       {paginatedEntries
-                    //         .map((url, i) => {
-                    //           return (
-                    //             <div key={i} className="hover:bg-background-card-input -mx-2 px-2 py-1 bg-background-card">
-                    //               <div className="flex gap-1">
-                    //                 <a href={url.loc} target="_blank" className="underline opacity-60 hover:opacity-100">
-                    //                   <MaterialSymbolsOpenInNew className="w-3.5 h-3.5" />
-                    //                 </a>
-                    //                 <div
-                    //                   onClick={() => navigation.navigate('url', url.loc)}
-                    //                   className="underline opacity-60 hover:opacity-100 clickable">
-                    //                   <MaterialSymbolsSearchRounded className="w-3.5 h-3.5" />
-                    //                 </div>
-                    //               </div>
-                    //               <div className="">
-                    //                 {url.loc.split(props.fullUrl.split('://')[1])[1] || url.loc}
-                    //               </div>
-                    //               <div className="grid grid-cols-[5rem_4rem] overflow-hidden">
-                    //                 <div className="overflow-hidden">
-                    //                   {formatDate(url.lastmod, 'mediumDate')}
-                    //                 </div>
-                    //                 <div className="overflow-hidden place-self-end">
-                    //                   {formatDate(url.lastmod, 'shortTime')}
-                    //                 </div>
-                    //               </div>
-                    //               <div className="place-self-center">{url.changefreq ?? "-"}</div>
-                    //               <div className="place-self-center">{url.priority ?? "-"}</div>
-                    //             </div>
-                    //           )
-                    //         })}
-                    //       <div className="h-2 rounded-b-md -mx-2 bg-background-card" />
-                    //     </div>
-                    //   </div>
-
-                    //   {/* PAGINATION */}
-                    //   <div className="flex gap-1 pt-2 justify-end items-center">
-                    //     {(entriesCount ?? 0) > LIMIT && (
-                    //       <div className=" px-1 text-foreground-muted-2">Only {LIMIT} entries are shown out of {entriesCount}</div>
-                    //     )}
-                    //     {totalPages > 1 && (
-                    //       <>
-                    //         <CardDetailButton onClick={() => prevPage()} className="px-3">
-                    //           ◀
-                    //         </CardDetailButton>
-                    //         <CardDetailButton className="pointer-events-none bg-transparent px-3">
-                    //           {page} / {totalPages}
-                    //         </CardDetailButton>
-                    //         <CardDetailButton onClick={() => nextPage()} className="px-3">
-                    //           ▶
-                    //         </CardDetailButton>
-                    //       </>
-                    //     )}
-                    //   </div>
-                    // </div>
                   )}
                 </CollapsibleRow>
               </div>
-
-
             </div>
           )}
         </CollapsibleRow>
-
       </div>
     }
   />
@@ -435,7 +301,11 @@ function CardDetailButton(props: ComponentProps<"button">) {
     <button
       {...props}
       className={cn(
-        "text-nowrap text-xs text-foreground-muted bg-background-button hover:bg-background-button-hover p-2 px-4 flex items-center gap-1 rounded-lg", props.className
+        "text-nowrap text-xs text-foreground-muted bg-background-button hover:bg-background-button-hover p-2 px-4 flex items-center gap-1 rounded-lg",
+        "disabled:pointer-events-none disabled:opacity-50",
+        "transition-opacity",
+        "select-none",
+        props.className
       )}
     />
   )
@@ -473,7 +343,9 @@ export function ListPaginationMenu(props: {
   page: number,
   totalPages: number,
   nextPage: () => void,
-  prevPage: () => void
+  prevPage: () => void,
+  hasNextPage: boolean,
+  hasPrevPage: boolean,
 }) {
   const { entriesCount, LIMIT, page, totalPages, nextPage, prevPage } = props
   return (
@@ -483,13 +355,21 @@ export function ListPaginationMenu(props: {
       )}
       {totalPages > 1 && (
         <>
-          <CardDetailButton onClick={() => prevPage()} className="px-3">
+          <CardDetailButton
+            onClick={() => prevPage()}
+            className="px-3"
+            disabled={!props.hasPrevPage}
+          >
             ◀
           </CardDetailButton>
           <CardDetailButton className="pointer-events-none bg-transparent px-3">
             {page} / {totalPages}
           </CardDetailButton>
-          <CardDetailButton onClick={() => nextPage()} className="px-3">
+          <CardDetailButton
+            onClick={() => nextPage()}
+            className="px-3"
+            disabled={!props.hasNextPage}
+          >
             ▶
           </CardDetailButton>
         </>

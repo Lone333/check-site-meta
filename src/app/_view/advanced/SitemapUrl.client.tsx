@@ -33,7 +33,9 @@ export function SitemapUrlList(props: {
     nextPage,
     prevPage,
     totalPages,
-    page
+    page,
+    hasNextPage,
+    hasPrevPage,
   } = usePagination(LIMIT, sortedEntries)
 
   const navigation = useAppNavigation()
@@ -104,35 +106,17 @@ export function SitemapUrlList(props: {
             <div className="h-2 rounded-b-md -mx-2 bg-background-card" />
           </div>
         </div>
-
-        {/* PAGINATION */}
-        {/* <div className="flex gap-1 pt-2 justify-end items-center">
-          {(entriesCount ?? 0) > LIMIT && (
-            <div className=" px-1 text-foreground-muted-2">Only {LIMIT} entries are shown out of {entriesCount}</div>
-          )}
-          {totalPages > 1 && (
-            <>
-              <CardDetailButton onClick={() => prevPage()} className="px-3">
-                ◀
-              </CardDetailButton>
-              <CardDetailButton className="pointer-events-none bg-transparent px-3">
-                {page} / {totalPages}
-              </CardDetailButton>
-              <CardDetailButton onClick={() => nextPage()} className="px-3">
-                ▶
-              </CardDetailButton>
-            </>
-          )}
-        </div> */}
+        <ListPaginationMenu
+          entriesCount={sortedEntries.length}
+          LIMIT={LIMIT}
+          page={page}
+          totalPages={totalPages}
+          nextPage={nextPage}
+          prevPage={prevPage}
+          hasNextPage={hasNextPage}
+          hasPrevPage={hasPrevPage}
+        />
       </div>
-      <ListPaginationMenu
-        entriesCount={sortedEntries.length}
-        LIMIT={LIMIT}
-        page={page}
-        totalPages={totalPages}
-        nextPage={nextPage}
-        prevPage={prevPage}
-      />
     </>
   )
 }
