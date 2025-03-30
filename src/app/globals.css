@@ -53,21 +53,22 @@ body {
     var(--color-gray-100),
     --alpha(var(--color-neutral-700) / 0.5)
   );
-  
-  
+
   --color-background-card: light-dark(#fff, #232424);
-  
-  --color-background-card-box: light-dark(#F4F6F9, #1c1d1d);
+
+  --color-background-card-box: light-dark(#f4f6f9, #1c1d1d);
 
   --color-background-tooltip: light-dark(
     --alpha(var(--color-background-muted) / 0.5),
     --alpha(var(--color-foreground-muted-2) / 0.1)
   );
 
-
   --color-background-input: light-dark(#fff, #202121);
   --color-background-button: light-dark(#fff, #202121);
-  --color-background-button-hover: light-dark(var(--color-slate-100), var(--color-neutral-800));
+  --color-background-button-hover: light-dark(
+    var(--color-slate-100),
+    var(--color-neutral-800)
+  );
 
   --color-border: light-dark(#e6eaf2, #2f3030);
   --color-focus: light-dark(var(--color-slate-200), var(--color-neutral-800));
@@ -77,7 +78,6 @@ body {
   );
 
   /* Component Colors */
-
 
   /* Accent Colors */
   --color-warning: light-dark(
@@ -207,12 +207,56 @@ body {
   }
 }
 
+/* Scrollbar -------------------------------- */
+/* 
+.app-scrollbar {
+  --scrollbar-thumb-color: var(--color-card);
+}
+
+@utility scrollbar-thumb-* {
+  --scrollbar-thumb-color: --value(--color-*);
+} */
+
+:root {
+  --scrollbar-thumb-color: #fff7;
+  --scrollbar-track-color: transparent;
+  --scrollbar-thumb-round: 1rem;
+  --scrollbar-thumb-margin: 4px;
+}
+
+@utility scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+/* For browsers that support `scrollbar-*` properties */
+@supports (scrollbar-color: auto) {
+  * {
+    scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color);
+  }
+}
+
+/* Otherwise, use `::-webkit-scrollbar-*` pseudo-elements */
+@supports selector(::-webkit-scrollbar) {
+  *::-webkit-scrollbar {
+    background: var(--scrollbar-track-color);
+  }
+  *::-webkit-scrollbar-thumb {
+    border-radius: var(--scrollbar-thumb-round);
+    background: var(--scrollbar-thumb-color);
+    background-clip: content-box;
+    border: var(--scrollbar-thumb-margin) solid transparent;
+  }
+}
+
 /* Components ----------------------------- */
 
 @utility button-card {
-  --tw-shadow-color: light-dark(var(--color-slate-200),var(--color-neutral-900));
+  --tw-shadow-color: light-dark(
+    var(--color-slate-200),
+    var(--color-neutral-900)
+  );
   @apply rounded-md shadow-sm
-   disabled:text-foreground-muted-2/20 disabled:pointer-events-none
+   disabled:text-foreground-muted-2/20 disabled:pointer-events-none;
 }
 
 @utility collapsible-row-grid-* {
@@ -274,7 +318,7 @@ body {
   bg-background-muted;
 }
 @utility tab-card {
-  @apply bg-background-muted/80
+  @apply bg-background-muted/80;
 }
 @custom-variant tab-item (& .tab-item);
 @utility tab-item {
