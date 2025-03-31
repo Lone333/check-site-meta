@@ -247,12 +247,12 @@ export function SitemapFileCard(props: {
                   </>
                 }
                 {errors.length > 0 && (
-                  <div className="badge-red px-3 py-1 rounded-full ">
+                  <div className="text-red-400 px-1">
                     {errors.length} Errors
                   </div>
                 )}
                 {warns.length > 0 && (
-                  <div className="text-amber-500 px-1">
+                  <div className=" text-amber-500 px-1">
                     {warns.length} Warnings
                   </div>
                 )}
