@@ -102,7 +102,7 @@ export function RobotsClientDetails(props: {
                 )}
               </div>}
               Content={<>
-                <div className="text-xs p-2 pl-4">
+                <div className="text-xs pt-2 pl-4">
 
                   {rule.rule.map((r, j) => {
                     return (
