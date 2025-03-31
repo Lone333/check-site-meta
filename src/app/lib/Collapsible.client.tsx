@@ -30,35 +30,43 @@ export function useExpandableList(arr: unknown[]) {
 
 }
 
-export function ExpandableAdvancedCard({ expanded, toggleExpanse, Label, Content, headerProps, zIndex, ...props }: ComponentProps<"div"> & {
-  expanded: boolean,
+export function ExpandableAdvancedCard({ expanded, toggleExpanse, Label, Content, headerProps, zIndex, className, ...props }: ComponentProps<"div"> & {
+  expanded?: boolean,
   toggleExpanse?: () => void,
   Label: ReactNode,
   Content: ReactNode,
   headerProps?: ComponentProps<"div">,
   zIndex?: number,
 }) {
+  const [opened, setOpened] = useState(expanded ?? false)
+
+  const isExpanded = expanded ?? opened
+  const toggleOpen = () => (expanded !== undefined) ? toggleExpanse?.() ?? setOpened(!opened) : setOpened(!opened)
+
   return (
     <div className="grow">
-      <div {...props} className={cn(props.className)}>
-
-
+      <div {...props} className={cn(className)}>
         <div {...headerProps} className={cn("flex sticky top-(--header-offset)", headerProps?.className)} style={{ zIndex }}>
           <div className="bg-(--bg) grow pt-2 min-w-0">
             <div className="border-x border-t border-border bg-background-card rounded-t-md">
+
               {/* Button have py which will be overlapped by Bottom Rounded Piece */}
-              <button className="flex items-start gap-2 py-2 pl-3 grow leading-none min-w-0 w-full text-nowrap overflow-clip **:overflow-hidden **:text-ellipsis"
-                onClick={() => toggleExpanse?.()}
+              <button className={cn(
+                "flex items-start gap-2 py-2 pl-3 grow min-w-0 w-full text-nowrap overflow-clip",
+                "text-foreground-muted font-medium"
+              )}
+                onClick={() => toggleOpen()}
               >
                 <MaterialSymbolsExpandMoreRounded className={cn("w-4 h-4 transition-all shrink-0",
-                  expanded ? "rotate-180" : "rotate-0"
+                  isExpanded ? "rotate-180" : "rotate-0"
                 )} />
                 {Label}
               </button>
+
             </div>
           </div>
         </div>
-        
+
 
         {/* Wrapper to pass background color to child */}
         <div className="border-x  border-border overflow-clip bg-(--bg)"
@@ -66,8 +74,10 @@ export function ExpandableAdvancedCard({ expanded, toggleExpanse, Label, Content
             "--bg": "var(--color-background)",
           }}
         >
-          <CollapsibleRow data-opened={expanded}>
-            {Content}
+          <CollapsibleRow data-opened={isExpanded}>
+            <div className="pb-2">
+              {Content}
+            </div>
           </CollapsibleRow>
         </div>
       </div>
@@ -77,7 +87,7 @@ export function ExpandableAdvancedCard({ expanded, toggleExpanse, Label, Content
         style={{ zIndex }}>
         <div className="h-2 grow rounded-b-md border-b border-x border-border -mt-2 transition-[background]"
           style={{
-            background: expanded ? "var(--color-background)" : "var(--color-background-card)",
+            background: isExpanded ? "var(--color-background)" : "var(--color-background-card)",
           }}
         />
       </div>
