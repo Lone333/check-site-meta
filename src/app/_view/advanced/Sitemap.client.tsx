@@ -38,7 +38,6 @@ export function SitemapCategoryCollapsible(
 }
 
 function useSitemapStore(id: string) {
-  const urlSp = useSearchParams().get('url')
   const store = useStore()
   const globalSitemapStore = store['sitemap'] ??= {
     id: Math.random().toString(36).slice(2)
@@ -76,6 +75,9 @@ export function SitemapFileCard(props: {
   const [sitemapData, setSitemapData] = useState<GetSitemapActionResponse>(store.sitemapData ?? undefined)
   const { urls: rawUrls, sitemaps: rawSitemaps } = sitemapData?.validated.res ?? { urls: [], sitemaps: [] }
   function fetchAndSetData() {
+    setError(undefined)
+    // setSitemapData(undefined)
+    // store.sitemapData = undefined
     startTransition(async () => {
       const res = await getSitemapAction(props.fullUrl)
       startTransition(() => {
@@ -91,7 +93,6 @@ export function SitemapFileCard(props: {
     })
   }
   const [error, setError] = useState<ParsedError2>()
-
 
 
   // Messages
@@ -219,7 +220,7 @@ export function SitemapFileCard(props: {
                   onTabChange={(l, i, e) => setIsRaw(i === 1)}
                 />
                 <CardDetailButton
-                  className="h-7 px-3 button-card"
+                  className="h-7 px-3 button-card disabled:*:animate-spin"
                   disabled={isPending}
                   onClick={() => fetchAndSetData()}>
                   <MaterialSymbolsRefresh className="size-4" />
