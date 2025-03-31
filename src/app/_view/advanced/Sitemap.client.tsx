@@ -347,6 +347,10 @@ export function ListPaginationMenu(props: {
   hasPrevPage: boolean,
 }) {
   const { entriesCount, LIMIT, page, totalPages, nextPage, prevPage } = props
+  if (
+    totalPages <= 1 ||
+    (entriesCount ?? 0) <= LIMIT
+  ) return null;
   return (
     <div className="flex gap-1 pt-2 justify-end items-center">
       {(entriesCount ?? 0) > LIMIT && (
