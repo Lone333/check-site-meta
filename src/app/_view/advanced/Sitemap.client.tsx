@@ -69,7 +69,6 @@ export function SitemapFileCard(props: {
   const [isExpanded, _setIsExpanded] = useState(store.expanded ?? false)
   const setIsExpanded = (expanded: boolean) => {
     store.expanded = expanded
-    console.log(store)
     _setIsExpanded(expanded)
   }
 
@@ -83,10 +82,9 @@ export function SitemapFileCard(props: {
         if (res.data) {
           setSitemapData(res.data)
           store.sitemapData = res.data
-          // console.log(store)
+          setError(undefined)
         }
         if (res.error) {
-          console.error(res.error)
           setError(res.error)
         }
       })
