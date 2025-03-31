@@ -64,7 +64,7 @@ export default async function Home(context: SearchParamsContext) {
           "lg:grid lg:grid-cols-2 gap-x-8",
         )}>
 
-          <div className="flex flex-col min-h-80 py-12">
+          <div className="flex flex-col min-h-[80vh] py-12">
             <Header hidden={hideHome} />
             <InputForm
               query={query}

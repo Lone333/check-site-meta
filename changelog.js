@@ -1,6 +1,10 @@
 export const changelog = {
   "0.3.1": [
-    "Improve table sitemap UI",
+    "Improved table sitemap UI",
+    "Improved tab persistence",
+    "Improved overrall error handling",
+    "Improved favicon rendering",
+    "Improved scrollbar appearance",
   ],
   "0.3.0": [
     "Added ability to check sitemap and robots.txt: currently in beta",
