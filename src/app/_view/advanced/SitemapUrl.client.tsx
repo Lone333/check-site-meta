@@ -50,8 +50,9 @@ export function SitemapUrlList(props: {
         <div className="items-end top-0  overflow-x-auto overflow-y-clip px-2">
           {/* Table */}
           <div className={cn(
-            "bg-background-card text-foreground-muted rounded-t-xl -mx-2 *:pt-2 *:pb-1.5 sticky min-w-200",
-            "grid grid-cols-[2rem_4fr_9rem_0.5fr_0.5fr]",
+            "bg-background-card text-foreground-muted rounded-t-xl  sticky min-w-200",
+            "grid grid-cols-[2rem_4fr_9rem_0.5fr_0.5fr] gap-x-2",
+            "-mx-2 px-2 *:pt-2 *:pb-1.5"
           )}>
             <div className=""></div>
             <button onClick={() => toggleSort('loc')} className="flex gap-2 items-center rounded-none text-xs font-semibold text-start">
@@ -72,12 +73,18 @@ export function SitemapUrlList(props: {
             </button>
           </div>
 
-          <div className="fadeIn-0 col-span-5 *:grid *:grid-cols-[2rem_4fr_9rem_0.5fr_0.5fr] *:gap-x-2  *:*:min-w-0 *:*:overflow-ellipsis *:*:text-nowrap *:*:overflow-hidden">
+          <div className={cn(
+            "fadeIn-0 col-span-5",
+            "-mx-2 px-2",
+            // "outline",
+            "*:grid *:grid-cols-[2rem_4fr_9rem_0.5fr_0.5fr] *:gap-x-2",
+            "*:min-w-200"
+          )}>
             {paginatedEntries
               .map((url, i) => {
                 return (
-                  <div key={i} className="hover:bg-background-card-input -mx-2 px-2 py-1 bg-background-card">
-                    <div className="flex gap-1">
+                  <div key={i} className="hover:bg-background-card-box -mx-2 px-2 py-1 bg-background-card">
+                    <div className="flex gap-1 mt-0.5">
                       <a href={url.loc} target="_blank" className="underline opacity-60 hover:opacity-100">
                         <MaterialSymbolsOpenInNew className="w-3.5 h-3.5" />
                       </a>
@@ -87,7 +94,7 @@ export function SitemapUrlList(props: {
                         <MaterialSymbolsSearchRounded className="w-3.5 h-3.5" />
                       </div>
                     </div>
-                    <div className="">
+                    <div className="overflow-clip break-word">
                       {url.loc.split(props.fullUrl.split('://')[1])[1] || url.loc}
                     </div>
                     <div className="grid grid-cols-[5rem_4rem] overflow-hidden">
@@ -106,6 +113,7 @@ export function SitemapUrlList(props: {
             <div className="h-2 rounded-b-md -mx-2 bg-background-card" />
           </div>
         </div>
+
         <ListPaginationMenu
           entriesCount={sortedEntries.length}
           LIMIT={LIMIT}

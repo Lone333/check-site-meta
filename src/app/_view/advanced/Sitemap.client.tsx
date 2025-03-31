@@ -88,7 +88,6 @@ export function SitemapFileCard(props: {
   return <ExpandableAdvancedCard
 
     toggleExpanse={() => {
-
       if (!sitemapData && !isExpanded) {
         setIsExpanded(true)
         fetchAndSetData()
@@ -104,6 +103,7 @@ export function SitemapFileCard(props: {
         }
       }
     }}
+
     expanded={isExpanded}
 
     // ZIndex has to be top to bottom (100 > 0) so that the parent-most will be on top. So that parent doesn't stay below of list of childrens.
@@ -131,7 +131,7 @@ export function SitemapFileCard(props: {
         <div className="flex flex-col grow">
           <div className="flex">
             <div className={cn(
-              "font-normal text-sm text-start break-word grow",
+              "font-normal text-sm text-start break-word grow overflow-clip overflow-ellipsis",
               sitemapData
                 ? "text-foreground"
                 : "text-foreground-muted-2 italic",
@@ -170,8 +170,6 @@ export function SitemapFileCard(props: {
 
         <CollapsibleRow data-opened={!!error}>
           <HomeErrorCard error={error} />
-          {/* <ErrorCardMini error={error} /> */}
-          {/* <div className="p-3 px-4 text-foreground-muted-2 italic animate-pulse">Error: {error?.message}</div> */}
         </CollapsibleRow>
 
         <CollapsibleRow data-opened={isPending && !sitemapData}>
