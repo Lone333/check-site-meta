@@ -13,7 +13,7 @@ import { TextInputCard, TextInputIconStart } from "../inputs/TextInput"
 import { formatDate } from "@/app/lib/date"
 import { SitemapUrlList } from "./SitemapUrl.client"
 import { SitemapIndexList } from "./SitemapIndex.client"
-import { ErrorCardMini, type ParsedError } from "@/app/module/error/ErrorCard"
+import { HomeErrorCard, type ParsedError, type ParsedError2 } from "@/app/module/error/ErrorCard"
 
 export function SitemapCategoryCollapsible(
   props: {
@@ -64,7 +64,7 @@ export function SitemapFileCard(props: {
       })
     })
   }
-  const [error, setError] = useState<ParsedError>()
+  const [error, setError] = useState<ParsedError2>()
 
   // Messages
   const messages = sitemapData?.validated.messages ?? []
@@ -169,7 +169,8 @@ export function SitemapFileCard(props: {
       <div className="text-xs text-foreground-body flex flex-col text-start">
 
         <CollapsibleRow data-opened={!!error}>
-          <ErrorCardMini error={error} />
+          <HomeErrorCard error={error} />
+          {/* <ErrorCardMini error={error} /> */}
           {/* <div className="p-3 px-4 text-foreground-muted-2 italic animate-pulse">Error: {error?.message}</div> */}
         </CollapsibleRow>
 

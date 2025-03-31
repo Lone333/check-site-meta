@@ -15,7 +15,7 @@ export function getResolvedMetadata(m: Metadata) {
 
   const resolveUrl = (url?: string) => {
     if (!url) return undefined
-    try { return new URL(url, m.general.rawUrl).href } catch { }
+    try { return new URL(url, m.rawUrl).href } catch { }
   }
 
   const data = {
@@ -42,11 +42,6 @@ export function getResolvedMetadata(m: Metadata) {
         value: m.general.viewport,
         label: "viewport",
       },
-      rawUrl: {
-        value: m.general.rawUrl,
-        label: "rawUrl",
-        resolvedUrl: resolveUrl(m.general.rawUrl),
-      },
       ...(() => {
         const favicons = {
           value: undefined,
@@ -57,7 +52,7 @@ export function getResolvedMetadata(m: Metadata) {
               return {
                 value: e.href,
                 label: "",
-                source: `link[rel="${e.rel}"]`,
+                source: `link[rel="${ e.rel }"]`,
                 type: e.type,
                 sizes: e.sizes,
                 resolvedUrl: resolveUrl(e.href),
@@ -346,7 +341,13 @@ export function getResolvedMetadata(m: Metadata) {
     }
   }
 
-  return data
+  // inject rawurl
+  const res = {
+    ...data,
+    rawUrl: m.rawUrl,
+  }
+
+  return res
 }
 
 export type ResoledMetadata = ReturnType<typeof getResolvedMetadata>
@@ -366,12 +367,6 @@ export const descriptions = {
     url: "The canonical URL of the page, used to prevent duplicate content issues.",
     robots: "Instructions for search engines on how to index and follow links on the page.",
     viewport: "Defines the page's responsive behavior, commonly set for mobile-friendly design.",
-    rawUrl: "The original URL before any resolution or normalization.",
-    // favicon1: "Primary favicon of the page, usually a small icon shown in browser tabs.",
-    // favicon2: "Shortcut icon, another format of favicon used for bookmarking and home screens.",
-    // favicon3: "Icon shortcut, an alternative method for specifying a site icon.",
-    // favicon4: "Direct link to a favicon file, typically used when multiple favicons are available.",
-    // inferredFavicon: "The most relevant favicon chosen based on available metadata.",
     favicons: "List of all favicons found in the metadata, including different formats and sizes.",
     author: "The name of the content creator or website author.",
     keywords: "Keywords related to the page's content, used for SEO (though less relevant today).",
@@ -427,7 +422,8 @@ export const descriptions = {
   icons: {
     appleTouchIcons: "A list of Apple Touch Icons used for home screen shortcuts on iOS.",
     appleTouchIconsPrecomposed: "A list of precomposed Apple Touch Icons, where no effects are applied.",
-  }
+  },
+  rawUrl: "The original URL of the page, used as a reference for relative URLs in metadata." as any,
 } satisfies {
   [X in keyof ResoledMetadata]: { [Y in keyof ResoledMetadata[X]]: string }
 }

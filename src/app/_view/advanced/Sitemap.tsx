@@ -14,7 +14,7 @@ export function SitemapSummary(
     getRobots: (url: string) => Promise<{ sitemaps: string[] }>
   }
 ) {
-  const baseUrl = props.metadata.general.rawUrl.value
+  const baseUrl = props.metadata.rawUrl
   return <MetadataRow data={{ label: "Sitemap" }}>
     <div className="leading-none flex flex-col gap-2 mt-1.5">
       <Suspense key="sitemap-summary" fallback="Loading...">

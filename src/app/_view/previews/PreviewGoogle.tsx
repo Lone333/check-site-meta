@@ -130,8 +130,8 @@ async function getGooglePreview(metadata: ResoledMetadata) {
       m.general.description.value ??
       m.og.description.value ??
       m.twitter.description.value,
-    site: m.og.siteName.value ?? m.twitter.site.value ?? m.general.title.value ?? new URL(m.general.rawUrl.value).hostname, // Google might infer from domain if missing
-    url: m.general.url.value ?? m.general.rawUrl.value,
+    site: m.og.siteName.value ?? m.twitter.site.value ?? m.general.title.value ?? new URL(m.rawUrl).hostname, // Google might infer from domain if missing
+    url: m.general.url.value ?? m.rawUrl,
     favicon: m.general.favicons.values[0].resolvedUrl,
     fullWidthFavicon: false,
   }

@@ -161,7 +161,7 @@ export async function getTwitterPreview(metadata: ResoledMetadata) {
     imageUrl: m.twitter.image.value ?? m.og.images.values.at(-1)?.value ?? m.og.image.value,
     resolvedImageUrl: m.twitter.image.resolvedUrl ?? m.og.images.values.at(-1)?.resolvedUrl ?? m.og.image.resolvedUrl,
     imageAlt: m.twitter.imageAlt.value ?? m.og.imageAlt.value,
-    url: new URL(m.general.rawUrl.resolvedUrl!).host.replace('www.', ''),
+    url: new URL(m.rawUrl).host.replace('www.', ''),
     type: m.twitter.card.value ?? (m.og.type.value ? "summary" : undefined)
   }
 

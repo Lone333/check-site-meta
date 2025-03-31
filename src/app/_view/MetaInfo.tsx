@@ -14,6 +14,7 @@ import { RobotsSummary } from "./advanced/Robots";
 import { SitemapSummary } from "./advanced/Sitemap";
 import { getSitemap } from "../lib/get-sitemap";
 import { getRobots } from "../lib/get-robots";
+import { CollapsibleRow } from "../lib/Collapsible";
 
 export async function MetaInfoPanel(props: {
   metadata: SiteMetadata,
@@ -98,7 +99,9 @@ function SummaryMetadata(props: { m: ResoledMetadata }) {
     <MetadataRow data={d.general.author} />
     <MetadataRow data={d.general.favicons}>
       <Suspense fallback="Loading...">
-        <FaviconSummary data={d.general.favicons} baseUrl={d.general.rawUrl.value} />
+        <CollapsibleRow data-opened={false} className="expand-row-200">
+          <FaviconSummary data={d.general.favicons} baseUrl={d.rawUrl} />
+        </CollapsibleRow>
       </Suspense>
     </MetadataRow>
     <Separator />

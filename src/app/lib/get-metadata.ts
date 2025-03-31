@@ -1,36 +1,25 @@
 import parse, { type HTMLElement } from "node-html-parser";
 import { cache } from "react";
 import "server-only"
-import { AppError } from "../module/error/error-primitives";
-import { appFetch } from "./fetch";
+import { AppError2 } from "../module/error/error-primitives";
+import { appFetch, ensureCorrectContentType, getUTF8Text } from "./fetch";
 
 export const fetchRoot = cache(async function getRoot(url: string) {
-
   const res = await appFetch(url)
-    .catch(error => { throw new AppError(error, "fetch", "Fetch Failed", error.message, [`url: ${ url }`]) })
-
-  if (!res.headers.get("content-type")?.includes("text/html")) {
-    throw new AppError(null, "parse", "Fetch Returns Non-HTML", `Content-Type: ${ res.headers.get("content-type") }`)
-  }
-  const html = await res.text()
-    .catch(error => { throw new AppError(error, "parse", "Response Parse Failed", error.message) });
-
-  try {
-    const root = parse(html);
-    return { root, html }
-  } catch (error) {
-    throw new AppError(error, "parse", "HTML Parse Failed", error instanceof Error ? error.message : "Unknown Error")
-  }
+  await ensureCorrectContentType(res, "text/html")
+  const html = await getUTF8Text(res)
+  const root = parse(html);
+  return { root, html }
 })
 
 export function getMetadataValues(root: HTMLElement, rawUrl: string) {
   try {
     return {
+      rawUrl,
       general: {
         title: root.querySelector("title")?.text,
         description: root.querySelector("meta[name=description]")?.getAttribute("content"),
         url: root.querySelector("link[rel=canonical]")?.getAttribute("href"),
-        rawUrl,
         favicons: root.querySelectorAll("link[rel~=icon]").map(e => {
           return {
             rel: e.getAttribute("rel"),
@@ -145,10 +134,16 @@ export function getMetadataValues(root: HTMLElement, rawUrl: string) {
       },
       jsonld: {
         data: root.querySelectorAll("script[type='application/ld+json']").map(e => {
+          // Move this to a separate module
           try {
             return JSON.parse(e.text)
           } catch (error) {
-            throw new AppError(error, "parse", "JSON Parse Failed", error instanceof Error ? error.message : "Unknown Error")
+            throw new AppError2(
+              'getMetadataValues',
+              'JSON Parse Failed', error instanceof Error ? error.message : "Unknown Error",
+              [],
+              error
+            )
           }
         })
       },
@@ -157,7 +152,12 @@ export function getMetadataValues(root: HTMLElement, rawUrl: string) {
       }
     }
   } catch (error) {
-    throw new AppError(error, "parse", "Metadata Parse Failed", error instanceof Error ? error.message : "Unknown Error")
+    throw new AppError2(
+      'getMetadataValues',
+      'Metadata Parse Failed', error instanceof Error ? error.message : "Unknown Error",
+      [],
+      error
+    )
   }
 }
 

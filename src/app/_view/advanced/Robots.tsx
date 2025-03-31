@@ -26,7 +26,7 @@ export async function RobotsSummary(props: {
 
   async function RobotsSummaryData() {
     try {
-      const { parsed, sitemaps } = await props.getRobots(props.metadata.general.rawUrl.value)
+      const { parsed, sitemaps } = await props.getRobots(props.metadata.rawUrl)
       return (
         <>
           <div className="font-medium flex items-center gap-1">
@@ -74,7 +74,7 @@ export async function RobotsDetails({ data }: {
       </CardHeader>
       <TabsWithContent
         id="robots-rules"
-        className="self-start tab-item:py-1 tab-item:px-3.5 mb-3 mt-4 p-0.5 rounded-lg tab-background:rounded-md text-sm tab-item:font-semibold"
+        className="self-start tab-item:py-1.5 tab-item:px-3.5 mb-3 mt-4 p-1 rounded-lg tab-background:rounded-md text-xs tab-item:font-semibold"
         tabs={[
           tab("Parsed",
             <div key="p" className="fadeBlurIn-0">

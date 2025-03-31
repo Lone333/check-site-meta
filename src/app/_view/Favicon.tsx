@@ -12,19 +12,19 @@ export function FaviconPreview(props: {
 }) {
   return (
     <div className={cn("image-frame flex items-start")}>
-      <div className="p-1 bg-zinc-100 shrink">
+      <div className="p-1 bg-zinc-100 shrink w-12 h-12">
         <AppImage
           {...props.imgProps1}
           src={props.src}
-          className={cn("h-[1.5lh] w-[1.5lh] max-h-fit object-contain", props.imgProps1?.className)}
+          className={cn("object-contain w-full h-full", props.imgProps1?.className)}
         />
       </div>
 
-      <div className="p-1 bg-neutral-600 shrink">
+      <div className="p-1 bg-neutral-600 shrink w-12 h-12">
         <AppImage
           {...props.imgProps2}
           src={props.src}
-          className={cn("h-[1.5lh] w-[1.5lh] max-h-fit object-contain", props.imgProps2?.className)}
+          className={cn("object-contain w-full h-full", props.imgProps2?.className)}
         />
       </div>
     </div>

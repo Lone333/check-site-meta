@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { appFetch } from "./fetch";
 import { XMLParser } from "fast-xml-parser";
-import { AppError } from "../module/error/error-primitives";
+import { AppError2 } from "../module/error/error-primitives";
 import type { PreviewMessages } from "../_view/previews/Preview";
 import { isObject, isPropInObject } from "./validations";
 
@@ -21,7 +21,13 @@ export const getSitemap = cache(async function getSitemap(url: string) {
     const parsed = xmlparser.parse(text)
     return { parsed, raw: text, byteSize }
   } catch (error) {
-    throw new AppError(error, 'parse', 'Error parsing sitemap.xml', error instanceof Error ? error.message : 'Unknown Error')
+    throw new AppError2(
+      'getSitemap',
+      'Error parsing sitemap.xml',
+      error instanceof Error ? error.message : 'Unknown Error',
+      [],
+      error
+    )
   }
 });
 

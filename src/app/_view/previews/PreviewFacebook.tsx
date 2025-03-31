@@ -202,13 +202,13 @@ async function getFacebookPreview(metadata: ResoledMetadata) {
   const messages: PreviewMessages = []
 
   const data = {
-    title: m.general.title.value ?? m.og.title.value ?? m.twitter.title.value ?? new URL(m.general.rawUrl.value).hostname,
+    title: m.general.title.value ?? m.og.title.value ?? m.twitter.title.value ?? new URL(m.rawUrl).hostname,
     description:
       m.general.description.value ??
       m.og.description.value ??
       m.twitter.description.value,
-    site: m.og.siteName.value ?? m.twitter.site.value ?? m.general.title.value ?? new URL(m.general.rawUrl.value).hostname,
-    url: m.general.url.value ?? m.general.rawUrl.value,
+    site: m.og.siteName.value ?? m.twitter.site.value ?? m.general.title.value ?? new URL(m.rawUrl).hostname,
+    url: m.general.url.value ?? m.rawUrl,
     image: m.og.image.resolvedUrl ?? m.twitter.image.resolvedUrl,
     fullWidthFavicon: false,
     type: 'none' as 'small' | 'tall' | 'large'

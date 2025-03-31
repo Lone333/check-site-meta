@@ -8,12 +8,14 @@ import { cn } from "lazy-cn";
 import { getVersion } from "./lib/version";
 import { ThemeSwitcher } from "./theme-switch";
 import { changelog } from "../../changelog"
-import ErrorCard from "./module/error/ErrorCard";
+import { HomeErrorCard } from "./module/error/ErrorCard";
 import { getUserSettings } from "./lib/get-settings";
 import { LinkPreviewPanel } from "./_view/LinkPreview";
 import { InputForm } from "./_view/inputs/InputForm";
 import { RecentSuggestions } from "./_view/inputs/InputSuggestions";
 import { AdvancedPanel } from "./_view/advanced/AdvancedPanel";
+import { AppError2, type AppError } from "./module/error/error-primitives";
+import { isDev } from "./lib/env";
 
 // Structure:
 // 
@@ -35,13 +37,12 @@ export default async function Home(context: SearchParamsContext) {
 
   const query = await context.searchParams;
   const hideHome = !!query.url
-  // const searchId = Math.random()
-  const searchId = query.url + ''
+  const searchId = isDev ? query.url + '' : Math.random()
 
   const SummarySection = async () =>
     !!query.url && getPageData(query.url)
       .then(metadata => <MetaInfoPanel metadata={metadata} />)
-      .catch(err => <ErrorCard error={err} className="card" />)
+      .catch((err) => <HomeErrorCard error={err} />)
 
   const LinkPreviewSection = async () =>
     !!query.url && getPageData(query.url)
@@ -76,11 +77,11 @@ export default async function Home(context: SearchParamsContext) {
           </div>
 
           <div className="flex flex-col items-center gap-8 pt-15 pb-12">
-          <Changelog hidden={hideHome} />
-          <Suspense key={searchId + 'lp'}>
-            <LinkPreviewSection />
-          </Suspense>
-        </div>
+            <Changelog hidden={hideHome} />
+            <Suspense key={searchId + 'lp'}>
+              <LinkPreviewSection />
+            </Suspense>
+          </div>
 
           <div className="col-span-2 flex flex-col">
             <Suspense key={searchId}>
@@ -98,11 +99,15 @@ export default async function Home(context: SearchParamsContext) {
 // Data Getter -----------------------------
 
 const getPageData = cache(async function getPageData(query: string | string[]) {
-  const url = parseUrlFromQuery(query)
-  const { root, html } = await fetchRoot(url.toString())
-  const metadata = getMetadataValues(root, url.toString())
-  const resolved = getResolvedMetadata(metadata)
-  return { resolved, html, root }
+  try {
+    const url = parseUrlFromQuery(query)
+    const { root, html } = await fetchRoot(url.toString())
+    const metadata = getMetadataValues(root, url.toString())
+    const resolved = getResolvedMetadata(metadata)
+    return { resolved, html, root, url }
+  } catch (error) {
+    throw new AppError2('getPageData', undefined, undefined, undefined, error)
+  }
 })
 export type SiteMetadata = Awaited<ReturnType<typeof getPageData>>
 

@@ -5,7 +5,7 @@ import { MetaCard } from "../MetaInfo";
 import { RobotsDetails } from "./Robots";
 import { SitemapDetails } from "./Sitemap";
 import { Suspense, type ReactNode, type SVGProps } from "react";
-import type { ParsedError } from "@/app/module/error/ErrorCard";
+import { CardlessHomeErrorCard, HomeErrorCard, type ParsedError } from "@/app/module/error/ErrorCard";
 import { ExpandableErrorStack } from "@/app/module/error/Error.client";
 import { getRobots } from "@/app/lib/get-robots";
 
@@ -14,14 +14,14 @@ export function AdvancedPanel(props: {
 }) {
 
   const Robots = async () =>
-    getRobots(props.metadata.resolved.general.rawUrl.value)
+    getRobots(props.metadata.url)
       .then(res => <RobotsDetails data={res} />)
-      .catch(err => <AdvancedPanelErrorCard err={err}>
-        <div className="text-foreground-body max-w-screen-sm flex flex-col gap-2">
+      .catch(err => <CardlessHomeErrorCard error={err}>
+        <div className="text-foreground-body max-w-screen-sm flex flex-col gap-2 text-xxs">
           <p>Robots.txt file is used to control search engine crawlers. It is a text file that tells web robots which pages on your site to crawl. It also tells web robots which pages not to crawl.  </p>
           <p>To get started, you can create a robots.txt file and place it in the root directory of your website.</p>
         </div>
-      </AdvancedPanelErrorCard>)
+      </CardlessHomeErrorCard>)
 
   return (
     <TabsWithContent
@@ -38,7 +38,7 @@ export function AdvancedPanel(props: {
         tab("Robots",
           <MetaCard>
             <div key="r" className="card-content fadeBlurIn-100">
-              <Suspense>
+              <Suspense fallback="Loading robots.txt">
                 <Robots />
               </Suspense>
             </div>
@@ -49,7 +49,7 @@ export function AdvancedPanel(props: {
             <div key="sm" className="card-content fadeBlurIn-100">
               <Suspense fallback="Loading...">
                 <SitemapDetails
-                  url={props.metadata.resolved.general.rawUrl.value}
+                  url={props.metadata.url}
                   getRobots={getRobots}
                 />
               </Suspense>

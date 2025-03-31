@@ -4,7 +4,6 @@ import type { ParsedRobotRules } from "@/app/lib/get-robots";
 import { cn } from "lazy-cn";
 import { useState, type SVGProps } from "react";
 import { FormButton } from "../inputs/InputForm";
-import { CollapsibleRow } from "@/app/lib/Collapsible";
 import { ExpandableAdvancedCard, useExpandableList } from "@/app/lib/Collapsible.client";
 
 export function RobotsClientDetails(props: {

@@ -8,3 +8,5 @@ export async function getUserSettings() {
   }
 }
 export type UserSettings = Awaited<ReturnType<typeof getUserSettings>>
+
+// N.B. No need to catch errors here as it must be developer error if this fails.

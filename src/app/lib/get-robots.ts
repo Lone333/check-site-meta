@@ -1,25 +1,27 @@
 import robotsParser from "robots-parser"
-import { appFetch } from "./fetch"
+import { appFetch, getUTF8Text } from "./fetch"
 import { cache } from "react"
-import { AppError } from "../module/error/error-primitives"
+import { AppError2 } from "../module/error/error-primitives"
 
 export const getRobots = cache(async function getRobots(url: string) {
-  await new Promise(resolve => setTimeout(resolve, 500))
   const res = await appFetch(new URL('/robots.txt', url).toString())
-  const text = await res.text()
+  const text = await getUTF8Text(res)
   if (!['#', 'U', 'D', 'A', 'S'].includes(text.trim().at(0) ?? '')) {
-    throw new AppError(null, 'parse', 'Invalid robots.txt', 'robots.txt must start with a comment or a user-agent directive')
+    throw new AppError2(
+      'getRobots',
+      'Invalid robots.txt',
+      'robots.txt must start with a comment or a user-agent directive. See https://developers.google.com/search/reference/robots_txt',
+      ['Content: ' + text.slice(0, 1000)],
+    )
   }
+
   try {
     const parsedRobotRaw = robotsParser(url, text)
 
     const parsedRobot = Object.entries(
       (JSON.parse(JSON.stringify(parsedRobotRaw)) as ParsedRobotRaw)._rules
     ).map(([userAgent, rule]) => {
-      return {
-        userAgent,
-        rule
-      }
+      return { userAgent, rule }
     }) as ParsedRobotRules
 
     // get crawldelay for each ua
@@ -34,7 +36,13 @@ export const getRobots = cache(async function getRobots(url: string) {
       raw: text
     }
   } catch (error) {
-    throw new AppError(error, 'parse', 'Error parsing robots.txt', error instanceof Error ? error.message : 'Unknown Error')
+    throw new AppError2(
+      'getRobots',
+      'Error parsing robots.txt',
+      'An error occurred while parsing the robots.txt file.',
+      ['Content: ' + text.slice(0, 1000)],
+      error
+    )
   }
 })
 

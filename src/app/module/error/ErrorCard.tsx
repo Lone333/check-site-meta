@@ -1,5 +1,5 @@
-import type { ComponentProps, SVGProps } from "react"
-import { AppError, type ErrorInfo } from "./error-primitives"
+import { Fragment, type ComponentProps, type ReactNode, type SVGProps } from "react"
+import { AppError2 } from "./error-primitives"
 import { cn } from "lazy-cn"
 
 const ErrorInfoMessages = {
@@ -36,96 +36,101 @@ export type ParsedError = {
   stack?: string,
 }
 
-export function parseError(error: unknown): ParsedError {
-  
-  let parsedError: ParsedError = {
-    summary: "An unknown error occurred.",
-    type: "other",
-    context: [JSON.stringify(error)],
-    stack: error instanceof Error ? error.stack : undefined
-  }
+// export function parseError(error: unknown): ParsedError {
 
-  if (error instanceof AppError) {
-    parsedError = {
-      summary: error.summary,
-      type: error.type,
-      detail: error.detail,
-      context: error.context,
-      stack: error.error instanceof Error ? error.error.stack : undefined
-    }
-  }
+//   let parsedError: ParsedError = {
+//     summary: "An unknown error occurred.",
+//     type: "other",
+//     context: [JSON.stringify(error)],
+//     stack: error instanceof Error ? error.stack : undefined
+//   }
 
-  return parsedError 
-}
+//   if (error instanceof AppError) {
+//     parsedError = {
+//       summary: error.summary,
+//       type: error.type,
+//       detail: error.detail,
+//       context: error.context,
+//       stack: error.error instanceof Error ? error.error.stack : undefined
+//     }
+//   }
+
+//   return parsedError
+// }
 
 
-export default function ErrorCard(
-  { error, ...props }: { error: unknown } & ComponentProps<"div">
-) {
-  const parsedError = parseError(error)
+// export default function ErrorCard(
+//   { error, ...props }: { error: unknown } & ComponentProps<"div">
+// ) {
+//   const parsedError = parseError(error)
 
-  return (
-    <div {...props} className={cn("fadeIn-0", props.className)} >
-      <div className="flex flex-col gap-2 items-start">
-        <div className="shrink-0 text-red-400 p-2 rounded-md bg-[light-dark(var(--color-red-100),--alpha(var(--color-red-500)/0.2))]">
-          <LucideTriangleAlert className="w-6 h-6" />
-        </div>
-        <div className="flex flex-col gap-1">
-          <div className="font-bold text-lg leading-none!">{parsedError.summary}</div>
-          <div className="">{ErrorInfoMessages[parsedError.type].tips}</div>
-        </div>
-      </div>
-      {parsedError.detail && (
-        <ContextBox>{parsedError.detail}</ContextBox>
-      )}
-      {!!parsedError.context.length && (parsedError.context.map((context, index) => (
-        <ContextBox key={index} className="text-sm">{context}</ContextBox>
-      )))}
-      {parsedError.stack && (
-        <ContextBox className="text-sm">{parsedError.stack}</ContextBox>
-      )}
-    </div>
-  )
-}
+//   return (
+//     <div {...props} className={cn("fadeIn-0", props.className)} >
+//       <div className="flex flex-col gap-2 items-start">
+//         <div className="shrink-0 text-red-400 p-2 rounded-md bg-[light-dark(var(--color-red-100),--alpha(var(--color-red-500)/0.2))]">
+//           <LucideTriangleAlert className="w-6 h-6" />
+//         </div>
+//         <div className="flex flex-col gap-1">
+//           <div className="font-bold text-lg leading-none!">{parsedError.summary}</div>
+//           <div className="">{ErrorInfoMessages[parsedError.type].tips}</div>
+//         </div>
+//       </div>
+//       {parsedError.detail && (
+//         <ContextBox className="whitespace-pre-wrap break-word">{parsedError.detail}</ContextBox>
+//       )}
+//       {!!parsedError.context.length && (parsedError.context.map((context, index) => (
+//         <ContextBox key={index}>{context}</ContextBox>
+//       )))}
+//       {parsedError.stack && (
+//         <ContextBox>{parsedError.stack}<br /><br /></ContextBox>
+//       )}
+//     </div>
+//   )
+// }
+
+
+
+
 
 function ContextBox({ className, ...props }: ComponentProps<"div">) {
-  return (<div className={cn("font-mono p-2 px-2 mt-4 mb-4 bg-background-tooltip text-foreground-muted-2 text-xs border border-border rounded-md whitespace-pre overflow-auto font-normal", className)} {...props} />)
+  return (<div className={cn("font-mono p-2 px-2 bg-background text-foreground-muted-2 text-xs border border-border rounded-md whitespace-pre overflow-auto font-normal", className)} {...props} />)
 }
 
 
 function LucideTriangleAlert(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01"></path></svg>
-  )
+  return (<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01"></path></svg>)
 }
 
 
-export function ErrorCardMini(
-  { error, ...props }: { error: unknown } & Omit<ComponentProps<"div">, 'children'> & {
-    children?: (error: ParsedError) => React.ReactNode
-  }
-) {
-  let parsedError: ParsedError = {
-    summary: "An unknown error occurred.",
-    type: "other",
-    context: [JSON.stringify(error)],
-  }
+// export function ErrorCardMini(
+//   { error, ...props }: { error: unknown } & Omit<ComponentProps<"div">, 'children'> & {
+//     children?: (error: ParsedError) => React.ReactNode
+//   }
+// ) {
+//   let parsedError: ParsedError = {
+//     summary: "An unknown error occurred.",
+//     type: "other",
+//     context: [JSON.stringify(error)],
+//   }
 
-  if (error instanceof AppError) {
-    parsedError = {
-      summary: error.summary,
-      type: error.type,
-      detail: error.detail,
-      context: error.context
-    }
-  }
+//   if (error instanceof AppError) {
+//     parsedError = {
+//       summary: error.summary,
+//       type: error.type,
+//       detail: error.detail,
+//       context: error.context
+//     }
+//   }
 
-  return (
-    <div {...props} className={cn("fadeIn-0", props.className)} >
-      {props.children?.(parsedError)}
-    </div>
-  )
-}
+//   return (
+//     <div {...props} className={cn("fadeIn-0", props.className)} >
+//       {props.children?.(parsedError)}
+//     </div>
+//   )
+// }
+
+
+
 
 export function StackTrace(props: ComponentProps<"div"> & { stack?: string }) {
   if (!props.stack) return null
@@ -134,4 +139,161 @@ export function StackTrace(props: ComponentProps<"div"> & { stack?: string }) {
       <ContextBox className="text-sm">{props.stack}</ContextBox>
     </div>
   )
+}
+
+
+
+export function parseError(error: unknown) {
+  let parsedError: ParsedError2 = {
+    summary: "An unknown error occurred.",
+    context: [],
+    who: [],
+    stack: error instanceof Error ? error.stack! : '',
+  }
+  if (error instanceof AppError2) {
+    parsedError = {
+      summary: error.summary,
+      detail: error.detail,
+      context: error.context,
+      stack: error.stack!,
+      who: error.who,
+    }
+  }
+  return parsedError
+}
+
+
+
+
+
+
+
+
+
+
+
+export type ParsedError2 = {
+  summary: string,
+  detail?: string,
+  context: string[],
+  stack: string,
+  who: string[],
+}
+
+
+export function ErrorMessageBase({ error, children, ...rest }:
+  & { error: unknown }
+  & Omit<ComponentProps<"div">, 'children'>
+  & { children?: (error: ParsedError2) => ReactNode }
+) {
+  const parsedError = parseError(error)
+
+  if (!children) return null
+  return (
+    <div {...rest} className={cn("fadeIn-0", rest.className)} >
+      {children(parsedError)}
+    </div>
+  )
+}
+
+
+
+
+export function HomeErrorCard({ children, ...props }: { error: unknown } & ComponentProps<"div">) {
+  return (
+    <ErrorMessageBase {...props} className={cn("card", props.className)} >
+      {({ summary, detail, context, stack, who }) => (
+        <div className="flex flex-col gap-3 items-start">
+
+          <div className="shrink-0 text-red-400 p-2 rounded-md bg-[light-dark(var(--color-red-100),--alpha(var(--color-red-500)/0.2))]">
+            <LucideTriangleAlert className="w-6 h-6" />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <div className="font-semibold text-lg leading-none!">{summary}</div>
+            <div className="text-foreground-body">{detail}</div>
+          </div>
+
+          <ContextBox className="whitespace-pre-wrap break-word max-w-full w-full">
+            {context.map((context, index) => (
+              <Fragment key={index}>
+                <div>{context}</div>
+                <hr className="border-border my-2 -mx-2" />
+              </Fragment>
+            ))}
+
+            {who.length > 0 && (
+              <>
+                <div className="whitespace-pre scrollbar-thin break-all overflow-auto">
+                  {formatWho(who)}
+                </div>
+                <hr className="border-border my-2 -mx-2" />
+              </>
+            )}
+
+            <div className="whitespace-pre -mb-2 pb-3 -mx-2 px-2 -mt-2 pt-3 scrollbar-thin break-all overflow-auto">
+              {formatStack(stack)}
+            </div>
+          </ContextBox>
+
+          {children}
+        </div>
+      )}
+    </ErrorMessageBase>
+  )
+}
+
+
+export function CardlessHomeErrorCard({ error, children, ...props }: { error: unknown } & ComponentProps<"div">) {
+  return (
+    <HomeErrorCard error={error} {...props} className="border-none p-0" />
+  )
+}
+
+
+
+
+function formatStack(stack?: string) {
+  if (!stack) return ''
+  const lines = stack.split('\n')
+  const jsx = lines.map((line, index) => {
+    const isStackDetail = line.includes('at ')
+    const leadingSpaceCount = line.match(/^\s*/)?.[0].length
+    return (
+      <div key={index} style={{
+        paddingLeft: leadingSpaceCount ? `${ (leadingSpaceCount + 1) * 0.5 }ch` : undefined,
+        textIndent: leadingSpaceCount ? '-1ch' : undefined,
+      }} className={cn(
+        isStackDetail && "text-xxs",
+      )}>
+        {
+          isStackDetail
+            ? (() => {
+              const [at, what, ...rest] = line.trim().split(' ')
+              return (<>
+                <span className="text-foreground-muted-2">{at} {what}</span>{' '}
+                <span className="text-foreground-muted-2/50">{rest.join(' ')}</span>
+              </>)
+            })()
+            : line.trim()
+        }
+      </div>
+    )
+  })
+  return jsx
+}
+
+function formatWho(whos?: string[]) {
+  if (!whos) return ''
+  const jsx = whos.map((line, index) => {
+    return (
+      <div key={index} style={{
+        paddingLeft: `${ index }ch`,
+      }}>
+        {index !== 0 && '↳ '}
+        {line}
+      </div>
+    )
+  })
+  return jsx
 }
