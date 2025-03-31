@@ -4,21 +4,34 @@ import { cn } from "lazy-cn"
 import { useState, type ComponentProps, type CSSProperties, type ReactNode, type SVGProps } from "react"
 import { CollapsibleRow } from "./Collapsible"
 
-export function useExpandableList(arr: unknown[]) {
-  const [expandedList, setExpandedList] = useState([...Array.from(arr, () => true)])
+export function useExpandableList(arr: boolean[], opts?: {
+  onChange?: (arr: boolean[]) => void
+  // onToggle?: (index: number, arr: boolean[]) => void
+  // onExpandAll?: (arr: boolean[]) => void
+  // onCollapseAll?: (arr: boolean[]) => void
+}) {
+  const [expandedList, setExpandedList] = useState([...Array.from(arr)])
   const isExpanded = (index: number) => expandedList[index]
   const toggaleExpanse = (index: number) => {
     setExpandedList((prev) => {
       const copy = [...prev]
       copy[index] = !copy[index]
+      opts?.onChange?.(copy)
+      // opts?.onToggle?.(index, copy)
       return copy
     })
   }
   const expandAll = () => {
-    setExpandedList([...Array.from(arr, () => true)])
+    const newArr = [...Array.from(arr, () => true)]
+    setExpandedList(newArr)
+    opts?.onChange?.(newArr)
+    // opts?.onExpandAll?.(newArr)
   }
   const collapseAll = () => {
-    setExpandedList([...Array.from(arr, () => false)])
+    const newArr = [...Array.from(arr, () => false)]
+    setExpandedList(newArr)
+    opts?.onChange?.(newArr)
+    // opts?.onCollapseAll?.(newArr)
   }
 
   return {

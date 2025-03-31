@@ -5,15 +5,28 @@ import { cn } from "lazy-cn";
 import { useState, type SVGProps } from "react";
 import { FormButton } from "../inputs/InputForm";
 import { ExpandableAdvancedCard, useExpandableList } from "@/app/lib/Collapsible.client";
+import { useStore } from "@/app/context";
 
 
 export function Robots() {
-  
+
 
 
 }
 
 
+
+export function useRobotsStore() {
+  const store = useStore()
+  const robotsStore = store['robots'] ??= {}
+
+  return robotsStore as {
+    expandArr?: boolean[]
+    // uaRules: (ParsedRobotRules[number] & {
+    //   expanded: boolean
+    // })[]
+  }
+}
 
 
 
@@ -22,6 +35,7 @@ export function RobotsClientDetails(props: {
 }) {
   const rules = props.uaRules
 
+  const store = useRobotsStore()
   const [search, setSearch] = useState("")
   const filteredRules = search ? rules.filter((r) => {
     const inUserAgent = r.userAgent.includes(search)
@@ -35,7 +49,14 @@ export function RobotsClientDetails(props: {
     toggaleExpanse,
     expandAll,
     collapseAll,
-  } = useExpandableList(rules)
+  } = useExpandableList(
+    rules.map((r, i) => {
+      return store.expandArr?.[i] ?? true
+    }),
+    {
+      onChange: (expanded) => store.expandArr = expanded
+    }
+  )
 
   return (
     <div className="flex flex-col gap-2">

@@ -39,12 +39,8 @@ export function SitemapCategoryCollapsible(
 
 function useSitemapStore(id: string) {
   const store = useStore()
-  const globalSitemapStore = store['sitemap'] ??= {
-    id: Math.random().toString(36).slice(2)
-  }
-  const sitemapStore = globalSitemapStore[id] ??= {
-    id: Math.random().toString(36).slice(2)
-  }
+  const globalSitemapStore = store['sitemap'] ??= {}
+  const sitemapStore = globalSitemapStore[id] ??= {}
 
   return sitemapStore as {
     expanded?: boolean,
