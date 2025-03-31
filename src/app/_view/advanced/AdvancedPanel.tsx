@@ -5,7 +5,7 @@ import { MetaCard } from "../MetaInfo";
 import { RobotsDetails } from "./Robots";
 import { SitemapDetails } from "./Sitemap";
 import { Suspense, type ReactNode, type SVGProps } from "react";
-import { CardlessHomeErrorCard, HomeErrorCard, type ParsedError } from "@/app/module/error/ErrorCard";
+import { CardlessHomeErrorCard, type ParsedError } from "@/app/module/error/ErrorCard";
 import { ExpandableErrorStack } from "@/app/module/error/Error.client";
 import { getRobots } from "@/app/lib/get-robots";
 

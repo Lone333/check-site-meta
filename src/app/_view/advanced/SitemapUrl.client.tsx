@@ -51,7 +51,7 @@ export function SitemapUrlList(props: {
           {/* Table */}
           <div className={cn(
             "bg-background-card text-foreground-muted rounded-t-xl  sticky min-w-200",
-            "grid grid-cols-[2rem_4fr_9rem_0.5fr_0.5fr] gap-x-2",
+            "grid grid-cols-[2rem_4fr_9rem_1fr_1fr] gap-x-2",
             "-mx-2 px-2 *:pt-2 *:pb-1.5"
           )}>
             <div className=""></div>
@@ -77,7 +77,7 @@ export function SitemapUrlList(props: {
             "fadeIn-0 col-span-5",
             "-mx-2 px-2",
             // "outline",
-            "*:grid *:grid-cols-[2rem_4fr_9rem_0.5fr_0.5fr] *:gap-x-2",
+            "*:grid *:grid-cols-[2rem_4fr_9rem_1fr_1fr] *:gap-x-2",
             "*:min-w-200"
           )}>
             {paginatedEntries
@@ -97,7 +97,7 @@ export function SitemapUrlList(props: {
                     <div className="overflow-clip break-word">
                       {url.loc.split(props.fullUrl.split('://')[1])[1] || url.loc}
                     </div>
-                    <div className="grid grid-cols-[5rem_4rem] overflow-hidden">
+                    <div className="grid grid-cols-[5rem_4rem] overflow-hidden break-word">
                       <div className="overflow-hidden">
                         {formatDate(url.lastmod, 'mediumDate')}
                       </div>
@@ -105,8 +105,8 @@ export function SitemapUrlList(props: {
                         {formatDate(url.lastmod, 'shortTime')}
                       </div>
                     </div>
-                    <div className="place-self-center">{url.changefreq ?? "-"}</div>
-                    <div className="place-self-center">{url.priority ?? "-"}</div>
+                    <div className="break-word place-self-center">{url.changefreq ?? "-"}</div>
+                    <div className="break-word place-self-center">{url.priority ?? "-"}</div>
                   </div>
                 )
               })}
@@ -139,13 +139,13 @@ function SortIconTableHeader(props: {
   </>
 }
 
-function CardDetailButton(props: ComponentProps<"button">) {
-  return (
-    <button
-      {...props}
-      className={cn(
-        "text-nowrap text-xs text-foreground-muted bg-background-button hover:bg-background-button-hover p-2 px-4 flex items-center gap-1 rounded-lg", props.className
-      )}
-    />
-  )
-}
+// function CardDetailButton(props: ComponentProps<"button">) {
+//   return (
+//     <button
+//       {...props}
+//       className={cn(
+//         "text-nowrap text-xs text-foreground-muted bg-background-button hover:bg-background-button-hover p-2 px-4 flex items-center gap-1 rounded-lg", props.className
+//       )}
+//     />
+//   )
+// }

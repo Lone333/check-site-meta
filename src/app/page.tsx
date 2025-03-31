@@ -16,6 +16,7 @@ import { RecentSuggestions } from "./_view/inputs/InputSuggestions";
 import { AdvancedPanel } from "./_view/advanced/AdvancedPanel";
 import { AppError2, type AppError } from "./module/error/error-primitives";
 import { isDev } from "./lib/env";
+import { LocalContextProvider } from "./context";
 
 // Structure:
 // 
@@ -85,7 +86,9 @@ export default async function Home(context: SearchParamsContext) {
 
           <div className="col-span-2 flex flex-col">
             <Suspense key={searchId}>
-              <AdvancedSection />
+              <LocalContextProvider key={searchId}>
+                <AdvancedSection />
+              </LocalContextProvider>
             </Suspense>
           </div>
 

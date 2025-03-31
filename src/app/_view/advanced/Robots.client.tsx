@@ -6,6 +6,17 @@ import { useState, type SVGProps } from "react";
 import { FormButton } from "../inputs/InputForm";
 import { ExpandableAdvancedCard, useExpandableList } from "@/app/lib/Collapsible.client";
 
+
+export function Robots() {
+  
+
+
+}
+
+
+
+
+
 export function RobotsClientDetails(props: {
   uaRules: ParsedRobotRules
 }) {
@@ -46,7 +57,7 @@ export function RobotsClientDetails(props: {
           </FormButton>
         </div>
       </div>
-      {/* --bg: required for <ExpandableAdvancedCard/> to show correctly | may refactor later */}
+      {/* --bg: requir ed for <ExpandableAdvancedCard/> to show correctly | may refactor later */}
       <pre className="text-sm flex flex-col gap-2" style={{ "--bg": "var(--color-background-card)" }}>
         {filteredRules.map((rule, i) => {
           const expanded = isExpanded(i)

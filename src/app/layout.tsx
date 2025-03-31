@@ -3,6 +3,7 @@ import { JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { cn } from "lazy-cn";
 import "./globals.css";
 import { ThemeSwitcherDev } from "./theme-switch";
+import { LocalContextProvider } from "./context";
 
 
 // Metadata -----------------------------

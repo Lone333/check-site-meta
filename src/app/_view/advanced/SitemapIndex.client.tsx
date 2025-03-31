@@ -3,6 +3,7 @@ import type { GetSitemapActionResponse } from "./Sitemap.action"
 import { ListSearchInputField, SitemapFileCard, ListPaginationMenu } from "./Sitemap.client"
 
 export function SitemapIndexList(props: {
+  id: string,
   indexes:
   NonNullable<
     NonNullable<
@@ -45,13 +46,15 @@ export function SitemapIndexList(props: {
         {paginatedEntries
           .map((sitemaps, i) => {
             return (
-              <SitemapFileCard key={sitemaps.loc + i}
+              <SitemapFileCard
+                id={props.id + "_" + i}
+                key={sitemaps.loc + i}
                 fullUrl={sitemaps.loc}
                 title={sitemaps.loc}
                 lastModified={sitemaps.lastmod}
                 defaultClosed
                 depth={(props.depth ?? 0) + 1}
-                topOffset={(props.topOffset ?? 0) + (props.lastModified ? 12 : 8.5)}
+                topOffset={(props.lastModified ? 12 : 8.5)}
               />
             )
           })}

@@ -10,16 +10,17 @@ export function TabsWithContent
     { id, tabs, children, className, ...props }: {
       id: string,
       tabs: { label: ReactNode, content?: ReactNode }[],
-      children?: { label: ReactNode, content?: ReactNode }[],
+      // children?: { label: ReactNode, content?: ReactNode }[],
       className?: string,
     } & ComponentProps<'div'>
   ) {
   const navigation = useAppNavigation()
   const [tabNum, setTab] = useState<number>(() => parseInt(navigation.get(id) ?? '0') || 0)
+  
   const { saveContentRect } = useContentHeighTransition(id, tabNum)
 
-  const tab = tabs[tabNum]
-  const currentContent = tab.content
+  const tabCache = useRef(tabs.map(t => t.content));
+  const currentContent = tabCache.current[tabNum] ?? tabs[tabNum].content
 
   return (
     <>
@@ -30,11 +31,15 @@ export function TabsWithContent
         onTabChange={(_, index) => {
           saveContentRect()
           setTab(index)
+          if (!tabCache.current[index]) {
+            tabCache.current[index] = tabs[index].content; // Cache the tab content
+          }
           navigation.softNavigate(id, index.toString())
         }}
         tabs={tabs}
         {...props}
       />
+      {/* {tabs.map((tab, index) => tab.content)} */}
       {currentContent}
     </>
   )

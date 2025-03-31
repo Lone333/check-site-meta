@@ -1,11 +1,10 @@
 "use client"
 
-import { useEffect, useState, useTransition, type ComponentProps, type ReactNode, type SVGProps } from "react"
+import { use, useEffect, useState, useTransition, type ComponentProps, type ReactNode, type SVGProps } from "react"
 import { CollapsibleRow } from "@/app/lib/Collapsible"
 import { ExpandableAdvancedCard } from "@/app/lib/Collapsible.client"
 import { cn } from "lazy-cn"
 import { getSitemapAction, type GetSitemapActionResponse } from "./Sitemap.action"
-import { useAppNavigation } from "@/app/lib/searchParams"
 import { TabList } from "@/app/module/tab/TabRoot"
 import { tab } from "@/app/module/tab/tab-primitives"
 import { SourceHeader } from "./Sitemap"
@@ -13,7 +12,9 @@ import { TextInputCard, TextInputIconStart } from "../inputs/TextInput"
 import { formatDate } from "@/app/lib/date"
 import { SitemapUrlList } from "./SitemapUrl.client"
 import { SitemapIndexList } from "./SitemapIndex.client"
-import { HomeErrorCard, type ParsedError, type ParsedError2 } from "@/app/module/error/ErrorCard"
+import { HomeErrorCard, type ParsedError2 } from "@/app/module/error/ErrorCard"
+import { useStore } from "@/app/context"
+import { useSearchParams } from "next/navigation"
 
 export function SitemapCategoryCollapsible(
   props: {
@@ -36,10 +37,26 @@ export function SitemapCategoryCollapsible(
   )
 }
 
+function useSitemapStore(id: string) {
+  const urlSp = useSearchParams().get('url')
+  const store = useStore()
+  const globalSitemapStore = store['sitemap'] ??= {
+    id: Math.random().toString(36).slice(2)
+  }
+  const sitemapStore = globalSitemapStore[id] ??= {
+    id: Math.random().toString(36).slice(2)
+  }
+
+  return sitemapStore as {
+    expanded?: boolean,
+    sitemapData?: GetSitemapActionResponse
+  }
+}
 
 
 
 export function SitemapFileCard(props: {
+  id: string,
   fullUrl: string,
   title: string,
   lastModified?: string
@@ -48,15 +65,26 @@ export function SitemapFileCard(props: {
   depth?: number
   topOffset?: number
 }) {
-  const [isExpanded, setIsExpanded] = useState(false)
+  const store = useSitemapStore(props.id)
+  const [isExpanded, _setIsExpanded] = useState(store.expanded ?? false)
+  const setIsExpanded = (expanded: boolean) => {
+    store.expanded = expanded
+    console.log(store)
+    _setIsExpanded(expanded)
+  }
+
   const [isPending, startTransition] = useTransition()
-  const [sitemapData, setSitemapData] = useState<GetSitemapActionResponse>()
+  const [sitemapData, setSitemapData] = useState<GetSitemapActionResponse>(store.sitemapData ?? undefined)
   const { urls: rawUrls, sitemaps: rawSitemaps } = sitemapData?.validated.res ?? { urls: [], sitemaps: [] }
   function fetchAndSetData() {
     startTransition(async () => {
       const res = await getSitemapAction(props.fullUrl)
       startTransition(() => {
-        if (res.data) setSitemapData(res.data)
+        if (res.data) {
+          setSitemapData(res.data)
+          store.sitemapData = res.data
+          // console.log(store)
+        }
         if (res.error) {
           console.error(res.error)
           setError(res.error)
@@ -65,6 +93,8 @@ export function SitemapFileCard(props: {
     })
   }
   const [error, setError] = useState<ParsedError2>()
+
+
 
   // Messages
   const messages = sitemapData?.validated.messages ?? []
@@ -76,12 +106,13 @@ export function SitemapFileCard(props: {
   const [isRaw, setIsRaw] = useState(false)
 
   // Content Render Control
-  const [largeContentRendered, setLargeContentRendered] = useState(false)
+  const [largeContentRendered, setLargeContentRendered] = useState(store.expanded ?? false)
   useEffect(() => {
     if (largeContentRendered) setIsExpanded(true)
   }, [largeContentRendered])
+  
   useEffect(() => {
-    if (!!sitemapData) setLargeContentRendered(true)
+    if (!!sitemapData && isExpanded) setLargeContentRendered(true)
   }, [sitemapData])
 
 
@@ -111,6 +142,7 @@ export function SitemapFileCard(props: {
 
     style={{
       '--header-offset': `calc((var(--spacing) * ${ 9 }) + (var(--spacing) * ${ props.topOffset ?? 0 }) + ${ props.topOffset ? "(var(--spacing) * 2)" : "0px" })`,
+      // 
     }}
 
     onTransitionEnd={(e) => {
@@ -235,9 +267,11 @@ export function SitemapFileCard(props: {
 
               {/* Error Messages Goes Here */}
               {messages.length > 0 && (
-                <div className="px-3 flex flex-col gap-1 bg-background-tooltip text-foreground-muted-2 py-2">
+                <div className="flex flex-col">
                   {messages.map((message, i) => {
-                    return <div key={i} className={cn("rounded-md ")}>{message[0]}: {message[1]}</div>
+                    if (message[0] === 'error') return <div key={i} className={cn("py-1.5 px-3 bg-red-500/10 text-red-400/80 flex items-center gap-1")}><MaterialSymbolsErrorRounded /> {message[1]}</div>
+                    if (message[0] === 'warn') return <div key={i} className={cn("py-1.5 px-3 bg-amber-500/10 text-amber-400/80 flex items-center gap-1")}><MaterialSymbolsErrorRounded /> {message[1]}</div>
+                    if (message[0] === 'info') return <div key={i} className={cn("py-1.5 px-3 bg-foreground-muted/10 text-foreground-muted/80 flex items-center gap-1")}><MaterialSymbolsErrorRounded /> {message[1]}</div>
                   })}
                 </div>
               )}
@@ -259,6 +293,7 @@ export function SitemapFileCard(props: {
                   {/* Sitemap Indexes */}
                   {rawSitemaps && rawSitemaps.length > 0 && (
                     <SitemapIndexList
+                      id={props.id}
                       indexes={rawSitemaps}
                       depth={(props.depth ?? 0) + 1}
                       topOffset={(props.topOffset ?? 0) + (props.lastModified ? 12 : 8.5)}
@@ -403,5 +438,6 @@ export function MdiSortReverseVariant(props: SVGProps<SVGSVGElement>) {
 export function MdiSortVariant(props: SVGProps<SVGSVGElement>) {
   return (<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}>{/* Icon from Material Design Icons by Pictogrammers - https://github.com/Templarian/MaterialDesign/blob/master/LICENSE */}<path fill="currentColor" d="M3 13h12v-2H3m0-5v2h18V6M3 18h6v-2H3z"></path></svg>)
 }
-
-
+export function MaterialSymbolsErrorRounded(props: SVGProps<SVGSVGElement>) {
+  return (<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}>{/* Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE */}<path fill="currentColor" d="M12 17q.425 0 .713-.288T13 16t-.288-.712T12 15t-.712.288T11 16t.288.713T12 17m0-4q.425 0 .713-.288T13 12V8q0-.425-.288-.712T12 7t-.712.288T11 8v4q0 .425.288.713T12 13m0 9q-2.075 0-3.9-.788t-3.175-2.137T2.788 15.9T2 12t.788-3.9t2.137-3.175T8.1 2.788T12 2t3.9.788t3.175 2.137T21.213 8.1T22 12t-.788 3.9t-2.137 3.175t-3.175 2.138T12 22"></path></svg>)
+}

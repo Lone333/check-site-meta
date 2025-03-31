@@ -65,7 +65,7 @@ export function SitemapDetails(props: {
 
 
 
-
+  
 
   return (
     <div className="flex flex-col gap-4">
@@ -117,7 +117,7 @@ export function SitemapDetails(props: {
     try {
       return (
         <div>
-          <SitemapFileCard title={'/sitemap.xml'} fullUrl={new URL('/sitemap.xml', baseUrl).href} />
+          <SitemapFileCard id="sitemapxml" title={'/sitemap.xml'} fullUrl={new URL('/sitemap.xml', baseUrl).href} />
         </div>
       )
     } catch (error) {
@@ -130,10 +130,10 @@ export function SitemapDetails(props: {
     try {
       const { sitemaps } = await props.getRobots(baseUrl)
       return (
-        <div className="flex flex-col -mt-2">
+        <div className="flex flex-col">
           {sitemaps.map((sitemap, i) => (
             <Suspense fallback="Loading..." key={i}>
-              <SitemapFileCard title={sitemap} fullUrl={sitemap} />
+              <SitemapFileCard id={`robotstxt_${i}`} title={sitemap} fullUrl={sitemap} />
             </Suspense>
           ))}
         </div>
