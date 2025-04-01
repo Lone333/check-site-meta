@@ -47,7 +47,8 @@ export function SitemapUrlList(props: {
       }
       <div className="px-2 pb-1 relative">
         {/* TABLES CONTAINER */}
-        <div className="items-end top-0  overflow-x-auto overflow-y-clip px-2 bg-background-card rounded-xl border border-border shadow-xs">
+        <div className="items-end top-0  overflow-x-auto overflow-y-clip px-2 bg-background-card rounded-xl shadow-sm shadow-shadow
+        ">
           {/* Table */}
           <div className={cn(
             "text-foreground-muted sticky min-w-200",

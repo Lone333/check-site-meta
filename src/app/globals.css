@@ -70,6 +70,10 @@ body {
     var(--color-neutral-800)
   );
 
+  /* Misc Colors */
+
+  --color-shadow: light-dark(#eaeff5, #121312);
+
   --color-border: light-dark(#e6eaf2, #2f3030);
   --color-focus: light-dark(var(--color-slate-200), var(--color-neutral-800));
   --color-border-focus: light-dark(
@@ -77,7 +81,6 @@ body {
     var(--color-neutral-700)
   );
 
-  /* Component Colors */
 
   /* Accent Colors */
   --color-warning: light-dark(
