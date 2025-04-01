@@ -83,7 +83,7 @@ export function SitemapUrlList(props: {
             {paginatedEntries
               .map((url, i) => {
                 return (
-                  <div key={i} className="hover:bg-background-card-box -mx-2 px-2 py-1 bg-background-card">
+                  <div key={i + "_" + page} className="hover:bg-background-card-box -mx-2 px-2 py-1 bg-background-card">
                     <div className="flex gap-1 mt-0.5">
                       <a href={url.loc} target="_blank" className="underline opacity-60 hover:opacity-100">
                         <MaterialSymbolsOpenInNew className="w-3.5 h-3.5" />

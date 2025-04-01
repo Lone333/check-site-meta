@@ -47,8 +47,8 @@ export function SitemapIndexList(props: {
           .map((sitemaps, i) => {
             return (
               <SitemapFileCard
-                id={props.id + "_" + i}
-                key={sitemaps.loc + i}
+                id={props.id + "_" + i + "_" + page}
+                key={sitemaps.loc + "_" + i + "_" + page}
                 fullUrl={sitemaps.loc}
                 title={sitemaps.loc}
                 lastModified={sitemaps.lastmod}
