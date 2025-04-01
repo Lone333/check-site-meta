@@ -15,6 +15,46 @@ export function createError(
   return { type, summary, detail, context: context ?? [] }
 }
 
+export type ParsedError2 = {
+  summary: string,
+  detail?: string,
+  context: string[],
+  stack: string,
+  who: string[],
+  instanceof?: string
+}
+
+export function serializeError(error: unknown) {
+  let parsedError: ParsedError2 = {
+    summary: "An unknown error occurred.",
+    detail: error instanceof Error ? error.message : '',
+    context: [],
+    who: [],
+    stack: error instanceof Error ? error.stack! : '',
+    instanceof: "ParsedAppError"
+  }
+  if (error instanceof AppError2) {
+    parsedError = {
+      summary: error.summary,
+      detail: error.detail,
+      context: error.context,
+      stack: error.stack!,
+      who: error.who,
+      instanceof: "ParsedAppError"
+    }
+  }
+  if (typeof error === 'object' && error && 'instanceof' in error && error.instanceof === "ParsedAppError") {
+    parsedError = {
+      summary: ('summary' in error && typeof error.summary === 'string') ? error.summary : "An unknown error occurred. (s)",
+      detail: ('detail' in error && typeof error.detail === 'string') ? error.detail : 'Please contact the developer for more information. (s)',
+      context: ('context' in error && Array.isArray(error.context)) ? error.context : [],
+      stack: ('stack' in error && typeof error.stack === 'string') ? '(parsed serialized error) ' + error.stack : '',
+      who: ('who' in error && Array.isArray(error.who)) ? error.who : [],
+      instanceof: "ParsedAppError"
+    }
+  }
+  return parsedError
+}
 
 export class AppError2 extends Error {
 
@@ -47,6 +87,8 @@ export class AppError2 extends Error {
 
   ) {
     let errorMessageUsed = false
+
+    const isErrorObject = typeof error === 'object' && error
 
     const _summary = summary ?? (error instanceof AppError2
       ? error.summary
@@ -83,7 +125,9 @@ export class AppError2 extends Error {
 
     if (!error) this.error = this
     this.name = "AppError"
-    this.stack = error instanceof Error ? error.stack : this.stack
+    this.stack = error instanceof Error
+      ? error.stack
+      : this.stack
   }
 }
 

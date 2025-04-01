@@ -17,10 +17,11 @@ export function TabsWithContent
   const navigation = useAppNavigation()
   const [tabNum, setTab] = useState<number>(() => parseInt(navigation.get(id) ?? '0') || 0)
   
-  const { saveContentRect } = useContentHeighTransition(id, tabNum)
+  const { saveContentRect } = useTabsContentHeighTransition(id, tabNum)
 
-  const tabCache = useRef(tabs.map(t => t.content));
-  const currentContent = tabCache.current[tabNum] ?? tabs[tabNum].content
+  // const tabCache = useRef(tabs.map(t => t.content));
+  // const currentContent = tabCache.current[tabNum] ?? tabs[tabNum].content
+  const currentContent = tabs[tabNum].content
 
   return (
     <>
@@ -31,9 +32,9 @@ export function TabsWithContent
         onTabChange={(_, index) => {
           saveContentRect()
           setTab(index)
-          if (!tabCache.current[index]) {
-            tabCache.current[index] = tabs[index].content; // Cache the tab content
-          }
+          // if (!tabCache.current[index]) {
+          //   tabCache.current[index] = tabs[index].content; // Cache the tab content
+          // }
           navigation.softNavigate(id, index.toString())
         }}
         tabs={tabs}
@@ -47,7 +48,7 @@ export function TabsWithContent
 
 
 // Use ID because virtual dom can't update sibling nodes accurately.
-function useContentHeighTransition(
+function useTabsContentHeighTransition(
   id: string,
   tabNum: number
 ) {

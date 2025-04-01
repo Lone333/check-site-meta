@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { cn } from "lazy-cn"
-import { useState, type ComponentProps, type CSSProperties, type ReactNode, type SVGProps } from "react"
+import { useEffect, useRef, useState, type ComponentProps, type CSSProperties, type ReactNode, type SVGProps } from "react"
 import { CollapsibleRow } from "./Collapsible"
+import { px } from "./unit"
 
 export function useExpandableList(arr: boolean[], opts?: {
   onChange?: (arr: boolean[]) => void
@@ -111,4 +113,41 @@ export function ExpandableAdvancedCard({ expanded, toggleExpanse, Label, Content
 
 export function MaterialSymbolsExpandMoreRounded(props: SVGProps<SVGSVGElement>) {
   return (<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}>{/* Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE */}<path fill="currentColor" d="M12 14.95q-.2 0-.375-.062t-.325-.213l-4.6-4.6q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275l3.9 3.9l3.9-3.9q.275-.275.7-.275t.7.275t.275.7t-.275.7l-4.6 4.6q-.15.15-.325.213T12 14.95"></path></svg>)
+}
+
+export function useContentHeighTransition(
+  deps: any[],
+) {
+  const targetRef = useRef<HTMLElement | null>(null)
+  const contentRect = useRef({ height: null as number | null })
+
+  useEffect(() => {
+    if (!targetRef.current) return
+    const content = targetRef.current
+    const prev = contentRect.current.height
+    const curr = content.clientHeight
+    if (!prev) return
+    const delta = curr - prev
+    if (delta === 0) return
+    content.animate([{ marginBottom: px(-delta) }, {}], {
+      duration: 300,
+      easing: 'ease-out',
+      fill: 'both',
+    })
+    
+
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps)
+
+  function saveContentRect() {
+    if (!targetRef.current) return
+    contentRect.current.height = targetRef.current.clientHeight
+  }
+
+  return {
+    targetRef,
+    saveContentRect,
+  }
+
 }

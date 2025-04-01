@@ -6,7 +6,7 @@ import { CardHeader, CardHeaderSubtitle, CardHeaderTitle } from "../Card";
 import { SitemapCategoryCollapsible, SitemapFileCard } from "./Sitemap.client";
 import { ExpandableAdvancedCard, MaterialSymbolsExpandMoreRounded } from "@/app/lib/Collapsible.client";
 import { cn } from "lazy-cn";
-import { parseError } from "@/app/module/error/ErrorCard";
+import { serializeError } from "@/app/module/error/error-primitives";
 
 export function SitemapSummary(
   props: {
@@ -184,7 +184,7 @@ export function MaterialSymbolsErrorRounded(props: SVGProps<SVGSVGElement>) {
 
 
 function ErrorItemCard(props: { error: unknown, children: ReactNode }) {
-  const parsedError = parseError(props.error)
+  const parsedError = serializeError(props.error)
   return (
     <ExpandableAdvancedCard
       Label={<div className="-my-2 flex gap-2 py-2 items-center text-red-400">

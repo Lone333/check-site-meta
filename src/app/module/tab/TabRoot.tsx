@@ -5,11 +5,13 @@ import { useLayoutEffect, useRef, type ComponentProps, type MouseEvent, type Rea
 
 export function TabList({ tabs, tabNum, className, onTabChange, ...props }: ComponentProps<"div"> & {
   tabs: {
+    key?: string
     label: ReactNode
   }[],
   tabNum?: number,
   onTabChange?: (
     label: {
+      key?: string;
       label: ReactNode;
     },
     index: number,

@@ -15,7 +15,7 @@ export function AdvancedPanel(props: {
 
   const Robots = async () =>
     getRobots(props.metadata.url)
-      .then(res => <RobotsDetails data={res} />)
+      .then(res => <RobotsDetails data={res} url={props.metadata.url} />)
       .catch(err => <CardlessHomeErrorCard error={err}>
         <div className="text-foreground-body max-w-screen-sm flex flex-col gap-2 text-xxs">
           <p>Robots.txt file is used to control search engine crawlers. It is a text file that tells web robots which pages on your site to crawl. It also tells web robots which pages not to crawl.  </p>

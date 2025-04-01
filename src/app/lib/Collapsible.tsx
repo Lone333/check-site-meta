@@ -19,7 +19,7 @@ export function CollapsibleRow(props: ComponentProps<"div"> & { 'data-opened': b
 export function CollapsibleColumn(props: ComponentProps<"div"> & { 'data-opened': boolean }) {
   return (
     <div {...props} className={cn(
-      "grid grid-columns-[0fr] opened:grid-columns-[1fr] overflow-clip",
+      "grid grid-cols-[0fr] opened:grid-cols-[1fr] overflow-clip",
       "transition-[grid-template-columns,opacity] duration-500",
       props.className
     )}

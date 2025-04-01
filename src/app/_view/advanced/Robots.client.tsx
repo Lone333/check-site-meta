@@ -2,10 +2,17 @@
 
 import type { ParsedRobotRules } from "@/app/lib/get-robots";
 import { cn } from "lazy-cn";
-import { useState, type SVGProps } from "react";
+import { startTransition, useActionState, useEffect, useState, type ComponentProps, type SVGProps } from "react";
 import { FormButton } from "../inputs/InputForm";
-import { ExpandableAdvancedCard, useExpandableList } from "@/app/lib/Collapsible.client";
+import { ExpandableAdvancedCard, useContentHeighTransition, useExpandableList } from "@/app/lib/Collapsible.client";
 import { useStore } from "@/app/context";
+import { getRobotsAction } from "./Robots.action";
+import { CardlessHomeErrorCard, HomeErrorCard } from "@/app/module/error/ErrorCard";
+import { TabsWithContent } from "@/app/module/tab/Tabs";
+import { tab } from "@/app/module/tab/tab-primitives";
+import { TabList } from "@/app/module/tab/TabRoot";
+import { CollapsibleColumn, CollapsibleRow } from "@/app/lib/Collapsible";
+import { MaterialSymbolsRefresh } from "./Sitemap.client";
 
 
 export function Robots() {
@@ -21,6 +28,7 @@ export function useRobotsStore() {
   const robotsStore = store['robots'] ??= {}
 
   return robotsStore as {
+    tab?: "parsed" | "raw"
     expandArr?: boolean[]
     // uaRules: (ParsedRobotRules[number] & {
     //   expanded: boolean
@@ -28,12 +36,84 @@ export function useRobotsStore() {
   }
 }
 
-
-
-export function RobotsClientDetails(props: {
-  uaRules: ParsedRobotRules
+export function RobotsAdvancedDetailsBoundary(props: {
+  url: string
 }) {
-  const rules = props.uaRules
+  const store = useRobotsStore()
+  const [res, dispatch, pending] = useActionState(getRobotsAction, undefined)
+
+  const [currentTab, setTab] = useState<"parsed" | "raw">(store.tab ?? "parsed")
+
+
+  useEffect(() => {
+    startTransition(() => dispatch(props.url))
+  }, [])
+
+  const {
+    saveContentRect,
+    targetRef,
+  } = useContentHeighTransition([currentTab, res])
+
+  return (
+    <>
+      <div className="flex gap-2 mb-4">
+        <TabList
+          className="tab-item:py-1.5 tab-item:px-3.5 p-1"
+          onTabChange={(_, index) => {
+            saveContentRect()
+            const tabName = index === 0 ? "parsed" : "raw"
+            store.tab = tabName
+            setTab(tabName)
+          }}
+          tabNum={currentTab === "parsed" ? 0 : 1}
+          tabs={[
+            tab("Parsed"),
+            tab("Raw"),
+          ]}
+        />
+        <button
+          className="button-card px-4 bg-background-card shadow-none hover:bg-background-button-hover text-foreground-muted"
+          onClick={() => startTransition(() => {
+            if (pending) return
+            saveContentRect()
+            dispatch(props.url)
+          })}
+        >
+          <MaterialSymbolsRefresh className="size-4" />
+          {pending ? "Loading..." : "Refresh"}
+        </button>
+      </div>
+
+      {currentTab === "raw" && res?.data &&
+        <pre
+          ref={(node) => { targetRef.current = node }}
+          className="text-xs p-2 border border-border rounded-md bg-background fadeIn-0">
+          {res.data.raw}
+        </pre>
+      }
+
+      {currentTab === "parsed" && res?.data &&
+        <RobotsClientDetails
+          ref={(node) => { targetRef.current = node }}
+          uaRules={res.data.parsed} className="fadeIn-0" />
+      }
+
+      {res?.error &&
+        <CardlessHomeErrorCard
+          ref={(node) => { targetRef.current = node }}
+          error={res.error} className="fadeIn-0 p-2" />
+      }
+    </>
+  )
+}
+
+
+
+
+export function RobotsClientDetails({ uaRules, ...props }: {
+  uaRules: ParsedRobotRules
+} & ComponentProps<"div">) {
+  const rules = uaRules
 
   const store = useRobotsStore()
   const [search, setSearch] = useState("")
@@ -59,7 +139,7 @@ export function RobotsClientDetails(props: {
   )
 
   return (
-    <div className="flex flex-col gap-2">
+    <div {...props} className={cn("flex flex-col gap-2", props.className)}>
       <div className="flex gap-2 grow items-center max-w-2xl">
         <div className="grow card p-0 flex h-9 rounded-full bg-background-card-input overflow-hidden px-4">
           <input

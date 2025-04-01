@@ -12,9 +12,10 @@ import { TextInputCard, TextInputIconStart } from "../inputs/TextInput"
 import { formatDate } from "@/app/lib/date"
 import { SitemapUrlList } from "./SitemapUrl.client"
 import { SitemapIndexList } from "./SitemapIndex.client"
-import { HomeErrorCard, type ParsedError2 } from "@/app/module/error/ErrorCard"
+import { HomeErrorCard } from "@/app/module/error/ErrorCard"
 import { useStore } from "@/app/context"
 import { useSearchParams } from "next/navigation"
+import type { ParsedError2 } from "@/app/module/error/error-primitives"
 
 export function SitemapCategoryCollapsible(
   props: {

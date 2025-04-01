@@ -260,7 +260,10 @@ body {
     var(--color-neutral-900)
   );
   @apply rounded-md shadow-sm
-   disabled:text-foreground-muted-2/20 disabled:pointer-events-none;
+   disabled:text-foreground-muted-2/20 disabled:pointer-events-none
+   flex items-center gap-2
+   select-none
+   ;
 }
 
 @utility collapsible-row-grid-* {

@@ -6,7 +6,7 @@ import { TabsWithContent } from "@/app/module/tab/Tabs"
 import { tab } from "@/app/module/tab/tab-primitives"
 import type { ResoledMetadata } from "@/app/lib/get-metadata-field-data"
 import { CardHeader, CardHeaderSubtitle, CardHeaderTitle } from "../Card"
-import { RobotsClientDetails } from "./Robots.client"
+import { RobotsClientDetails, RobotsAdvancedDetailsBoundary } from "./Robots.client"
 
 
 export async function RobotsSummary(props: {
@@ -57,14 +57,14 @@ export function MaterialSymbolsCircleOutline(props: SVGProps<SVGSVGElement>) {
 }
 
 
-export async function RobotsDetails({ data }: {
+export async function RobotsDetails({ data, url }: {
+  url: string,
   data: GetRobotsResult,
-
 }) {
   const { parsed, raw } = data
   return (
     <div className={cn("flex flex-col")}>
-      <CardHeader>
+      <CardHeader className="pb-4">
         <CardHeaderTitle>
           Robots.txt (beta)
         </CardHeaderTitle>
@@ -72,23 +72,8 @@ export async function RobotsDetails({ data }: {
           Rules for search engine crawlers
         </CardHeaderSubtitle>
       </CardHeader>
-      <TabsWithContent
-        id="robots-rules"
-        className="self-start tab-item:py-1.5 tab-item:px-3.5 mb-3 mt-4 p-1 rounded-lg tab-background:rounded-md text-xs tab-item:font-semibold"
-        tabs={[
-          tab("Parsed",
-            <div key="p" className="fadeBlurIn-0">
-              <RobotsClientDetails uaRules={parsed} />
-            </div>
-          ),
-          tab("Raw",
-            <div key="r" className="fadeBlurIn-0">
-              <pre className="text-xs p-2 border border-border rounded-md bg-background">
-                {raw}
-              </pre>
-            </div>
-          ),
-        ]}
+      <RobotsAdvancedDetailsBoundary
+        url={url}
       />
     </div>
   )

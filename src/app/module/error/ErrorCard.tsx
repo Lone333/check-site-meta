@@ -1,5 +1,5 @@
 import { Fragment, type ComponentProps, type ReactNode, type SVGProps } from "react"
-import { AppError2 } from "./error-primitives"
+import { AppError2, serializeError, type ParsedError2 } from "./error-primitives"
 import { cn } from "lazy-cn"
 
 const ErrorInfoMessages = {
@@ -143,42 +143,10 @@ export function StackTrace(props: ComponentProps<"div"> & { stack?: string }) {
 
 
 
-export function parseError(error: unknown) {
-  let parsedError: ParsedError2 = {
-    summary: "An unknown error occurred.",
-    context: [],
-    who: [],
-    stack: error instanceof Error ? error.stack! : '',
-  }
-  if (error instanceof AppError2) {
-    parsedError = {
-      summary: error.summary,
-      detail: error.detail,
-      context: error.context,
-      stack: error.stack!,
-      who: error.who,
-    }
-  }
-  return parsedError
-}
 
 
 
 
-
-
-
-
-
-
-
-export type ParsedError2 = {
-  summary: string,
-  detail?: string,
-  context: string[],
-  stack: string,
-  who: string[],
-}
 
 
 export function ErrorMessageBase({ error, children, ...rest }:
@@ -186,7 +154,7 @@ export function ErrorMessageBase({ error, children, ...rest }:
   & Omit<ComponentProps<"div">, 'children'>
   & { children?: (error: ParsedError2) => ReactNode }
 ) {
-  const parsedError = parseError(error)
+  const parsedError = serializeError(error)
 
   if (!children) return null
   return (
@@ -245,8 +213,9 @@ export function HomeErrorCard({ children, ...props }: { error: unknown } & Compo
 
 
 export function CardlessHomeErrorCard({ error, children, ...props }: { error: unknown } & ComponentProps<"div">) {
+  console.log(error)
   return (
-    <HomeErrorCard error={error} {...props} className="border-none p-0" />
+    <HomeErrorCard error={error} {...props} className={cn("border-none p-0", props.className)} />
   )
 }
 
