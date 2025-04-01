@@ -1,4 +1,7 @@
 export const changelog = {
+  "0.3.2": [
+    "Improved sitemap UI",
+  ],
   "0.3.1": [
     "Improved table sitemap UI",
     "Improved tab persistence",
