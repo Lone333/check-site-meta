@@ -13,6 +13,7 @@ import { tab } from "@/app/module/tab/tab-primitives";
 import { TabList } from "@/app/module/tab/TabRoot";
 import { CollapsibleColumn, CollapsibleRow } from "@/app/lib/Collapsible";
 import { MaterialSymbolsRefresh } from "./Sitemap.client";
+import type { FuncRet } from "@/app/lib/type";
 
 
 export function Robots() {
@@ -26,13 +27,10 @@ export function Robots() {
 export function useRobotsStore() {
   const store = useStore()
   const robotsStore = store['robots'] ??= {}
-
   return robotsStore as {
     tab?: "parsed" | "raw"
     expandArr?: boolean[]
-    // uaRules: (ParsedRobotRules[number] & {
-    //   expanded: boolean
-    // })[]
+    res?: FuncRet<typeof getRobotsAction>
   }
 }
 
@@ -40,14 +38,22 @@ export function RobotsAdvancedDetailsBoundary(props: {
   url: string
 }) {
   const store = useRobotsStore()
-  const [res, dispatch, pending] = useActionState(getRobotsAction, undefined)
+  const [res, dispatch, pending] = useActionState(getRobotsAction, store.res ?? undefined)
 
   const [currentTab, setTab] = useState<"parsed" | "raw">(store.tab ?? "parsed")
 
 
   useEffect(() => {
-    startTransition(() => dispatch(props.url))
+    if (!res) {
+      startTransition(() => dispatch(props.url))
+    }
   }, [])
+
+  useEffect(() => {
+    if (res?.data) {
+      store.res = res
+    }
+  }, [res])
 
   const {
     saveContentRect,
@@ -55,7 +61,7 @@ export function RobotsAdvancedDetailsBoundary(props: {
   } = useContentHeighTransition([currentTab, res])
 
   return (
-    <>
+    <div >
       <div className="flex gap-2 mb-4">
         <TabList
           className="tab-item:py-1.5 tab-item:px-3.5 p-1"
@@ -86,6 +92,7 @@ export function RobotsAdvancedDetailsBoundary(props: {
 
       {currentTab === "raw" && res?.data &&
         <pre
+          key={res?.data?.id}
           ref={(node) => { targetRef.current = node }}
           className="text-xs p-2 border border-border rounded-md bg-background fadeIn-0">
           {res.data.raw}
@@ -94,6 +101,7 @@ export function RobotsAdvancedDetailsBoundary(props: {
 
       {currentTab === "parsed" && res?.data &&
         <RobotsClientDetails
+          key={res?.data?.id}
           ref={(node) => { targetRef.current = node }}
           uaRules={res.data.parsed} className="fadeIn-0" />
       }
@@ -103,7 +111,7 @@ export function RobotsAdvancedDetailsBoundary(props: {
           ref={(node) => { targetRef.current = node }}
           error={res.error} className="fadeIn-0 p-2" />
       }
-    </>
+    </div>
   )
 }
 
