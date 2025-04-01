@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { appFetch } from "./fetch";
+import { appFetch, getUTF8Text } from "./fetch";
 import { XMLParser } from "fast-xml-parser";
 import { AppError2 } from "../module/error/error-primitives";
 import type { PreviewMessages } from "../_view/previews/Preview";
@@ -9,7 +9,7 @@ import { isObject, isPropInObject } from "./validations";
 export const getSitemap = cache(async function getSitemap(url: string) {
   await new Promise(resolve => setTimeout(resolve, 500))
   const res = await appFetch(url)
-  const text = await res.text()
+  const text = await getUTF8Text(res)
   const byteSize = new TextEncoder().encode(text).length;
   try {
     const xmlparser = new XMLParser({
@@ -33,10 +33,10 @@ export const getSitemap = cache(async function getSitemap(url: string) {
 
 
 // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-(() => {
-  const sm = getSitemap('https://example.com/sitemap.xml')
-  const res = validateSitemap(sm)
-})
+// (() => {
+//   const sm = getSitemap('https://example.com/sitemap.xml')
+//   const res = validateSitemap(sm)
+// })
 
 
 export type Sitemap = {
@@ -62,7 +62,6 @@ export function validateSitemap(input: object) {
     messages.push(["error", "Sitemap not found", "root"])
     return { messages, res, isIndex }
   }
-
 
   // Check for XML declaration
   if ('?xml' in input === false) {

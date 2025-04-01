@@ -14,7 +14,7 @@ export function RecentSuggestions(props: {
 
   useEffect(() => {
     if (!props.hidden) setRecent(recentSuggestionsLocal.get())
-    console.log(props.hidden)
+    // console.log(props.hidden)
   }, [props.hidden])
 
   const onClear = () => {

@@ -20,7 +20,6 @@ export function AppImage(
   }
 
   if (error && onErrorFallback) {
-    // console.log("Hello???")
     return onErrorFallback
   }
 

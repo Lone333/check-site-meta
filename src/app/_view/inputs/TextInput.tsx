@@ -9,6 +9,7 @@ export function TextInputCard(props: ComponentProps<"div">) {
       "outline-0 outline-transparent hover:outline-2 hover:outline-focus",
       "px-4",
       "[&_input]:outline-0",
+      "border border-border",
       props.className
     )} />
   )

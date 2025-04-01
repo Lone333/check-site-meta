@@ -45,12 +45,12 @@ export function SitemapUrlList(props: {
       {sortedEntries.length > 0
         && <ListSearchInputField search={search} setSearch={setSearch} />
       }
-      <div className="px-2 relative">
+      <div className="px-2 pb-1 relative">
         {/* TABLES CONTAINER */}
-        <div className="items-end top-0  overflow-x-auto overflow-y-clip px-2">
+        <div className="items-end top-0  overflow-x-auto overflow-y-clip px-2 bg-background-card rounded-xl border border-border shadow-xs">
           {/* Table */}
           <div className={cn(
-            "bg-background-card text-foreground-muted rounded-t-xl  sticky min-w-200",
+            "text-foreground-muted sticky min-w-200",
             "grid grid-cols-[2rem_4fr_9rem_1fr_1fr] gap-x-2",
             "-mx-2 px-2 *:pt-2 *:pb-1.5"
           )}>
