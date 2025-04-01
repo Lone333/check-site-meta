@@ -1,4 +1,7 @@
 export const changelog = {
+  "0.3.5": [
+    "Removed bloat from previous version."
+  ], 
   "0.3.4": [
     "Added Refresh button on robots.txt."
   ],
