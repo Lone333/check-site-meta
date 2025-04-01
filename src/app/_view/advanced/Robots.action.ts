@@ -13,7 +13,6 @@ export async function getRobotsAction(state: unknown, payload: string) {
     return { data: {...robots, id: Date.now().toString(36)  } }
   } catch (e) {
     const error = serializeError(e)
-    console.log(error)
     return { error }
   }
 }

@@ -7,11 +7,9 @@ import { FormButton } from "../inputs/InputForm";
 import { ExpandableAdvancedCard, useContentHeighTransition, useExpandableList } from "@/app/lib/Collapsible.client";
 import { useStore } from "@/app/context";
 import { getRobotsAction } from "./Robots.action";
-import { CardlessHomeErrorCard, HomeErrorCard } from "@/app/module/error/ErrorCard";
-import { TabsWithContent } from "@/app/module/tab/Tabs";
+import { CardlessHomeErrorCard } from "@/app/module/error/ErrorCard";
 import { tab } from "@/app/module/tab/tab-primitives";
 import { TabList } from "@/app/module/tab/TabRoot";
-import { CollapsibleColumn, CollapsibleRow } from "@/app/lib/Collapsible";
 import { MaterialSymbolsRefresh } from "./Sitemap.client";
 import type { FuncRet } from "@/app/lib/type";
 
@@ -38,9 +36,9 @@ export function RobotsAdvancedDetailsBoundary(props: {
   url: string
 }) {
   const store = useRobotsStore()
-  const [res, dispatch, pending] = useActionState(getRobotsAction, store.res ?? undefined)
-
   const [currentTab, setTab] = useState<"parsed" | "raw">(store.tab ?? "parsed")
+
+  const [res, dispatch, pending] = useActionState(getRobotsAction, store.res ?? undefined)
 
 
   useEffect(() => {
@@ -89,7 +87,6 @@ export function RobotsAdvancedDetailsBoundary(props: {
           {pending ? "Loading..." : "Refresh"}
         </button>
       </div>
-
       {currentTab === "raw" && res?.data &&
         <pre
           key={res?.data?.id}
@@ -98,14 +95,12 @@ export function RobotsAdvancedDetailsBoundary(props: {
           {res.data.raw}
         </pre>
       }
-
       {currentTab === "parsed" && res?.data &&
         <RobotsClientDetails
           key={res?.data?.id}
           ref={(node) => { targetRef.current = node }}
           uaRules={res.data.parsed} className="fadeIn-0" />
       }
-
       {res?.error &&
         <CardlessHomeErrorCard
           ref={(node) => { targetRef.current = node }}

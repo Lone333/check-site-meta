@@ -32,7 +32,6 @@ export const getSitemap = cache(async function getSitemap(url: string) {
 });
 
 
-// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 // (() => {
 //   const sm = getSitemap('https://example.com/sitemap.xml')
 //   const res = validateSitemap(sm)
