@@ -1,4 +1,7 @@
 export const changelog = {
+  "0.3.3": [
+    "Added more themes as per discord's new theme redesign"
+  ],
   "0.3.2": [
     "Improved sitemap UI",
   ],
