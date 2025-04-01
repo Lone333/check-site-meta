@@ -62,6 +62,7 @@ export default async function Home(context: SearchParamsContext) {
           "container-sm lg:container-2xl font-medium font-sans",
           "px-8 lg:px-12 xl:px-24 pb-40",
           "lg:grid lg:grid-cols-2 gap-x-8",
+          "items-start",
         )}>
 
           <div className="flex flex-col min-h-[80vh] py-12">
