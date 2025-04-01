@@ -5,6 +5,7 @@ export const changelog = {
     "Improved overrall error handling",
     "Improved favicon rendering",
     "Improved scrollbar appearance",
+    "Fixed Google Preview collapsed UI"
   ],
   "0.3.0": [
     "Added ability to check sitemap and robots.txt: currently in beta",
