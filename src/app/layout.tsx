@@ -3,7 +3,7 @@ import { JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { cn } from "lazy-cn";
 import "./globals.css";
 import { ThemeSwitcherDev } from "./theme-switch";
-import { LocalContextProvider } from "./context";
+import { ReactScan } from "./lib/react-scan";
 
 
 // Metadata -----------------------------
@@ -34,6 +34,7 @@ export default function RootLayout(props: {
       overflowAnchor: "none",
     }}>
       <head>
+        <ReactScan />
         <ThemeScript />
         <meta name="version" content={process.env['CSM_VERSION']} />
         <meta name="disable_analytics" content={process.env['DISABLE_ANALYTICS']} />
@@ -43,6 +44,7 @@ export default function RootLayout(props: {
         mono.variable,
         `subpixel-antialiased bg-background`
       )}>
+        
         <ThemeSwitcherDev />
         {props.children}
       </body>

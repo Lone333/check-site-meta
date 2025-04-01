@@ -83,6 +83,9 @@ nextProcess.stdout.on("data", (data) => {
             }
             else {
                 console.log(' → Skipping browser launch.');
+                setTimeout(() => {
+                    console.log(' → Found any bugs? Be sure to DM me on X: @alfonsusac or create an issue in the check-site-meta github repo.');
+                }, 2000);
             }
             rl.close();
         });
