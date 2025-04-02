@@ -69,7 +69,7 @@ export async function RobotsDetails({ data, url }: {
           Robots.txt (beta)
         </CardHeaderTitle>
         <CardHeaderSubtitle>
-          Rules for search engine crawlers
+          {`A standard file that tells web crawlers which pages they can or can't access on a website.`}
         </CardHeaderSubtitle>
       </CardHeader>
       <RobotsAdvancedDetailsBoundary

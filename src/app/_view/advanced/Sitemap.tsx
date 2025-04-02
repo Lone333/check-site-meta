@@ -64,14 +64,15 @@ export function SitemapDetails(props: {
   const baseUrl = props.url
 
 
-
-  
-
   return (
     <div className="flex flex-col gap-4">
       <CardHeader>
-        <CardHeaderTitle>Sitemaps (beta)</CardHeaderTitle>
-        <CardHeaderSubtitle>List of sitemap entries</CardHeaderSubtitle>
+        <CardHeaderTitle>
+          Sitemaps (beta)
+        </CardHeaderTitle>
+        <CardHeaderSubtitle>
+          {`A file that lists a website's pages to help search engines discover and index content efficiently.`}
+        </CardHeaderSubtitle>
       </CardHeader>
 
       <div className="rounded-md flex flex-col gap-2">
