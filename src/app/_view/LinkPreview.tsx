@@ -23,7 +23,7 @@ export async function LinkPreviewPanel(
         style={{
           "--p": "0.5rem",
           "--px": "0.75rem",
-        } as CSSProperties}
+        }}
         tabs={[
           tab(
             <LinkPreviewPanelTooltip label="X/Twitter">
