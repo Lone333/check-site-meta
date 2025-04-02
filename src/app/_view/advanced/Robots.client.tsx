@@ -59,7 +59,7 @@ export function RobotsAdvancedDetailsBoundary(props: {
   } = useContentHeighTransition([currentTab, res])
 
   return (
-    <div >
+    <div>
       <div className="flex gap-2 mb-4">
         <TabList
           className="tab-item:py-1.5 tab-item:px-3.5 p-1"

@@ -8,6 +8,7 @@ import { Suspense, type ReactNode, type SVGProps } from "react";
 import { CardlessHomeErrorCard, type ParsedError } from "@/app/module/error/ErrorCard";
 import { ExpandableErrorStack } from "@/app/module/error/Error.client";
 import { getRobots } from "@/app/lib/get-robots";
+import { LLMs } from "./Llms";
 
 export function AdvancedPanel(props: {
   metadata: SiteMetadata
@@ -37,7 +38,7 @@ export function AdvancedPanel(props: {
         ),
         tab("Robots",
           <MetaCard>
-            <div key="r" className="card-content fadeBlurIn-100">
+            <div key="r" className="card-content fadeBlurIn-0">
               <Suspense fallback="Loading robots.txt">
                 <Robots />
               </Suspense>
@@ -46,7 +47,7 @@ export function AdvancedPanel(props: {
         ),
         tab("Sitemap",
           <MetaCard>
-            <div key="sm" className="card-content fadeBlurIn-100">
+            <div key="sm" className="card-content fadeBlurIn-0">
               <Suspense fallback="Loading...">
                 <SitemapDetails
                   url={props.metadata.url}
@@ -56,6 +57,13 @@ export function AdvancedPanel(props: {
             </div>
           </MetaCard>
         ),
+        tab("LLms",
+          <MetaCard>
+            <div key="sm" className="card-content fadeBlurIn-0">
+              <LLMs url={props.metadata.url} />
+            </div>
+          </MetaCard>
+        )
       ]}
     >
     </TabsWithContent>

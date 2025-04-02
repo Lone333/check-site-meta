@@ -1,5 +1,5 @@
 import { cn } from "lazy-cn";
-import { Suspense, type ComponentProps, type ReactNode, type SVGProps } from "react";
+import { Suspense, type ComponentProps, type CSSProperties, type ReactNode, type SVGProps } from "react";
 import { StaticTooltip, TooltipBase } from "../lib/Tooltip";
 import { tab } from "../module/tab/tab-primitives";
 import { TabsWithContent } from "../module/tab/Tabs";
@@ -23,7 +23,7 @@ export async function LinkPreviewPanel(
         style={{
           "--p": "0.5rem",
           "--px": "0.75rem",
-        }}
+        } as CSSProperties}
         tabs={[
           tab(
             <LinkPreviewPanelTooltip label="X/Twitter">
