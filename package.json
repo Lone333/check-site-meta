@@ -16,6 +16,7 @@
     "prepublishOnly": "npm run build && tsc --p ./bin"
   },
   "dependencies": {
+    "@types/mdast": "^4.0.4",
     "commander": "^13.1.0",
     "fast-xml-parser": "^5.0.9",
     "image-size": "^2.0.1",
@@ -26,7 +27,9 @@
     "open": "^10.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "robots-parser": "^3.0.1"
+    "remark-parse": "^11.0.0",
+    "robots-parser": "^3.0.1",
+    "unified": "^11.0.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",

@@ -43,14 +43,13 @@ export function RobotsAdvancedDetailsBoundary(props: {
 
   useEffect(() => {
     if (!res) {
+      saveContentRect()
       startTransition(() => dispatch(props.url))
     }
   }, [])
 
   useEffect(() => {
-    if (res?.data) {
-      store.res = res
-    }
+    if (res?.data) store.res = res
   }, [res])
 
   const {
@@ -77,35 +76,38 @@ export function RobotsAdvancedDetailsBoundary(props: {
         />
         <button
           className="button-card px-4 bg-background-card shadow-none hover:bg-background-button-hover text-foreground-muted"
-          onClick={() => startTransition(() => {
-            if (pending) return
-            saveContentRect()
-            dispatch(props.url)
-          })}
+          onClick={
+            () => startTransition(() => {
+              if (pending) return
+              saveContentRect()
+              dispatch(props.url)
+            })
+          }
         >
           <MaterialSymbolsRefresh className="size-4" />
           {pending ? "Loading..." : "Refresh"}
         </button>
       </div>
-      {currentTab === "raw" && res?.data &&
-        <pre
-          key={res?.data?.id}
-          ref={(node) => { targetRef.current = node }}
-          className="text-xs p-2 border border-border rounded-md bg-background fadeIn-0">
-          {res.data.raw}
-        </pre>
-      }
-      {currentTab === "parsed" && res?.data &&
-        <RobotsClientDetails
-          key={res?.data?.id}
-          ref={(node) => { targetRef.current = node }}
-          uaRules={res.data.parsed} className="fadeIn-0" />
-      }
-      {res?.error &&
-        <CardlessHomeErrorCard
-          ref={(node) => { targetRef.current = node }}
-          error={res.error} className="fadeIn-0 p-2" />
-      }
+
+      <div ref={node => { targetRef.current = node }}>
+        {currentTab === "raw" && res?.data &&
+          <pre
+            key={res?.data?.id}
+            className="text-xs p-2 border border-border rounded-md bg-background fadeIn-0">
+            {res.data.raw}
+          </pre>
+        }
+        {currentTab === "parsed" && res?.data &&
+          <RobotsClientDetails
+            key={res?.data?.id}
+            uaRules={res.data.parsed} className="fadeIn-0" />
+        }
+        {res?.error &&
+          <CardlessHomeErrorCard
+            error={res.error} className="fadeIn-0 p-2" />
+        }
+      </div>
+
     </div>
   )
 }

@@ -213,7 +213,6 @@ export function HomeErrorCard({ children, ...props }: { error: unknown } & Compo
 
 
 export function CardlessHomeErrorCard({ error, children, ...props }: { error: unknown } & ComponentProps<"div">) {
-  console.log(error)
   return (
     <HomeErrorCard error={error} {...props} className={cn("border-none p-0", props.className)} />
   )

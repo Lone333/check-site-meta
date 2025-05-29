@@ -1,7 +1,8 @@
 import { AppError2 } from "../module/error/error-primitives";
+import { isDev } from "./env";
 import { getUserSettings } from "./get-settings";
 
-const fetchInstance = globalThis.fetch;
+const fetchInstance = fetch;
 
 
 export async function appFetch(...args: Parameters<typeof fetchInstance>) {
@@ -14,13 +15,13 @@ export async function appFetch(...args: Parameters<typeof fetchInstance>) {
       headers: {
         'User-Agent': settings.userAgent,
         'Accept-Language': 'en-GB-oxendict,en-GB;q=0.9,en;q=0.8,id;q=0.7,en-US;q=0.6',
-        'Cache-Control': 'no-store', // Prevents caching
-        'Pragma': 'no-cache', // For compatibility with HTTP/1.0 caches
+        'Cache-Control': isDev ? '' : 'no-store', // Prevents caching
+        'Pragma': isDev ? '' : 'no-cache', // For compatibility with HTTP/1.0 caches
         'Expires': '0', // Forces the response to always be fresh
         ...args[1]?.headers
       },
       redirect: "follow",
-      cache: "no-store"
+      cache: isDev ? undefined : "no-store"
     })
     return res
   } catch (error) {

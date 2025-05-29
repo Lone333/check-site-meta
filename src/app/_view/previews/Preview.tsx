@@ -5,7 +5,7 @@ import type { ComponentProps, SVGProps } from "react";
 
 
 export type PreviewMessages = [
-  level: 'error' | 'warn' | 'info',
+  level: 'error' | 'warn' | 'info' | 'ok',
   text: string,
   source?: string
 ][]
@@ -32,13 +32,15 @@ export function MessageList(props: { messages: PreviewMessages }) {
 const IconMap = {
   error: ClarityExclamationCircleSolid,
   warn: ClarityExclamationTriangleSolid,
-  info: ClarityInfoCircleLine
+  info: ClarityInfoCircleLine,
+  ok: ClarityCheckCircleSolid,
 }
 
 const ColorMap = {
   error: "text-error",
   warn: "text-warning",
-  info: "text-foreground-muted-2"
+  info: "text-foreground-muted-2",
+  ok: "text-green-500"
 }
 
 export function ClarityInfoCircleLine(props: SVGProps<SVGSVGElement>) {
@@ -49,6 +51,11 @@ function ClarityExclamationCircleSolid(props: SVGProps<SVGSVGElement>) {
 }
 function ClarityExclamationTriangleSolid(props: SVGProps<SVGSVGElement>) {
   return (<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 36 36" {...props}><path fill="currentColor" d="M30.33 25.54L20.59 7.6a3 3 0 0 0-5.27 0L5.57 25.54A3 3 0 0 0 8.21 30h19.48a3 3 0 0 0 2.64-4.43Zm-13.87-12.8a1.49 1.49 0 0 1 3 0v6.89a1.49 1.49 0 1 1-3 0ZM18 26.25a1.72 1.72 0 1 1 1.72-1.72A1.72 1.72 0 0 1 18 26.25" className="clr-i-solid clr-i-solid-path-1"></path><path fill="none" d="M0 0h36v36H0z"></path></svg>)
+}
+export function ClarityCheckCircleSolid(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 36 36" {...props}>{/* Icon from Clarity by VMware - https://github.com/vmware/clarity-assets/blob/master/LICENSE */}<path fill="currentColor" d="M30 18A12 12 0 1 1 18 6a12 12 0 0 1 12 12m-4.77-2.16a1.4 1.4 0 0 0-2-2l-6.77 6.77L13 17.16a1.4 1.4 0 0 0-2 2l5.45 5.45Z" className="clr-i-solid clr-i-solid-path-1"></path><path fill="none" d="M0 0h36v36H0z"></path></svg>
+  )
 }
 
 export function PreviewPanelContent(

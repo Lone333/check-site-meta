@@ -2,11 +2,9 @@ import { MetadataRow } from "../MetadataRow"
 import { type GetRobotsResult } from "@/app/lib/get-robots"
 import { Suspense, type SVGProps } from "react"
 import { cn } from "lazy-cn"
-import { TabsWithContent } from "@/app/module/tab/Tabs"
-import { tab } from "@/app/module/tab/tab-primitives"
 import type { ResoledMetadata } from "@/app/lib/get-metadata-field-data"
 import { CardHeader, CardHeaderSubtitle, CardHeaderTitle } from "../Card"
-import { RobotsClientDetails, RobotsAdvancedDetailsBoundary } from "./Robots.client"
+import { RobotsAdvancedDetailsBoundary } from "./Robots.client"
 
 
 export async function RobotsSummary(props: {
@@ -57,7 +55,7 @@ export function MaterialSymbolsCircleOutline(props: SVGProps<SVGSVGElement>) {
 }
 
 
-export async function RobotsDetails({ data, url }: {
+export function RobotsDetails({ data, url }: {
   url: string,
   data: GetRobotsResult,
 }) {

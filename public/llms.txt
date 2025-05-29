@@ -1,0 +1,20 @@
+# check-site-meta Documentation for LLMs
+
+> `check-site-meta` is a tool to inspect website metadata, including Open Graph data, robots.txt, sitemap.xml, and even llms.txt. It runs locally using Node.js to bypass CORS and caching issues.
+
+## Documentation Sets
+
+- [README](https://github.com/alfonsusac/check-site-meta#readme): A minimal overview of usage and functionality
+- [Development notes](https://github.com/alfonsusac/check-site-meta/blob/main/NOTES.md): Internal thoughts and extra details
+
+## Feature Documentation
+
+- [CLI metadata fetcher](https://github.com/alfonsusac/check-site-meta/blob/main/src/app/page.tsx): Entry point that handles user input
+- [Server-side fetch logic](https://github.com/alfonsusac/check-site-meta/blob/main/src/app/api/route.ts): Metadata fetch implementation, bypassing CORS
+- [Sitemap & robots parser](https://www.npmjs.com/package/robots-parser): External library used for parsing `robots.txt` and `sitemap.xml`
+
+## Notes
+
+- This project does not require deployment to work — just `npm run dev`
+- The llms.txt is included as a conceptual demonstration for tools like this one
+- External references are allowed for clarity

@@ -1,4 +1,4 @@
-import { cache, Fragment, Suspense, type ComponentProps, type ReactNode } from "react";
+import { cache, Fragment, Suspense, type ComponentProps } from "react";
 import { getMetadataValues, fetchRoot } from "./lib/get-metadata";
 import { parseUrlFromQuery } from "./lib/parse-url";
 import type { SearchParamsContext } from "./lib/next-types";
@@ -32,7 +32,6 @@ import { LocalContextProvider } from "./context";
 //   ↓             ↓
 //  fields       previews
 // 
-type Query = Record<string, string | string[] | undefined>
 
 export default async function Home(context: SearchParamsContext) {
 
@@ -131,7 +130,7 @@ function Header(props: {
           check-site-meta
         </div>
         <div className="text-foreground-muted max-w-100 mt-2 font-sans text-xl g-closed:opacity-0 g-closed:translate-y-10 transition duration-700">
-          100% local site metadata checker
+          100% local site metadata checker {}
         </div>
       </div>
     </div>

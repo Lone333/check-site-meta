@@ -7,7 +7,7 @@ import { isObject, isPropInObject } from "./validations";
 
 
 export const getSitemap = cache(async function getSitemap(url: string) {
-  await new Promise(resolve => setTimeout(resolve, 500))
+  // await new Promise(resolve => setTimeout(resolve, 500))
   const res = await appFetch(url)
   const text = await getUTF8Text(res)
   const byteSize = new TextEncoder().encode(text).length;
