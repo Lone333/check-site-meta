@@ -15,7 +15,7 @@ import { SitemapIndexList } from "./SitemapIndex.client"
 import { HomeErrorCard } from "@/app/module/error/ErrorCard"
 import { useStore } from "@/app/context"
 import { useSearchParams } from "next/navigation"
-import type { ParsedError2 } from "@/app/module/error/error-primitives"
+import type { ParsedError } from "@/app/module/error/error-primitives"
 
 export function SitemapCategoryCollapsible(
   props: {
@@ -89,7 +89,7 @@ export function SitemapFileCard(props: {
       })
     })
   }
-  const [error, setError] = useState<ParsedError2>()
+  const [error, setError] = useState<ParsedError>()
 
 
   // Messages

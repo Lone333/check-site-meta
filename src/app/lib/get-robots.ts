@@ -1,13 +1,13 @@
 import robotsParser from "robots-parser"
 import { appFetch, getUTF8Text } from "./fetch"
 import { cache } from "react"
-import { AppError2 } from "../module/error/error-primitives"
+import { AppError } from "../module/error/error-primitives"
 
 export const getRobots = cache(async function getRobots(url: string) {
   const res = await appFetch(new URL('/robots.txt', url).toString())
   const text = await getUTF8Text(res)
   if (!['#', 'U', 'D', 'A', 'S'].includes(text.trim().at(0) ?? '')) {
-    throw new AppError2(
+    throw new AppError(
       'getRobots',
       'Invalid robots.txt',
       'robots.txt must start with a comment or a user-agent directive. See https://developers.google.com/search/reference/robots_txt',
@@ -36,7 +36,7 @@ export const getRobots = cache(async function getRobots(url: string) {
       raw: text
     }
   } catch (error) {
-    throw new AppError2(
+    throw new AppError(
       'getRobots',
       'Error parsing robots.txt',
       'An error occurred while parsing the robots.txt file.',

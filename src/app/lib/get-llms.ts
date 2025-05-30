@@ -1,5 +1,5 @@
 import { unified } from "unified";
-import { AppError2 } from "../module/error/error-primitives";
+import { AppError } from "../module/error/error-primitives";
 import { appFetch, getUTF8Text } from "./fetch";
 import remarkParse from "remark-parse";
 import type { Root, RootContent } from "mdast";
@@ -27,7 +27,7 @@ export async function getLLMtext(url: string) {
 
 
     if ('error' in json) {
-      throw new AppError2('getLLMtext', 'Failed to get context length', json.error, ['util.alfon.dev returned error'])
+      throw new AppError('getLLMtext', 'Failed to get context length', json.error, ['util.alfon.dev returned error'])
     }
 
     const contextLengths = Object.entries(json.data).map(([encoding, data]) => {
@@ -53,7 +53,7 @@ export async function getLLMtext(url: string) {
     }
 
   } catch (error) {
-    throw new AppError2('getLLMtext', 'Failed to get context length', undefined, undefined, error)
+    throw new AppError('getLLMtext', 'Failed to get context length', undefined, undefined, error)
   }
 }
 

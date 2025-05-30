@@ -1,4 +1,4 @@
-import { AppError2 } from "../module/error/error-primitives"
+import { AppError } from "../module/error/error-primitives"
 
 export function parseUrlFromQuery(query: string | string[]) {
 
@@ -12,7 +12,7 @@ export function parseUrlFromQuery(query: string | string[]) {
   try {
     parsedUrl = new URL(inferredUrl)
   } catch (error) {
-    throw new AppError2(
+    throw new AppError(
       'parseUrlFromQuery',
       'Invalid URL',
       'URL could not be parsed. Please check the URL and try again.',
@@ -21,7 +21,7 @@ export function parseUrlFromQuery(query: string | string[]) {
   }
 
   if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
-    throw new AppError2(
+    throw new AppError(
       'parseUrlFromQuery',
       'Invalid Protocol',
       'Protocol not supported. Please use http:// or https://',

@@ -14,7 +14,7 @@ import { LinkPreviewPanel } from "./_view/LinkPreview";
 import { InputForm } from "./_view/inputs/InputForm";
 import { RecentSuggestions } from "./_view/inputs/InputSuggestions";
 import { AdvancedPanel } from "./_view/advanced/AdvancedPanel";
-import { AppError2, type AppError } from "./module/error/error-primitives";
+import { AppError } from "./module/error/error-primitives";
 import { isDev } from "./lib/env";
 import { LocalContextProvider } from "./context";
 
@@ -33,24 +33,28 @@ import { LocalContextProvider } from "./context";
 //  fields       previews
 // 
 
+
 export default async function Home(context: SearchParamsContext) {
 
   const query = await context.searchParams;
-  const hideHome = !!query.url
+  const hasURL = !!query.url
   const searchId = isDev ? query.url + '' : Math.random()
 
   const SummarySection = async () =>
-    !!query.url && getPageData(query.url)
+    !!query.url
+    && getPageData(query.url)
       .then(metadata => <MetaInfoPanel metadata={metadata} />)
-      .catch((err) => <HomeErrorCard error={err} />)
+      .catch(err => <HomeErrorCard error={err} />)
 
   const LinkPreviewSection = async () =>
-    !!query.url && getPageData(query.url)
+    !!query.url
+    && getPageData(query.url)
       .then(metadata => <LinkPreviewPanel metadata={metadata} />)
       .catch(() => null)
 
   const AdvancedSection = async () =>
-    !!query.url && getPageData(query.url)
+    !!query.url
+    && getPageData(query.url)
       .then(metadata => <AdvancedPanel metadata={metadata} />)
       .catch(() => null)
 
@@ -59,33 +63,33 @@ export default async function Home(context: SearchParamsContext) {
       <div className="min-h-screen">
         <main className={cn(
           "container-sm lg:container-2xl font-medium font-sans",
-          "px-8 lg:px-12 xl:px-24 pb-40",
+          "px-8 lg:px-12 xl:px-24 ",
+          "pb-40",
           "lg:grid lg:grid-cols-2 gap-x-8",
           "items-start",
         )}>
-
           <div className="flex flex-col min-h-[80vh] py-12">
-            <Header hidden={hideHome} />
+            <Header hidden={hasURL} />
             <InputForm
               query={query}
               settings={await getUserSettings()} />
-            <RecentSuggestions hidden={hideHome} />
+            <RecentSuggestions hidden={hasURL} />
             <div className="flex flex-col gap-8 pt-8">
-              <Suspense key={searchId + 'sum'} fallback={<Loading />}>
+              <Suspense key={searchId + 'summary'} fallback={<Loading />}>
                 <SummarySection />
               </Suspense>
             </div>
           </div>
 
           <div className="flex flex-col items-center gap-8 pt-15 pb-12">
-            <Changelog hidden={hideHome} />
-            <Suspense key={searchId + 'lp'}>
+            <Changelog hidden={hasURL} />
+            <Suspense key={searchId + 'linkpreview'}>
               <LinkPreviewSection />
             </Suspense>
           </div>
 
           <div className="col-span-2 flex flex-col">
-            <Suspense key={searchId}>
+            <Suspense key={searchId + 'advanced'}>
               <LocalContextProvider key={searchId}>
                 <AdvancedSection />
               </LocalContextProvider>
@@ -103,13 +107,16 @@ export default async function Home(context: SearchParamsContext) {
 
 const getPageData = cache(async function getPageData(query: string | string[]) {
   try {
+    // console.log("Getting Page Data..")
+    // delay 1s
+    // await new Promise(resolve => setTimeout(resolve, 1000))
     const url = parseUrlFromQuery(query)
     const { root, html } = await fetchRoot(url.toString())
     const metadata = getMetadataValues(root, url.toString())
     const resolved = getResolvedMetadata(metadata)
     return { resolved, html, root, url }
   } catch (error) {
-    throw new AppError2('getPageData', undefined, undefined, undefined, error)
+    throw new AppError('getPageData', undefined, undefined, undefined, error)
   }
 })
 export type SiteMetadata = Awaited<ReturnType<typeof getPageData>>
@@ -130,7 +137,7 @@ function Header(props: {
           check-site-meta
         </div>
         <div className="text-foreground-muted max-w-100 mt-2 font-sans text-xl g-closed:opacity-0 g-closed:translate-y-10 transition duration-700">
-          100% local site metadata checker {}
+          100% local site metadata checker
         </div>
       </div>
     </div>

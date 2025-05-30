@@ -15,7 +15,7 @@ export function createError(
   return { type, summary, detail, context: context ?? [] }
 }
 
-export type ParsedError2 = {
+export type ParsedError = {
   summary: string,
   detail?: string,
   context: string[],
@@ -25,7 +25,7 @@ export type ParsedError2 = {
 }
 
 export function serializeError(error: unknown) {
-  let parsedError: ParsedError2 = {
+  let parsedError: ParsedError = {
     summary: "An unknown error occurred.",
     detail: error instanceof Error ? error.message : '',
     context: [],
@@ -33,7 +33,7 @@ export function serializeError(error: unknown) {
     stack: error instanceof Error ? error.stack! : '',
     instanceof: "ParsedAppError"
   }
-  if (error instanceof AppError2) {
+  if (error instanceof AppError) {
     parsedError = {
       summary: error.summary,
       detail: error.detail,
@@ -56,15 +56,13 @@ export function serializeError(error: unknown) {
   return parsedError
 }
 
-export class AppError2 extends Error {
+export class AppError extends Error {
 
   readonly who: string[]
   readonly summary: string
   readonly detail?: string
   readonly context: string[]
   readonly error: unknown | undefined | null
-
-
 
   constructor(
     /** Custom-made stack implementation */
@@ -84,13 +82,10 @@ export class AppError2 extends Error {
     /** The original error. To determine the original stack trace */
     error?: unknown | undefined | null,
 
-
   ) {
     let errorMessageUsed = false
 
-    const isErrorObject = typeof error === 'object' && error
-
-    const _summary = summary ?? (error instanceof AppError2
+    const _summary = summary ?? (error instanceof AppError
       ? error.summary
       : ((error instanceof Error && error.message.length < 50) ? (() => {
         errorMessageUsed = true
@@ -98,7 +93,7 @@ export class AppError2 extends Error {
       })() : "An error occurred")
     )
 
-    const _detail = detail ?? (error instanceof AppError2
+    const _detail = detail ?? (error instanceof AppError
       ? error.detail
       : ((error instanceof Error && !errorMessageUsed)
         ? error.message
@@ -106,11 +101,11 @@ export class AppError2 extends Error {
       )
     )
 
-    const _context = error instanceof AppError2
+    const _context = error instanceof AppError
       ? [...error.context, ...context ?? []]
       : context ?? []
 
-    const _who = error instanceof AppError2
+    const _who = error instanceof AppError
       ? [who, ...error.who]
       : [who]
 
@@ -128,55 +123,5 @@ export class AppError2 extends Error {
     this.stack = error instanceof Error
       ? error.stack
       : this.stack
-  }
-}
-
-
-
-
-
-
-
-export class AppError extends Error implements ErrorInfo {
-  constructor(
-    /**
-     * The error that caused this error, if any.
-     */
-    readonly error: unknown | undefined | null,
-    /**
-     * The type of error. 
-     * Used to categorize the error and determine how it should be handled.
-     * Also determines the icon used to represent the error.
-     */
-    readonly type: "input" | "fetch" | "server" | "parse" | "other",
-    /**
-     * A short summary of the error.
-     * This should be a human-readable string that describes the error in a way that is easy to understand.
-     * Should be short enough to fit in a single line.
-     * Shown as the title of the error card.
-     */
-    readonly summary: string,
-    /**
-     * A detailed description of the error.
-     * This should provide more information about the error and how it can be resolved.
-     * Example:
-     */
-    readonly detail?: string | undefined,
-    readonly context: string[] = [],
-  ) {
-    super(summary)
-    if (!error) {
-      this.error = new Error(summary)
-    }
-    this.name = "AppError"
-  }
-
-  toObject(): ErrorInfo {
-    return {
-      type: this.type,
-      summary: this.summary,
-      detail: this.detail,
-      context: this.context,
-    }
   }
 }

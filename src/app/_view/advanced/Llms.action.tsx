@@ -1,7 +1,7 @@
 "use server"
 
 import { getLLMtext } from "@/app/lib/get-llms"
-import { AppError2, serializeError } from "@/app/module/error/error-primitives"
+import { AppError, serializeError } from "@/app/module/error/error-primitives"
 
 
 export async function getLLMsAction(_: unknown, payload: string) {

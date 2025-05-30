@@ -1,7 +1,7 @@
 import parse, { type HTMLElement } from "node-html-parser";
 import { cache } from "react";
 import "server-only"
-import { AppError2 } from "../module/error/error-primitives";
+import { AppError } from "../module/error/error-primitives";
 import { appFetch, ensureCorrectContentType, getUTF8Text } from "./fetch";
 
 export const fetchRoot = cache(async function getRoot(url: string) {
@@ -138,7 +138,7 @@ export function getMetadataValues(root: HTMLElement, rawUrl: string) {
           try {
             return JSON.parse(e.text)
           } catch (error) {
-            throw new AppError2(
+            throw new AppError(
               'getMetadataValues',
               'JSON Parse Failed', error instanceof Error ? error.message : "Unknown Error",
               [],
@@ -152,7 +152,7 @@ export function getMetadataValues(root: HTMLElement, rawUrl: string) {
       }
     }
   } catch (error) {
-    throw new AppError2(
+    throw new AppError(
       'getMetadataValues',
       'Metadata Parse Failed', error instanceof Error ? error.message : "Unknown Error",
       [],

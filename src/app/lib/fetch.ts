@@ -1,4 +1,4 @@
-import { AppError2 } from "../module/error/error-primitives";
+import { AppError } from "../module/error/error-primitives";
 import { isDev } from "./env";
 import { getUserSettings } from "./get-settings";
 
@@ -25,7 +25,7 @@ export async function appFetch(...args: Parameters<typeof fetchInstance>) {
     })
     return res
   } catch (error) {
-    throw new AppError2(
+    throw new AppError(
       'appFetch',
       "Fetch Failed",
       "Ensure you have an active internet connection and the server is reachable.",
@@ -45,7 +45,7 @@ export async function ensureCorrectContentType(res: Response, expected: string) 
   const contentType = res.headers.get("content-type")
   if (!contentType?.includes(expected)) {
     const text = await res.clone().text()
-    throw new AppError2(
+    throw new AppError(
       'ensureCorrectContentType',
       "Incorrect Content-Type",
       `Expected ${ expected } but got ${ contentType }`,
@@ -65,7 +65,7 @@ export async function getUTF8Text(res: Response) {
     return decoder.decode(buffer);
   } catch (error) {
     const text = await res.text()
-    throw new AppError2(
+    throw new AppError(
       'getUTF8',
       "UTF-8 Decode Failed",
       "Ensure the response is valid UTF-8 encoded text.",
