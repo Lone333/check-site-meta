@@ -23,11 +23,15 @@ export function useAppNavigation() {
   function get(key: string) {
     return sp.get(key)
   }
+  function getAll() {
+    return Array.from(sp.entries())
+  }
 
   return {
     navigate,
     softNavigate,
     sp,
-    get
+    get,
+    getAll,
   }
 }

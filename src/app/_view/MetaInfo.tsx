@@ -1,7 +1,7 @@
 import { tab } from "../module/tab/tab-primitives";
 import { TabsWithContent } from "../module/tab/Tabs";
 import { type MetadataMetadataItem, type ResoledMetadata } from "../lib/get-metadata-field-data";
-import { ExternalIcon, MetadataRow, Separator } from "./MetadataRow";
+import { ExternalIcon, InlineLink, MetadataRow, Separator } from "./MetadataRow";
 import { Suspense, type ComponentProps } from "react";
 import { FaviconPreview, IconListPreviewMetadataItem } from "./Favicon";
 import { appFetch } from "../lib/fetch";
@@ -22,64 +22,64 @@ export async function MetaInfoPanel(props: {
   const metadata = props.metadata.resolved;
   if (!metadata) return null
 
-  const head = props.metadata.html;
-
   return (
-    <TabsWithContent
-      className="fadeInFromLeft-0 self-start"
-      id="info"
-      tabs={[
-        tab(
-          "General",
-          <MetaCard>
-            <MetaCardContent key="g">
-              <SummaryMetadata m={metadata} />
-            </MetaCardContent>
-          </MetaCard>
-        ),
-        tab(
-          "Open Graph",
-          <MetaCard>
-            <MetaCardContent key="og">
-              <OpengraphMetadata m={metadata} />
-            </MetaCardContent>
-          </MetaCard>
-        ),
-        tab(
-          "Twitter",
-          <MetaCard>
-            <MetaCardContent key="t">
-              <TwitterMetadata m={metadata} />
-            </MetaCardContent>
-          </MetaCard>
-        ),
-        tab(
-          "Icons",
-          <MetaCard>
-            <MetaCardContent key="i">
-              <IconMetadata data={metadata} />
-            </MetaCardContent>
-          </MetaCard>
-        ),
-        tab(
-          "Robots",
-          <MetaCard>
-            <MetaCardContent key="r">
-              <RobotsSummary
-                metadata={metadata}
-                getRobots={getRobots}
-              />
-              <Separator />
-              <SitemapSummary
-                metadata={metadata}
-                getSitemap={getSitemap}
-                getRobots={getRobots}
-              />
-            </MetaCardContent>
-          </MetaCard>
-        )
-      ]}>
-    </TabsWithContent>
+    <>
+      <TabsWithContent
+        className="fadeInFromLeft-0 self-start"
+        id="info"
+        tabs={[
+          tab(
+            "General",
+            <MetaCard>
+              <MetaCardContent key="g">
+                <SummaryMetadata m={metadata} />
+              </MetaCardContent>
+            </MetaCard>
+          ),
+          tab(
+            "Open Graph",
+            <MetaCard>
+              <MetaCardContent key="og">
+                <OpengraphMetadata m={metadata} />
+              </MetaCardContent>
+            </MetaCard>
+          ),
+          tab(
+            "Twitter",
+            <MetaCard>
+              <MetaCardContent key="t">
+                <TwitterMetadata m={metadata} />
+              </MetaCardContent>
+            </MetaCard>
+          ),
+          tab(
+            "Icons",
+            <MetaCard>
+              <MetaCardContent key="i">
+                <IconMetadata data={metadata} />
+              </MetaCardContent>
+            </MetaCard>
+          ),
+          tab(
+            "Robots",
+            <MetaCard>
+              <MetaCardContent key="r">
+                <RobotsSummary
+                  metadata={metadata}
+                  getRobots={getRobots}
+                />
+                <Separator />
+                <SitemapSummary
+                  metadata={metadata}
+                  getSitemap={getSitemap}
+                  getRobots={getRobots}
+                />
+              </MetaCardContent>
+            </MetaCard>
+          )
+        ]}>
+      </TabsWithContent>
+    </>
   );
 }
 
@@ -91,12 +91,25 @@ function MetaCardContent({ className, ...props }: ComponentProps<"div">) {
 }
 
 
+
 function SummaryMetadata(props: { m: ResoledMetadata }) {
   const d = props.m;
   return (<>
     <MetadataRow data={d.general.title} />
     <MetadataRow data={d.general.description} />
-    <MetadataRow data={d.general.author} />
+    <MetadataRow data={d.general.author}>
+      {d.general.author.values.length === 0 && <div className="meta-mute">-</div>}
+      {d.general.author.values.map((item, i, arr) => {
+        return <span key={i}>
+          {
+            item.resolvedUrl ?
+              <InlineLink value={item.value} href={item.resolvedUrl} className="inline" />
+              : item.value
+          }
+          {i !== arr.length - 1 ? <span className="meta-mute">, </span> : null}
+        </span>
+      })}
+    </MetadataRow>
     <MetadataRow data={d.general.favicons}>
       <Suspense fallback="Loading...">
         <CollapsibleRow data-opened={false} className="expand-row-200">

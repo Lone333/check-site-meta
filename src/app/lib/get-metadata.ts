@@ -28,7 +28,31 @@ export function getMetadataValues(root: HTMLElement, rawUrl: string) {
             href: e.getAttribute("href")
           }
         }),
-        author: root.querySelector("meta[name=author]")?.getAttribute("content"),
+        author: root.querySelectorAll("link[rel=author],meta[name=author]").reduce(
+          (prev, curr) => {
+            let tempHref = undefined as undefined | string
+            let tempName = undefined as undefined | string
+            console.log(curr.tagName)
+            if (curr.tagName === 'LINK') {
+              tempHref = curr.getAttribute("href")
+              if (curr.nextElementSibling?.tagName === 'META' && curr.nextElementSibling.hasAttribute('content')) {
+                tempName = curr.nextElementSibling.getAttribute('content')!
+                prev.push({ name: tempName, href: tempHref })
+                return prev
+              }
+            }
+            if (curr.tagName === 'META' && curr.hasAttribute('content')) {
+              tempName = curr.getAttribute('content')!
+              if (prev.some(e => e.name === tempName)) return prev // Avoid duplicates
+              prev.push({ name: tempName, href: tempHref })
+              return prev
+            }
+            return prev
+          }
+          , [] as { name: string, href?: string }[]
+        ),
+        // author: root.querySelector("meta[name=author]")?.getAttribute("content"),
+        // authors: root.querySelectorAll("meta[name=author]").map(e => e.getAttribute("content")).filter(e => e !== null),
         robots: root.querySelector("meta[name=robots]")?.getAttribute("content"),
         keywords: root.querySelector("meta[name=keywords]")?.getAttribute("content"),
         generator: root.querySelector("meta[name=generator]")?.getAttribute("content"),

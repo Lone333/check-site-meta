@@ -1,5 +1,5 @@
 import { Fragment, type ComponentProps, type ReactNode, type SVGProps } from "react"
-import { AppError, serializeError, type ParsedError } from "./error-primitives"
+import { serializeError, type ParsedError } from "./error-primitives"
 import { cn } from "lazy-cn"
 
 const ErrorInfoMessages = {
@@ -29,14 +29,12 @@ const ErrorInfoMessages = {
 }
 
 function ContextBox({ className, ...props }: ComponentProps<"div">) {
-  return (<div className={cn("font-mono p-2 px-2 bg-background text-foreground-muted-2 text-xs border border-border rounded-md whitespace-pre overflow-auto font-normal", className)} {...props} />)
+  return <div className={cn("font-mono p-2 px-2 bg-background text-foreground-muted-2 text-xs border border-border rounded-md whitespace-pre overflow-auto font-normal", className)} {...props} />
 }
-
 
 function LucideTriangleAlert(props: SVGProps<SVGSVGElement>) {
-  return (<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01"></path></svg>)
+  return <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01"></path></svg>
 }
-
 
 export function StackTrace(props: ComponentProps<"div"> & { stack?: string }) {
   if (!props.stack) return null

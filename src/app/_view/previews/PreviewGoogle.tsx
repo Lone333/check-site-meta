@@ -47,7 +47,7 @@ export async function PreviewGoogle({ metadata, className, ...props }: Component
         <div className="relative flex flex-col justify-start text-px-14 font-[400] leading-[1.58]">
           <div className="basis-full grow shrink min-w-0">
             <div className="flex flex-col-reverse leading-[1.3] ">
-              <h3 className="fadeIn-50 mb-px-3 pt-px-5 text-(--accent) text-px-20 line-clamp-1">
+              <h3 className="fadeIn-50 mt-px-3 pt-px-5 text-(--accent) text-px-20 line-clamp-1">
                 {data.title}
               </h3>
               <div className="max-w-[calc(100%_-_20px)] fadeIn-0 flex w-full">
@@ -106,7 +106,7 @@ export async function PreviewGoogle({ metadata, className, ...props }: Component
               themes={[
                 { key: "default", icon: <MaterialSymbolsLightModeOutline /> },
                 { key: "dark", icon: <MaterialSymbolsDarkModeOutline /> },
-            ]} />
+              ]} />
           </PreviewMenu>
         </>
       }

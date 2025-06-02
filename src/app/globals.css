@@ -8,8 +8,12 @@ body {
   color: var(--color-foreground);
 }
 .flex > * {
-  min-height: 0;
+  /* min-height: 0; */
   min-width: 0;
+  /* 
+  Not adding min-height because we want content to naturally expand downward as user scroll.
+  Unlike width-wise which is bounded by the viewport's width. Therefore needing a min-width:0 to allow squeezing by default.
+  */
 }
 
 /* Tokens ----------------------------- */
@@ -51,7 +55,7 @@ body {
   --color-background-muted: light-dark(#eaeff5, #121312);
   --color-background-muted-2: light-dark(
     var(--color-gray-100),
-    --alpha(var(--color-neutral-700) / 0.5)
+    --alpha(var(--color-red-700) / 0.5)
   );
 
   --color-background-card: light-dark(#fff, #232424);
@@ -181,6 +185,79 @@ body {
 }
 @utility rounded-px-* {
   border-radius: calc(--value(integer) / 16 * 1rem);
+}
+
+@theme {
+  --align-items-baseline: baseline;
+  --align-items-center: center;
+  --align-items-first-baseline: first-baseline;
+  --align-items-end: flex-end;
+  --align-items-start: flex-start;
+  --align-items-last-baseline: last-baseline;
+  --align-items-normal: normal;
+  --align-items-safe: safe;
+  --align-items-self-end: self-end;
+  --align-items-self-start: self-start;
+  --align-items-stretch: stretch;
+  --align-items-unsafe: unsafe;
+  --align-items-initial: initial;
+  --align-items-inherit: inherit;
+  --align-items-unset: unset;
+
+  --justify-content-baseline: baseline;
+  --justify-content-center: center;
+  --justify-content-first-baseline: first-baseline;
+  --justify-content-end: flex-end;
+  --justify-content-start: flex-start;
+  --justify-content-last-baseline: last-baseline;
+  --justify-content-left: left;
+  --justify-content-right: right;
+  --justify-content-safe: safe;
+  --justify-content-around: space-around;
+  --justify-content-between: space-between;
+  --justify-content-evenly: space-evenly;
+  --justify-content-stretch: stretch;
+  --justify-content-unsafe: unsafe;
+  --justify-content-initial: initial;
+  --justify-content-inherit: inherit;
+  --justify-content-unset: unset;
+}
+
+@utility frow {
+  display: flex;
+  flex-direction: row;
+}
+@utility fcol-* {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  align-items: --modifier(--align-items-*);
+  justify-content: --value(--justify-content-*);
+  gap: calc(--value(number) * var(--spacing))
+}
+
+@utility fcol {
+  display: flex;
+  flex-direction: column;
+}
+@utility frow-* {
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+  align-items: --modifier(--align-items-*);
+  justify-content: --value(--justify-content-*);
+  gap: calc(--value(number) * var(--spacing))
+}
+
+@utility grid-* {
+  display: grid;
+  grid-template-columns: repeat(--value(integer), minmax(0, 1fr));
+  grid-template-columns: repeat(--value([*]), minmax(0, 1fr));
+  grid-template-rows: repeat(--modifier(integer), minmax(0, 1fr));
+  grid-template-rows: repeat(--modifier([*]), minmax(0, 1fr));
+}
+@utility no-overflow-anchor {
+  overflow-anchor: none;
 }
 
 /* Selectors ----------------------------- */
@@ -354,7 +431,7 @@ body {
 
 @utility card {
   --padding: --spacing(5);
-  @apply p-[var(--padding)]
+  @apply p-(--padding)
     border rounded-md
     border-border
     bg-background-card;

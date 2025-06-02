@@ -61,6 +61,7 @@ const nextProcess = spawn("node", [path.join(__dirname, "./standalone/server.js"
         PORT: String(PORT),
         DISABLE_ANALYTICS: !options.analytics ? "true" : undefined,
         CSM_VERSION: VERSION,
+        LOCAL: 'true',
     },
 });
 nextProcess.stdout.on("data", (data) => {

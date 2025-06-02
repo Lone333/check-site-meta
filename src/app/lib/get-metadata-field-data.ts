@@ -81,8 +81,15 @@ export function getResolvedMetadata(m: Metadata) {
         }
       })(),
       author: {
-        value: m.general.author,
+        value: m.general.author[0]?.name,
         label: "author",
+        values: m.general.author.map(e => {
+          return {
+            value: e.name,
+            label: e.name,
+            resolvedUrl: resolveUrl(e.href),
+          }
+        })
       },
       keywords: {
         value: m.general.keywords,

@@ -1,7 +1,7 @@
-import { cache, Fragment, Suspense, type ComponentProps } from "react";
+import { cache, Fragment, Suspense, type ComponentProps, type ReactElement } from "react";
 import { getMetadataValues, fetchRoot } from "./lib/get-metadata";
-import { parseUrlFromQuery } from "./lib/parse-url";
-import type { SearchParamsContext } from "./lib/next-types";
+import { getUrlFromQuery, parseUrlFromQuery } from "./lib/parse-url";
+import type { NextPageProps } from "./lib/next-types";
 import { getResolvedMetadata } from "./lib/get-metadata-field-data";
 import { MetaInfoPanel } from "./_view/MetaInfo";
 import { cn } from "lazy-cn";
@@ -17,6 +17,7 @@ import { AdvancedPanel } from "./_view/advanced/AdvancedPanel";
 import { AppError } from "./module/error/error-primitives";
 import { isDev } from "./lib/env";
 import { LocalContextProvider } from "./context";
+import { $ } from "./util";
 
 // Structure:
 // 
@@ -31,85 +32,13 @@ import { LocalContextProvider } from "./context";
 //  resolved metadata  ← descriptions
 //   ↓             ↓
 //  fields       previews
-// 
+//
 
 
-export default async function Home(context: SearchParamsContext) {
+// Main Metadata Data -----------------------------
 
-  const query = await context.searchParams;
-  const hasURL = !!query.url
-  const searchId = isDev ? query.url + '' : Math.random()
-
-  const SummarySection = async () =>
-    !!query.url
-    && getPageData(query.url)
-      .then(metadata => <MetaInfoPanel metadata={metadata} />)
-      .catch(err => <HomeErrorCard error={err} />)
-
-  const LinkPreviewSection = async () =>
-    !!query.url
-    && getPageData(query.url)
-      .then(metadata => <LinkPreviewPanel metadata={metadata} />)
-      .catch(() => null)
-
-  const AdvancedSection = async () =>
-    !!query.url
-    && getPageData(query.url)
-      .then(metadata => <AdvancedPanel metadata={metadata} />)
-      .catch(() => null)
-
-  return (
-    <>
-      <div className="min-h-screen">
-        <main className={cn(
-          "container-sm lg:container-2xl font-medium font-sans",
-          "px-8 lg:px-12 xl:px-24 ",
-          "pb-40",
-          "lg:grid lg:grid-cols-2 gap-x-8",
-          "items-start",
-        )}>
-          <div className="flex flex-col min-h-[80vh] py-12">
-            <Header hidden={hasURL} />
-            <InputForm
-              query={query}
-              settings={await getUserSettings()} />
-            <RecentSuggestions hidden={hasURL} />
-            <div className="flex flex-col gap-8 pt-8">
-              <Suspense key={searchId + 'summary'} fallback={<Loading />}>
-                <SummarySection />
-              </Suspense>
-            </div>
-          </div>
-
-          <div className="flex flex-col items-center gap-8 pt-15 pb-12">
-            <Changelog hidden={hasURL} />
-            <Suspense key={searchId + 'linkpreview'}>
-              <LinkPreviewSection />
-            </Suspense>
-          </div>
-
-          <div className="col-span-2 flex flex-col">
-            <Suspense key={searchId + 'advanced'}>
-              <LocalContextProvider key={searchId}>
-                <AdvancedSection />
-              </LocalContextProvider>
-            </Suspense>
-          </div>
-
-        </main>
-      </div>
-      <Footer />
-    </>
-  );
-}
-
-// Data Getter -----------------------------
-
-const getPageData = cache(async function getPageData(query: string | string[]) {
+const getSiteMetadata = cache(async function getPageData(query: string) {
   try {
-    // console.log("Getting Page Data..")
-    // delay 1s
-    // await new Promise(resolve => setTimeout(resolve, 1000))
     const url = parseUrlFromQuery(query)
     const { root, html } = await fetchRoot(url.toString())
     const metadata = getMetadataValues(root, url.toString())
@@ -119,27 +48,90 @@ const getPageData = cache(async function getPageData(query: string | string[]) {
     throw new AppError('getPageData', undefined, undefined, undefined, error)
   }
 })
-export type SiteMetadata = Awaited<ReturnType<typeof getPageData>>
+export type SiteMetadata = Awaited<ReturnType<typeof getSiteMetadata>>
 
+
+
+export default async function Home(context: NextPageProps) {
+
+  const query = await context.searchParams;
+  const hasURL = !!query.url
+  const searchId = isDev ? query.url + '' : Math.random()
+  const url = getUrlFromQuery(query.url);
+
+  const userSettings = await getUserSettings();
+
+  return (
+    <LocalContextProvider key={searchId}>
+      <main className={cn(
+        "min-h-screen",
+        "container-sm lg:container-2xl font-medium font-sans",
+        "px-8 lg:px-12 xl:px-24 ",
+        "pb-40",
+        "lg:grid lg:grid-cols-2 gap-x-8",
+      )}>
+        <div className="fcol min-h-[80vh] py-12">
+          {/* Home Page */}
+          <Header hidden={hasURL} />
+          <InputForm query={query} settings={userSettings} />
+          <RecentSuggestions hidden={hasURL} />
+
+          {/* Detail Page */}
+          <div className="fcol-8 pt-8">
+            <Suspense key={searchId + 'summary'} fallback={<Loading />}>
+              <$ await={url && getSiteMetadata(url)} catch={err => <HomeErrorCard error={err} />} truthy>
+                {metadata => <MetaInfoPanel metadata={metadata} />}
+              </$>
+            </Suspense>
+          </div>
+        </div>
+
+        <div className="fcol items-center gap-8 pt-15 pb-12">
+          {/* Home Page */}
+          <Changelog hidden={hasURL} />
+
+          {/* Detail Page */}
+          <Suspense key={searchId + 'linkpreview'}>
+            <$ await={url && getSiteMetadata(url)} truthy>
+              {metadata => <LinkPreviewPanel metadata={metadata} />}
+            </$>
+          </Suspense>
+        </div>
+
+        <div className="col-span-2">
+          {/* Detail Page */}
+          <Suspense key={searchId + 'advanced'}>
+            <$ await={url && getSiteMetadata(url)} truthy>
+              {metadata => <AdvancedPanel metadata={metadata} />}
+            </$>
+          </Suspense>
+        </div>
+
+      </main>
+      <Footer />
+    </LocalContextProvider>
+  );
+}
 
 // Components -----------------------------
-
 
 function Header(props: {
   hidden: boolean
 }) {
-  return <header className="collapsible-row-grid-700 closed:collapse-row group" data-closed={props.hidden ? "" : undefined} style={{
-    overflowAnchor: 'none',
-  }}>
+  return <header className="collapsible-row-grid-700 closed:collapse-row group-data group no-overflow-anchor fadeIn-0"
+    data-closed={props.hidden ? "" : undefined}>
     <div className="min-h-0">
+
+      {/* Header Content */}
       <div className="mb-12 mt-20 text-center lg:text-start flex flex-col items-center lg:block g-closed:opacity-0 g-closed:translate-y-10 transition duration-700">
-        <div className="text-5xl md:text-6xl lg:text-5xl xl:text-6xl  tracking-[-0.08em] font-mono header-fill font-bold">
+        <div className="text-5xl md:text-6xl lg:text-5xl xl:text-6xl tracking-[-0.08em] font-mono header-fill font-bold">
           check-site-meta
         </div>
         <div className="text-foreground-muted max-w-100 mt-2 font-sans text-xl g-closed:opacity-0 g-closed:translate-y-10 transition duration-700">
           100% local site metadata checker
         </div>
       </div>
+
     </div>
   </header>
 }
@@ -147,6 +139,7 @@ function Header(props: {
 function Footer(props: ComponentProps<"footer">) {
   return (
     <footer {...props} className={cn("w-full min-h-[50vh] col-span-2 pb-40 pt-10 border-t border-border bg-background shadow-2xl", props.className)}>
+
       <div className="container-md lg:container-2xl px-8 lg:px-12 xl:px-24 text-foreground-body flex flex-wrap gap-y-8">
         <div className="flex flex-col grow font-mono">
           <div className="text-[1rem] font-semibold tracking-tight leading-none ">
@@ -173,6 +166,7 @@ function Footer(props: ComponentProps<"footer">) {
           <ThemeSwitcher />
         </div>
       </div>
+
     </footer>
   )
 }
@@ -186,25 +180,21 @@ function Loading() {
   )
 }
 
-
-// Components -----------------------------
-
-
 function Changelog(props: {
   hidden?: boolean
 }) {
   return (
     <div className="w-full grid grid-rows-[1fr] closed:grid-rows-[0fr] overflow-hidden group transition-[grid-template-rows] duration-700" data-closed={props.hidden ? "" : undefined}>
       <div className="min-h-0 closed:opacity-0 transition-all duration-300 delay-100" data-closed={props.hidden ? "" : undefined}>
-        <div className="pt-20 pb-4 text-foreground-muted-3 font-medium">changelog</div>
+        <div className="pt-20 pb-4 text-foreground-muted-3 font-medium">
+          changelog
+        </div>
         <div className="grid grid-cols-[6rem_1fr] gap-y-4 text-foreground-muted text-base">
           {Object.entries(changelog).map(([version, changes]) => (
             <Fragment key={version}>
               <div className="text-foreground-muted-3">{version}</div>
               <ul className="">
-                {changes.map((change, i) => (
-                  <li key={i} className="text-foreground-muted-2/80 py-0.5 list-['-___']">{change}</li>
-                ))}
+                {changes.map((change, i) => <li key={i} className="text-foreground-muted-2/80 py-0.5 list-['-___']">{change}</li>)}
               </ul>
             </Fragment>
           ))}

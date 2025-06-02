@@ -14,7 +14,10 @@ export const metadata: Metadata = {
   description: "Check the metadata of any site.",
   authors: [{
     name: "Alfonsus Ardani",
-    url: "https://alfon.dev",
+    // url: "https://alfon.dev",
+  }, {
+    name: "Check Site Meta",
+    url: "https://checksite.meta",
   }],
 }
 export const viewport: Viewport = {

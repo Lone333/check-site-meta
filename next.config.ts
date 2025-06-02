@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
   },
   /* config options here */
   output: 'standalone',
+  // experimental: {
+  //   ppr: true
+  // }
 };
 
 export default nextConfig;

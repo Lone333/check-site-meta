@@ -3,7 +3,7 @@
 import { logCheckButton } from "@/app/lib/analytics"
 import type { UserSettings } from "@/app/lib/get-settings"
 import { recentSuggestionsLocal } from "@/app/lib/localstorage"
-import { parseUrlFromQuery } from "@/app/lib/parse-url"
+import { getUrlFromQuery, parseUrlFromQuery } from "@/app/lib/parse-url"
 import { useAppNavigation } from "@/app/lib/searchParams"
 import { cn } from "lazy-cn"
 import Form from "next/form"
@@ -15,7 +15,7 @@ export function InputForm(props: {
   settings: UserSettings
 }) {
   const navigation = useAppNavigation()
-  const existingSp = [...navigation.sp.entries()].filter(([key]) => key !== 'url')
+  const existingSp = navigation.getAll().filter(([key]) => key !== 'url')
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -35,6 +35,7 @@ export function InputForm(props: {
     id="lookup_url"
     onSubmit={() => logCheckButton()}
     onKeyDown={(event) => {
+      // Allow submitting the form with Ctrl+Enter or Cmd+Enter
       if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) event.currentTarget.requestSubmit()
     }}
     action="/"
@@ -47,7 +48,8 @@ export function InputForm(props: {
       onClick={() => {
         if (inputRef.current) inputRef.current.focus()
       }}
-      className="relative card flex flex-col box-content h-auto p-0 rounded-[calc(var(--h)/2)] input-box-shadow input-outline-hover transition-[outline,box-shadow,height] z-50 overflow-hidden">
+      className="relative card flex flex-col box-content h-auto p-0 rounded-[calc(var(--h)/2)] input-box-shadow input-outline-hover transition-[outline,box-shadow,height] z-50 overflow-hidden"
+    >
       <div className="h-(--h) flex items-center">
         <CiSearchMagnifyingGlass className="size-4 ml-4.5 mr-0 " />
         <input
@@ -63,7 +65,8 @@ export function InputForm(props: {
           data-closed={props.query.url ? "" : undefined}
         >
           <FormButton type="button" onClick={() => {
-            window.open(parseUrlFromQuery(props.query['url']!), "_blank");
+            
+            window.open(parseUrlFromQuery(getUrlFromQuery(props.query['url'])!), "_blank");
           }}>
             <MaterialSymbolsOpenInNew className="w-4 h-4" />
           </FormButton>
