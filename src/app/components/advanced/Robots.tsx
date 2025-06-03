@@ -1,4 +1,4 @@
-import { MetadataRow } from "../MetadataRow"
+import { MetadataField } from "../SummaryPanelField"
 import { type GetRobotsResult } from "@/app/lib/get-robots"
 import { Suspense, type SVGProps } from "react"
 import { cn } from "lazy-cn"
@@ -12,14 +12,14 @@ export async function RobotsSummary(props: {
   getRobots: (url: string) => Promise<GetRobotsResult>
 }) {
   return <>
-    <MetadataRow data={props.metadata.general.robots} />
-    <MetadataRow data={{ label: 'robots.txt', }}>
+    <MetadataField data={props.metadata.general.robots} />
+    <MetadataField data={{ label: 'robots.txt', }}>
       <div className="leading-none flex flex-col gap-2 mt-1">
         <Suspense fallback="Loading...">
           <RobotsSummaryData />
         </Suspense>
       </div>
-    </MetadataRow>
+    </MetadataField>
   </>
 
   async function RobotsSummaryData() {

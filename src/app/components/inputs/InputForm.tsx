@@ -43,6 +43,7 @@ export function InputForm(props: {
     style={{
       '--h': 'calc(var(--spacing) * 11)',
     }}
+
   >
     <div
       onClick={() => {
@@ -74,7 +75,7 @@ export function InputForm(props: {
             <MaterialSymbolsRefresh className="w-4 h-4" />
           </FormButton>
           <FormButton type="button"
-            onClick={(e) => { navigation.navigate('url', undefined) }}>
+            onClick={() => { navigation.navigate('url', undefined) }}>
             <MaterialSymbolsCloseRounded className="w-4 h-4" />
           </FormButton>
         </div>

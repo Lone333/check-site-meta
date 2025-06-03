@@ -2,7 +2,7 @@ import { cache } from "react";
 import { appFetch, getUTF8Text } from "./fetch";
 import { XMLParser } from "fast-xml-parser";
 import { AppError } from "../module/error/error-primitives";
-import type { PreviewMessages } from "../_view/previews/Preview";
+import type { PreviewMessages } from "../components/previews/Preview";
 import { isObject, isPropInObject } from "./validations";
 
 

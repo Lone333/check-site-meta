@@ -1,5 +1,5 @@
 import type { ResoledMetadata } from "@/app/lib/get-metadata-field-data";
-import { MetadataRow } from "../MetadataRow";
+import { MetadataField } from "../SummaryPanelField";
 import { Suspense, type ComponentProps, type ReactNode, type SVGProps } from "react";
 import { MaterialSymbolsCheckCircle, MaterialSymbolsCircleOutline } from "./Robots";
 import { CardHeader, CardHeaderSubtitle, CardHeaderTitle } from "../Card";
@@ -16,7 +16,7 @@ export function SitemapSummary(
   }
 ) {
   const baseUrl = props.metadata.rawUrl
-  return <MetadataRow data={{ label: "Sitemap" }}>
+  return <MetadataField data={{ label: "Sitemap" }}>
     <div className="leading-none flex flex-col gap-2 mt-1.5">
       <Suspense key="sitemap-summary" fallback="Loading...">
         <SitemapPresence />
@@ -25,7 +25,7 @@ export function SitemapSummary(
         <SitemapFromRobots />
       </Suspense>
     </div>
-  </MetadataRow>
+  </MetadataField>
 
   async function SitemapPresence() {
     try {

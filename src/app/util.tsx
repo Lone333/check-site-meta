@@ -3,7 +3,11 @@ import type { ReactNode } from "react";
 type Falsy = false | 0 | 0n | "" | null | undefined;
 type Truthy<T> = T extends Falsy ? never : T;
 
-
+/**
+ * A react server component to resolve promises and consume them in a render function.
+ * @param props 
+ * @returns 
+ */
 export async function $<T, U extends boolean>(props: {
   children: (
     res: U extends false ? Awaited<T> : Truthy<Awaited<T>>

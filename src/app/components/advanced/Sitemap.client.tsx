@@ -14,7 +14,6 @@ import { SitemapUrlList } from "./SitemapUrl.client"
 import { SitemapIndexList } from "./SitemapIndex.client"
 import { HomeErrorCard } from "@/app/module/error/ErrorCard"
 import { useStore } from "@/app/context"
-import { useSearchParams } from "next/navigation"
 import type { ParsedError } from "@/app/module/error/error-primitives"
 
 export function SitemapCategoryCollapsible(

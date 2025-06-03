@@ -10,11 +10,21 @@ export function AppImage(
     onErrorFallback?: ReactNode
   }
 ) {
-  const [error, setError] = useState(false) 
+  const [error, setError] = useState(false)
 
   const usingProxyRef = useRef(false)
-  
+
   // if (!src) return null
+  if (src instanceof Blob) {
+    // If the src is a Blob, we can use it directly
+    return <img
+      {...props}
+      alt={props.alt || ""}
+      src={URL.createObjectURL(src)}
+      onError={() => setError(true)}
+    />
+  }
+
   if (firstFrameGif) {
     return <AppImageFirstFrameGif src={src ? `/api/proxy-img?url=${ encodeURIComponent(src) }` : undefined} {...props as ComponentProps<"canvas">} />
   }
@@ -66,7 +76,7 @@ function AppImageFirstFrameGif(
 
   return (
     <>
-      <img ref={imgRef} src={src} style={{ display: "none"}} />
+      <img ref={imgRef} src={src} style={{ display: "none" }} />
       <canvas {...props} ref={canvasRef} />
     </>
   )

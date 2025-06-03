@@ -1,23 +1,25 @@
-import { cache, Fragment, Suspense, type ComponentProps, type ReactElement } from "react";
-import { getMetadataValues, fetchRoot } from "./lib/get-metadata";
-import { getUrlFromQuery, parseUrlFromQuery } from "./lib/parse-url";
-import type { NextPageProps } from "./lib/next-types";
-import { getResolvedMetadata } from "./lib/get-metadata-field-data";
-import { MetaInfoPanel } from "./_view/MetaInfo";
-import { cn } from "lazy-cn";
-import { getVersion } from "./lib/version";
-import { ThemeSwitcher } from "./theme-switch";
+import { cache, Fragment, Suspense, type ComponentProps, type ReactElement } from "react"
+import { getMetadataValues, fetchRoot } from "./lib/get-metadata"
+import { getUrlFromQuery, parseUrlFromQuery } from "./lib/parse-url"
+import type { NextPageProps } from "./lib/next-types"
+import { getResolvedMetadata } from "./lib/get-metadata-field-data"
+import { cn } from "lazy-cn"
+import { getVersion } from "./lib/version"
+import { ThemeSwitcher } from "./theme-switch"
 import { changelog } from "../../changelog"
-import { HomeErrorCard } from "./module/error/ErrorCard";
-import { getUserSettings } from "./lib/get-settings";
-import { LinkPreviewPanel } from "./_view/LinkPreview";
-import { InputForm } from "./_view/inputs/InputForm";
-import { RecentSuggestions } from "./_view/inputs/InputSuggestions";
-import { AdvancedPanel } from "./_view/advanced/AdvancedPanel";
-import { AppError } from "./module/error/error-primitives";
-import { isDev } from "./lib/env";
-import { LocalContextProvider } from "./context";
-import { $ } from "./util";
+import { HomeErrorCard } from "./module/error/ErrorCard"
+import { getUserSettings } from "./lib/get-settings"
+import { LinkPreviewPanel } from "./components/LinkPreviewPanel"
+import { InputForm } from "./components/inputs/InputForm"
+import { RecentSuggestions } from "./components/inputs/InputSuggestions"
+import { AdvancedPanel } from "./components/advanced/AdvancedPanel"
+import { AppError } from "./module/error/error-primitives"
+import { isDev } from "./lib/env"
+import { LocalContextProvider } from "./context"
+import { $ } from "./util"
+import { MetaInfoPanel } from "./components/SummaryPanel"
+import { headers } from "next/headers"
+import { registerContext, searchParams } from "./lib/page-context"
 
 // Structure:
 // 
@@ -52,17 +54,21 @@ export type SiteMetadata = Awaited<ReturnType<typeof getSiteMetadata>>
 
 
 
-export default async function Home(context: NextPageProps) {
 
-  const query = await context.searchParams;
+
+export default async function Home(context: NextPageProps) {
+  registerContext(context)
+  const query = await searchParams()
+  console.log("SP", query)
   const hasURL = !!query.url
   const searchId = isDev ? query.url + '' : Math.random()
-  const url = getUrlFromQuery(query.url);
+  const url = getUrlFromQuery(query.url)
 
-  const userSettings = await getUserSettings();
+  const userSettings = await getUserSettings()
+  const siteMetadata = url && getSiteMetadata(url)
 
   return (
-    <LocalContextProvider key={searchId}>
+    <>
       <main className={cn(
         "min-h-screen",
         "container-sm lg:container-2xl font-medium font-sans",
@@ -70,6 +76,8 @@ export default async function Home(context: NextPageProps) {
         "pb-40",
         "lg:grid lg:grid-cols-2 gap-x-8",
       )}>
+        {JSON.stringify(query)}
+
         <div className="fcol min-h-[80vh] py-12">
           {/* Home Page */}
           <Header hidden={hasURL} />
@@ -79,70 +87,81 @@ export default async function Home(context: NextPageProps) {
           {/* Detail Page */}
           <div className="fcol-8 pt-8">
             <Suspense key={searchId + 'summary'} fallback={<Loading />}>
-              <$ await={url && getSiteMetadata(url)} catch={err => <HomeErrorCard error={err} />} truthy>
+              <$ truthy await={siteMetadata}
+                catch={err => <HomeErrorCard error={err} />}>
                 {metadata => <MetaInfoPanel metadata={metadata} />}
               </$>
             </Suspense>
           </div>
         </div>
 
-        <div className="fcol items-center gap-8 pt-15 pb-12">
+        <div className="fcol-8/center pt-15 pb-12">
           {/* Home Page */}
           <Changelog hidden={hasURL} />
 
           {/* Detail Page */}
           <Suspense key={searchId + 'linkpreview'}>
-            <$ await={url && getSiteMetadata(url)} truthy>
+            {/* <$ await={siteMetadata} truthy>
               {metadata => <LinkPreviewPanel metadata={metadata} />}
-            </$>
+            </$> */}
           </Suspense>
         </div>
 
         <div className="col-span-2">
           {/* Detail Page */}
           <Suspense key={searchId + 'advanced'}>
-            <$ await={url && getSiteMetadata(url)} truthy>
-              {metadata => <AdvancedPanel metadata={metadata} />}
-            </$>
+            {/* <$ await={siteMetadata} truthy>
+              {metadata => (
+                <LocalContextProvider key={searchId}>
+                  <AdvancedPanel metadata={metadata} />
+                </LocalContextProvider>
+              )}
+            </$> */}
           </Suspense>
         </div>
 
       </main>
       <Footer />
-    </LocalContextProvider>
-  );
+    </>
+  )
 }
 
 // Components -----------------------------
 
-function Header(props: {
+async function Header(props: {
   hidden: boolean
 }) {
-  return <header className="collapsible-row-grid-700 closed:collapse-row group-data group no-overflow-anchor fadeIn-0"
-    data-closed={props.hidden ? "" : undefined}>
-    <div className="min-h-0">
+  const query = await searchParams()
+  console.log("SP", query)
 
-      {/* Header Content */}
-      <div className="mb-12 mt-20 text-center lg:text-start flex flex-col items-center lg:block g-closed:opacity-0 g-closed:translate-y-10 transition duration-700">
-        <div className="text-5xl md:text-6xl lg:text-5xl xl:text-6xl tracking-[-0.08em] font-mono header-fill font-bold">
-          check-site-meta
+  return (
+    <header className="grid-rows-animate-data-closed duration-700 group no-overflow-anchor fadeIn-0"
+      data-closed={props.hidden ? "" : undefined}>
+      {JSON.stringify(query)}
+      <div className="min-h-0">
+
+        {/* Header Content */}
+        <div className="mb-12 mt-20 lg:text-start fcol-0 lg:block g-closed:opacity-0 g-closed:translate-y-10 transition duration-700">
+          <div className="text-5xl md:text-6xl lg:text-5xl xl:text-6xl tracking-[-0.08em] font-mono header-fill font-bold">
+            check-site-meta
+          </div>
+          <div className="text-foreground-muted max-w-100 mt-2 font-sans text-xl g-closed:opacity-0 g-closed:translate-y-10 transition duration-700">
+            100% local site metadata checker
+          </div>
         </div>
-        <div className="text-foreground-muted max-w-100 mt-2 font-sans text-xl g-closed:opacity-0 g-closed:translate-y-10 transition duration-700">
-          100% local site metadata checker
-        </div>
+
       </div>
-
-    </div>
-  </header>
+    </header>
+  )
 }
 
 function Footer(props: ComponentProps<"footer">) {
   return (
-    <footer {...props} className={cn("w-full min-h-[50vh] col-span-2 pb-40 pt-10 border-t border-border bg-background shadow-2xl", props.className)}>
+    <footer {...props} className={cn("w-full min-h-[50vh] pb-40 pt-10 border-t border-border bg-background shadow-2xl", props.className)}>
 
-      <div className="container-md lg:container-2xl px-8 lg:px-12 xl:px-24 text-foreground-body flex flex-wrap gap-y-8">
-        <div className="flex flex-col grow font-mono">
-          <div className="text-[1rem] font-semibold tracking-tight leading-none ">
+      <div className="flex flex-wrap gap-y-8 container-md lg:container-2xl px-8 lg:px-12 xl:px-24 text-foreground-body  ">
+        <div className="fcol grow font-mono">
+          <div className="text-[1rem]/none font-semibold tracking-tight">
             npx check-site-meta
           </div>
           <div className="text-xs">

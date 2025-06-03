@@ -259,6 +259,22 @@ body {
 @utility no-overflow-anchor {
   overflow-anchor: none;
 }
+@utility grid-rows-animate-data-closed {
+  @apply grid 
+  grid-rows-[1fr] 
+  closed:grid-rows-[0fr] 
+  transition-[grid-template-rows]
+  overflow-clip
+  ;
+}
+@utility grid-cols-animate-data-closed {
+  @apply grid 
+  grid-cols-[1fr] 
+  closed:grid-cols-[0fr] 
+  transition-[grid-template-columns]
+  overflow-clip
+  ;
+}
 
 /* Selectors ----------------------------- */
 
@@ -482,10 +498,6 @@ body {
 @custom-variant g-closed (&:is(:where(.group)[data-closed] *));
 
 @utility header-fill {
-  /* background: light-dark(
-    linear-gradient(90deg, #f0f, #0ff),
-    linear-gradient(90deg, #0f0, #f00),
-  ); */
   background: linear-gradient(
     to bottom,
     light-dark(var(--color-slate-500), var(--color-neutral-100)),

@@ -1,7 +1,7 @@
 import type { ResoledMetadata } from "@/app/lib/get-metadata-field-data"
 import { AppImage } from "@/app/module/image/Image"
 import { Fragment } from "react"
-import { MetadataRow } from "../MetadataRow"
+import { MetadataField } from "../SummaryPanelField"
 
 export function OpengraphMetadata(
   props: { m: ResoledMetadata }
@@ -9,33 +9,33 @@ export function OpengraphMetadata(
   const d = props.m
   return (
     <>
-      <MetadataRow data={d.og.title} />
-      <MetadataRow data={d.og.description} />
-      <MetadataRow data={d.og.image} />
-      <MetadataRow data={d.og.url} />
-      <MetadataRow data={d.og.type} />
-      <MetadataRow data={d.og.siteName} />
-      <MetadataRow data={d.og.locale} />
+      <MetadataField data={d.og.title} />
+      <MetadataField data={d.og.description} />
+      <MetadataField data={d.og.image} />
+      <MetadataField data={d.og.url} />
+      <MetadataField data={d.og.type} />
+      <MetadataField data={d.og.siteName} />
+      <MetadataField data={d.og.locale} />
       <hr />
-      <MetadataRow data={d.og.images}>
+      <MetadataField data={d.og.images}>
         <StructuredOpengraphMetadata d={d} type="images" />
-      </MetadataRow>
-      <MetadataRow data={d.og.articleAuthor}>
+      </MetadataField>
+      <MetadataField data={d.og.articleAuthor}>
         {d.og.articleAuthor.values.length === 0 && <div className="meta-mute">-</div>}
         {d.og.articleAuthor.values.map((item, i) => {
           return <div key={i}>{item}</div>
         })}
-      </MetadataRow>
-      <MetadataRow data={d.og.articlePublishedTime} />
-      <MetadataRow data={d.og.articleModifiedTime} />
-      <MetadataRow data={d.og.articleExpirationTime} />
-      <MetadataRow data={d.og.articleSection} />
-      <MetadataRow data={d.og.articleTag}>
+      </MetadataField>
+      <MetadataField data={d.og.articlePublishedTime} />
+      <MetadataField data={d.og.articleModifiedTime} />
+      <MetadataField data={d.og.articleExpirationTime} />
+      <MetadataField data={d.og.articleSection} />
+      <MetadataField data={d.og.articleTag}>
         {d.og.articleTag.values.length === 0 && <div className="meta-mute">-</div>}
         {d.og.articleTag.values.map((item, i) => {
           return <div key={i}>{item}</div>
         })}
-      </MetadataRow>
+      </MetadataField>
     </>
   )
 }

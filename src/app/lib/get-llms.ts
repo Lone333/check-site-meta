@@ -3,7 +3,7 @@ import { AppError } from "../module/error/error-primitives";
 import { appFetch, getUTF8Text } from "./fetch";
 import remarkParse from "remark-parse";
 import type { Root, RootContent } from "mdast";
-import type { PreviewMessages } from "../_view/previews/Preview";
+import type { PreviewMessages } from "../components/previews/Preview";
 
 export async function getLLMtext(url: string) {
   const res = await appFetch(url)

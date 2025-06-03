@@ -1,13 +1,13 @@
 import { tab } from "@/app/module/tab/tab-primitives";
 import { TabsWithContent } from "@/app/module/tab/Tabs";
 import type { SiteMetadata } from "@/app/page";
-import { MetaCard } from "../MetaInfo";
 import { RobotsDetails } from "./Robots";
 import { SitemapDetails } from "./Sitemap";
 import { Suspense, type SVGProps } from "react";
 import { CardlessHomeErrorCard } from "@/app/module/error/ErrorCard";
 import { getRobots } from "@/app/lib/get-robots";
 import { LLMs } from "./Llms";
+import { MetaCard } from "../SummaryPanel"
 
 export function AdvancedPanel(props: {
   metadata: SiteMetadata
