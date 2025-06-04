@@ -1,6 +1,6 @@
 import { tab } from "@/app/module/tab/tab-primitives";
 import { TabsWithContent } from "@/app/module/tab/Tabs";
-import type { SiteMetadata } from "@/app/page";
+import type { SiteMetadata } from "@/app/page.data";
 import { RobotsDetails } from "./Robots";
 import { SitemapDetails } from "./Sitemap";
 import { Suspense, type SVGProps } from "react";

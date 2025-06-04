@@ -2,7 +2,7 @@ import type { ComponentProps, SVGProps } from "react";
 import { MessageList, PreviewMenu, PreviewPanelContent, type PreviewMessages } from "./Preview";
 import { cn } from "lazy-cn";
 import { PreviewFrame, PreviewThemeSwitcher } from "./Preview.client";
-import type { ResoledMetadata } from "@/app/lib/get-metadata-field-data";
+import type { ResoledMetadata } from "@/app/lib/get-resolved-metadata";
 import { AppImage } from "@/app/module/image/Image";
 import { MaterialSymbolsLightModeOutline, MaterialSymbolsDarkModeOutline } from "@/app/theme-switch";
 

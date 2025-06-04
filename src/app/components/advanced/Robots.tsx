@@ -2,7 +2,7 @@ import { MetadataField } from "../SummaryPanelField"
 import { type GetRobotsResult } from "@/app/lib/get-robots"
 import { Suspense, type SVGProps } from "react"
 import { cn } from "lazy-cn"
-import type { ResoledMetadata } from "@/app/lib/get-metadata-field-data"
+import type { ResoledMetadata } from "@/app/lib/get-resolved-metadata"
 import { CardHeader, CardHeaderSubtitle, CardHeaderTitle } from "../Card"
 import { RobotsAdvancedDetailsBoundary } from "./Robots.client"
 

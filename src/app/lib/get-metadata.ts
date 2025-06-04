@@ -1,91 +1,82 @@
-import parse, { type HTMLElement } from "node-html-parser";
-import { cache } from "react";
-import "server-only"
-import { AppError } from "../module/error/error-primitives";
-import { appFetch, ensureCorrectContentType, getUTF8Text } from "./fetch";
 
-export const fetchRoot = cache(async function getRoot(url: string) {
+import parse, { type HTMLElement } from "node-html-parser"
+import { cache } from "react"
+import "server-only"
+import { AppError } from "../module/error/error-primitives"
+import { appFetch, ensureCorrectContentType, getUTF8Text } from "./fetch"
+import { extractAuthorData } from "./metadata/+author"
+
+export const fetchRoot = cache(async (url: string) => {
   const res = await appFetch(url)
   await ensureCorrectContentType(res, "text/html")
   const html = await getUTF8Text(res)
-  const root = parse(html);
+  const root = parse(html)
   return { root, html }
 })
 
+/**
+ * Extracts metadata values from the HTML document.
+ * The goal is to provide a structured object containing metadata.
+ * It is not meant to be a complete HTML parser.
+ * It is not meant to validate.
+ * It is not meant to 
+ */
 export function getMetadataValues(root: HTMLElement, rawUrl: string) {
+
+  const from = (s: string) => root.querySelector(s)
+  const fromAll = (s: string) => root.querySelectorAll(s)
+  const get = (attributeKey: string, from: HTMLElement | null) => from?.getAttribute(attributeKey)
+  const getMany = (attributeKey: string, from: HTMLElement[]) => from.map(element => element.getAttribute(attributeKey))
+
+  const getOg = (p: `og:${string}`) => get('content', from(`meta[property='og:${p}']`))
+
+
   try {
     return {
       rawUrl,
       general: {
-        title: root.querySelector("title")?.text,
-        description: root.querySelector("meta[name=description]")?.getAttribute("content"),
-        url: root.querySelector("link[rel=canonical]")?.getAttribute("href"),
-        favicons: root.querySelectorAll("link[rel~=icon]").map(e => {
-          return {
-            rel: e.getAttribute("rel"),
-            type: e.getAttribute("type"),
-            sizes: e.getAttribute("sizes"),
-            href: e.getAttribute("href")
-          }
-        }),
-        author: root.querySelectorAll("link[rel=author],meta[name=author]").reduce(
-          (prev, curr) => {
-            let tempHref = undefined as undefined | string
-            let tempName = undefined as undefined | string
-            console.log(curr.tagName)
-            if (curr.tagName === 'LINK') {
-              tempHref = curr.getAttribute("href")
-              if (curr.nextElementSibling?.tagName === 'META' && curr.nextElementSibling.hasAttribute('content')) {
-                tempName = curr.nextElementSibling.getAttribute('content')!
-                prev.push({ name: tempName, href: tempHref })
-                return prev
-              }
-            }
-            if (curr.tagName === 'META' && curr.hasAttribute('content')) {
-              tempName = curr.getAttribute('content')!
-              if (prev.some(e => e.name === tempName)) return prev // Avoid duplicates
-              prev.push({ name: tempName, href: tempHref })
-              return prev
-            }
-            return prev
-          }
-          , [] as { name: string, href?: string }[]
-        ),
-        // author: root.querySelector("meta[name=author]")?.getAttribute("content"),
-        // authors: root.querySelectorAll("meta[name=author]").map(e => e.getAttribute("content")).filter(e => e !== null),
-        robots: root.querySelector("meta[name=robots]")?.getAttribute("content"),
-        keywords: root.querySelector("meta[name=keywords]")?.getAttribute("content"),
-        generator: root.querySelector("meta[name=generator]")?.getAttribute("content"),
-        license: root.querySelector("meta[name=license]")?.getAttribute("content"),
-        viewport: root.querySelector("meta[name=viewport]")?.getAttribute("content"),
-        themeColor: root.querySelectorAll("meta[name='theme-color']").map(e => {
-          return {
-            media: e.getAttribute("media"),
-            value: e.getAttribute("content")
-          }
-        }),
-        colorScheme: root.querySelector("meta[name='color-scheme']")?.getAttribute("content"),
-        formatDetection: root.querySelector("meta[name='format-detection']")?.getAttribute("content"),
-        applicationName: root.querySelector("meta[name='application-name']")?.getAttribute("content"),
+        title: from("title")?.text,
+        description: get('content', from("meta[name=description]")),
+        url: get('content', from("link[rel=canonical]")),
+        favicons: fromAll("link[rel~=icon]").map(element => ({
+          rel: get('rel', element),
+          type: get("type", element),
+          sizes: get("sizes", element),
+          href: get("href", element)
+        })),
+        author: extractAuthorData(fromAll("link[rel=author], meta[name=author]")),
+        robots: get('content', from("meta[name=robots]")),
+        keywords: get('content', from("meta[name=keywords]")),
+        generator: get('content', from("meta[name=generator]")),
+        license: get('content', from("meta[name=license]")),
+        viewport: get('content', from("meta[name=viewport]")),
+        themeColor: fromAll("meta[name='theme-color']").map(element => ({
+          media: get("media", element),
+          value: get("content", element)
+        })),
+        colorScheme: get('content', from("meta[name='color-scheme']")),
+        formatDetection: get('content', from("meta[name='format-detection']")),
+        applicationName: get('content', from("meta[name='application-name']")),
       },
       og: {
         // Basic Metadata
-        title: fromMetaTagWithProperty(root, 'og:title'),
-        type: fromMetaTagWithProperty(root, 'og:type'),
-        image: fromMetaTagWithProperty(root, 'og:image'),
-        url: fromMetaTagWithProperty(root, 'og:url'),
+        title: getOg('og:title'),
+        type: getOg('og:type'),
+        image: getOg('og:image'),
+        url: getOg('og:url'),
 
         // Optional Metadata
-        audio: fromMetaTagWithProperty(root, 'og:audio'),
-        description: fromMetaTagWithProperty(root, 'og:description'),
-        determiner: fromMetaTagWithProperty(root, 'og:determiner'),
-        locale: fromMetaTagWithProperty(root, 'og:locale'),
-        localeAlternate: fromMetaTagWithPropertyArray(root, 'og:locale:alternate').map(e => e.getAttribute("content")),
-        siteName: fromMetaTagWithProperty(root, 'og:site_name'),
-        video: fromMetaTagWithProperty(root, 'og:video'),
+        audio: getOg('og:audio'),
+        description: getOg('og:description'),
+        determiner: getOg('og:determiner'),
+        locale: getOg('og:locale'),
+        localeAlternate: fromAll('meta[property="og:locale:alternate"]').map(e => e.getAttribute("content")),
 
-        imageAlt: fromMetaTagWithProperty(root, 'og:image:alt'),
-        keywords: fromMetaTagWithProperty(root, 'og:keywords'),
+        siteName: getOg('og:site_name'),
+        video: getOg('og:video'),
+
+        imageAlt: getOg('og:image:alt'),
+        keywords: getOg('og:keywords'),
 
         // Structured Properties
         images: root.querySelectorAll("meta[property*='og:image']").reduce((acc, e) => {
@@ -201,6 +192,15 @@ function fromMetaTagWithPropertyArray(root: HTMLElement, key: string) {
 
 export type Metadata = ReturnType<typeof getMetadataValues>
 
-
 export const dynamic = 'force-dynamic'
 export const fetchCache = 'force-no-store'
+
+class AppHTMLElement {
+  constructor(readonly element: HTMLElement) { }
+  get(key: string) {
+    return this.element.getAttribute(key)
+  }
+  get text() {
+    return this.element.text
+  }
+}

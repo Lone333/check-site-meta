@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, type ComponentProps, type ReactNode, type SVGProps } from "react"
-import { type FieldDataItem } from "../lib/get-metadata-field-data"
+import { type FieldDataItem } from "../lib/get-resolved-metadata"
 import { AppImage } from "../module/image/Image"
 import { cn } from "lazy-cn"
 import { CollapsibleRow } from "../lib/Collapsible"

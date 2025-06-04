@@ -4,7 +4,7 @@ import imageSize from "image-size";
 import { MessageList, PreviewMenu, PreviewPanelContent, type PreviewMessages } from "./Preview";
 import { PreviewFrame, PreviewThemeSwitcher } from "./Preview.client";
 import { appFetch } from "@/app/lib/fetch";
-import type { ResoledMetadata } from "@/app/lib/get-metadata-field-data";
+import type { ResoledMetadata } from "@/app/lib/get-resolved-metadata";
 import { validateHex } from "@/app/lib/hex";
 import { AppImage } from "@/app/module/image/Image";
 import { MaterialSymbolsDarkModeOutline, MaterialSymbolsLightModeOutline } from "@/app/theme-switch";

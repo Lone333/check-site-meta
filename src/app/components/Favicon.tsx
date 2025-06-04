@@ -2,7 +2,7 @@ import { cn } from "lazy-cn";
 import type { ComponentProps } from "react";
 import { AppImage } from "../module/image/Image";
 import { ExternalIcon, MetadataField } from "./SummaryPanelField";
-import type { ResoledMetadata } from "../lib/get-metadata-field-data";
+import type { ResoledMetadata } from "../lib/get-resolved-metadata";
 import { px } from "../lib/unit";
 import { appFetch } from "../lib/fetch"
 import { getImageSizeFromResponse } from "../lib/image-size"

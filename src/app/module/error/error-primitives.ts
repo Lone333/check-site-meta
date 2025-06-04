@@ -81,7 +81,6 @@ export class AppError extends Error {
 
     /** The original error. To determine the original stack trace */
     error?: unknown | undefined | null,
-
   ) {
     let errorMessageUsed = false
 

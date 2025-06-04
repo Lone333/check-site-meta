@@ -13,6 +13,7 @@ export type MetadataMetadataItem = {
 
 export function getResolvedMetadata(m: Metadata) {
 
+  // Resolve base URL against the raw URL.
   const resolveUrl = (url?: string) => {
     if (!url) return undefined
     try { return new URL(url, m.rawUrl).href } catch { }

@@ -2,7 +2,7 @@ import { cache, Fragment, Suspense, type ComponentProps, type ReactElement } fro
 import { getMetadataValues, fetchRoot } from "./lib/get-metadata"
 import { getUrlFromQuery, parseUrlFromQuery } from "./lib/parse-url"
 import type { NextPageProps } from "./lib/next-types"
-import { getResolvedMetadata } from "./lib/get-metadata-field-data"
+import { getResolvedMetadata } from "./lib/get-resolved-metadata"
 import { cn } from "lazy-cn"
 import { getVersion } from "./lib/version"
 import { ThemeSwitcher } from "./theme-switch"
@@ -20,6 +20,7 @@ import { $ } from "./util"
 import { MetaInfoPanel } from "./components/SummaryPanel"
 import { headers } from "next/headers"
 import { registerContext, searchParams } from "./lib/page-context"
+import { getSiteMetadata } from "./page.data"
 
 // Structure:
 // 
@@ -39,27 +40,10 @@ import { registerContext, searchParams } from "./lib/page-context"
 
 // Main Metadata Data -----------------------------
 
-const getSiteMetadata = cache(async function getPageData(query: string) {
-  try {
-    const url = parseUrlFromQuery(query)
-    const { root, html } = await fetchRoot(url.toString())
-    const metadata = getMetadataValues(root, url.toString())
-    const resolved = getResolvedMetadata(metadata)
-    return { resolved, html, root, url }
-  } catch (error) {
-    throw new AppError('getPageData', undefined, undefined, undefined, error)
-  }
-})
-export type SiteMetadata = Awaited<ReturnType<typeof getSiteMetadata>>
-
-
-
-
-
 export default async function Home(context: NextPageProps) {
   registerContext(context)
+
   const query = await searchParams()
-  console.log("SP", query)
   const hasURL = !!query.url
   const searchId = isDev ? query.url + '' : Math.random()
   const url = getUrlFromQuery(query.url)
@@ -76,8 +60,6 @@ export default async function Home(context: NextPageProps) {
         "pb-40",
         "lg:grid lg:grid-cols-2 gap-x-8",
       )}>
-        {JSON.stringify(query)}
-
         <div className="fcol min-h-[80vh] py-12">
           {/* Home Page */}
           <Header hidden={hasURL} />
@@ -86,12 +68,15 @@ export default async function Home(context: NextPageProps) {
 
           {/* Detail Page */}
           <div className="fcol-8 pt-8">
+
             <Suspense key={searchId + 'summary'} fallback={<Loading />}>
-              <$ truthy await={siteMetadata}
-                catch={err => <HomeErrorCard error={err} />}>
-                {metadata => <MetaInfoPanel metadata={metadata} />}
-              </$>
+              <$ truthy
+                await={siteMetadata}
+                then={metadata => <MetaInfoPanel metadata={metadata} />}
+                catch={error => <HomeErrorCard error={error} />}
+              />
             </Suspense>
+
           </div>
         </div>
 
@@ -101,22 +86,20 @@ export default async function Home(context: NextPageProps) {
 
           {/* Detail Page */}
           <Suspense key={searchId + 'linkpreview'}>
-            {/* <$ await={siteMetadata} truthy>
-              {metadata => <LinkPreviewPanel metadata={metadata} />}
-            </$> */}
+            <$ truthy
+              await={siteMetadata}
+              then={metadata => <LinkPreviewPanel metadata={metadata} />}
+            />
           </Suspense>
         </div>
 
         <div className="col-span-2">
           {/* Detail Page */}
           <Suspense key={searchId + 'advanced'}>
-            {/* <$ await={siteMetadata} truthy>
-              {metadata => (
-                <LocalContextProvider key={searchId}>
-                  <AdvancedPanel metadata={metadata} />
-                </LocalContextProvider>
-              )}
-            </$> */}
+            <$ truthy
+              await={siteMetadata}
+              then={metadata => <AdvancedPanel metadata={metadata} />}
+            />
           </Suspense>
         </div>
 
@@ -131,13 +114,9 @@ export default async function Home(context: NextPageProps) {
 async function Header(props: {
   hidden: boolean
 }) {
-  const query = await searchParams()
-  console.log("SP", query)
-
   return (
     <header className="grid-rows-animate-data-closed duration-700 group no-overflow-anchor fadeIn-0"
       data-closed={props.hidden ? "" : undefined}>
-      {JSON.stringify(query)}
       <div className="min-h-0">
 
         {/* Header Content */}

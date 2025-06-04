@@ -2,8 +2,8 @@ import { cn } from "lazy-cn";
 import { Suspense, type ComponentProps, type CSSProperties, type ReactNode, type SVGProps } from "react";
 import { StaticTooltip, TooltipBase } from "../lib/Tooltip";
 import { tab } from "../module/tab/tab-primitives";
-import { TabsWithContent } from "../module/tab/Tabs";
-import { SiteMetadata } from "../page";
+import { TabContent, TabsWithContent } from "../module/tab/Tabs";
+import { SiteMetadata } from "../page.data";
 import { PreviewDiscord } from "./previews/PreviewDiscord";
 import { PreviewFacebook } from "./previews/PreviewFacebook";
 import { PreviewGoogle } from "./previews/PreviewGoogle";
@@ -61,7 +61,9 @@ export async function LinkPreviewPanel(
           //   </LinkPreviewPanelTooltip>,
           //   <ComingSoon />
           // ),
-        ]} />
+        ]}>
+          <TabContent />
+        </TabsWithContent>
     </Suspense>
   )
 }

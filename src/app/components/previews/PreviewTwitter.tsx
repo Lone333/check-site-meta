@@ -3,7 +3,7 @@ import { cn } from "lazy-cn";
 import { PreviewPanelContent, MessageList, type PreviewMessages, PreviewMenu } from './Preview';
 import { PreviewFrame, PreviewThemeSwitcher } from './Preview.client';
 import { appFetch } from "@/app/lib/fetch";
-import type { ResoledMetadata } from "@/app/lib/get-metadata-field-data";
+import type { ResoledMetadata } from "@/app/lib/get-resolved-metadata";
 import { getImageSizeFromResponse } from "@/app/lib/image-size";
 import { AppImage } from "@/app/module/image/Image";
 import { MaterialSymbolsLightModeOutline, MaterialSymbolsDarkModeOutline } from "@/app/theme-switch";

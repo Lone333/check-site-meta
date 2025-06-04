@@ -1,4 +1,4 @@
-import type { ResoledMetadata } from "@/app/lib/get-metadata-field-data";
+import type { ResoledMetadata } from "@/app/lib/get-resolved-metadata";
 import { MetadataField } from "../SummaryPanelField";
 import { Suspense, type ComponentProps, type ReactNode, type SVGProps } from "react";
 import { MaterialSymbolsCheckCircle, MaterialSymbolsCircleOutline } from "./Robots";

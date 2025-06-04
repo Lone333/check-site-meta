@@ -1,6 +1,6 @@
 import { tab } from "../module/tab/tab-primitives"
 import { TabContent, TabsWithContent } from "../module/tab/Tabs"
-import { type MetadataMetadataItem, type ResoledMetadata } from "../lib/get-metadata-field-data"
+import { type MetadataMetadataItem, type ResoledMetadata } from "../lib/get-resolved-metadata"
 import { ExternalIcon, InlineLink, MetadataField, MetadataRowContent, Separator } from "./SummaryPanelField"
 import { Suspense, type ComponentProps } from "react"
 import { FaviconPreview, FaviconSummary, IconListPreviewMetadataItem, isValidIcon } from "./Favicon"
@@ -8,29 +8,18 @@ import { appFetch } from "../lib/fetch"
 import { px } from "../lib/unit"
 import { cn } from "lazy-cn"
 import { getImageSizeFromResponse } from "../lib/image-size"
-import type { SiteMetadata } from "../page"
+import type { SiteMetadata } from "../page.data"
 import { OpengraphMetadata } from "./meta-info-panels/OpenGraph"
 import { RobotsSummary } from "./advanced/Robots"
 import { SitemapSummary } from "./advanced/Sitemap"
 import { getSitemap } from "../lib/get-sitemap"
 import { getRobots } from "../lib/get-robots"
 import { CollapsibleRow } from "../lib/Collapsible"
-import { searchParams } from "../lib/page-context"
 
-
-
-
-export async function MetaInfoPanel(
-  props: { metadata: SiteMetadata }
-) {
+export async function MetaInfoPanel(props: { metadata: SiteMetadata }) {
   const metadata = props.metadata.resolved
-  if (!metadata) return null
-  
-  const query = await searchParams()
-  
   return (
     <>
-      Query: {JSON.stringify(query)}
       <TabsWithContent
         id="info"
         className="fadeInFromLeft-0 self-start"
@@ -149,44 +138,40 @@ function ColorThemes(
 
 
 
-function TwitterMetadata(
-  props: { m: ResoledMetadata }
-) {
-  const d = props.m
-  return (
-    <>
-      <MetadataField data={d.twitter.title} />
-      <MetadataField data={d.twitter.description} />
-      <MetadataField data={d.twitter.card} />
-      <MetadataField data={d.twitter.image} />
-      <MetadataField data={d.twitter.imageAlt} />
-      <Separator />
-      <MetadataField data={d.twitter.site} />
-      <MetadataField data={d.twitter.siteId} />
-      <Separator />
-      <MetadataField data={d.twitter.creator} />
-      <MetadataField data={d.twitter.creatorId} />
-      <Separator />
-      <MetadataField data={d.twitter.player} />
-      <MetadataField data={d.twitter.playerWidth} />
-      <MetadataField data={d.twitter.playerHeight} />
-      <MetadataField data={d.twitter.playerStream} />
-      <Separator />
-      <MetadataField data={d.twitter.appCountry} />
-      <Separator />
-      <MetadataField data={d.twitter.appNameIphone} />
-      <MetadataField data={d.twitter.appIdIphone} />
-      <MetadataField data={d.twitter.appUrlIphone} />
-      <Separator />
-      <MetadataField data={d.twitter.appNameIpad} />
-      <MetadataField data={d.twitter.appIdIpad} />
-      <MetadataField data={d.twitter.appUrlIpad} />
-      <Separator />
-      <MetadataField data={d.twitter.appNameGoogleplay} />
-      <MetadataField data={d.twitter.appIdGoogleplay} />
-      <MetadataField data={d.twitter.appUrlGoogleplay} />
-    </>
-  )
+function TwitterMetadata(props: { m: ResoledMetadata }) {
+  const t = props.m.twitter
+  return (<>
+    <MetadataField data={t.title} />
+    <MetadataField data={t.description} />
+    <MetadataField data={t.card} />
+    <MetadataField data={t.image} />
+    <MetadataField data={t.imageAlt} />
+    <Separator />
+    <MetadataField data={t.site} />
+    <MetadataField data={t.siteId} />
+    <Separator />
+    <MetadataField data={t.creator} />
+    <MetadataField data={t.creatorId} />
+    <Separator />
+    <MetadataField data={t.player} />
+    <MetadataField data={t.playerWidth} />
+    <MetadataField data={t.playerHeight} />
+    <MetadataField data={t.playerStream} />
+    <Separator />
+    <MetadataField data={t.appCountry} />
+    <Separator />
+    <MetadataField data={t.appNameIphone} />
+    <MetadataField data={t.appIdIphone} />
+    <MetadataField data={t.appUrlIphone} />
+    <Separator />
+    <MetadataField data={t.appNameIpad} />
+    <MetadataField data={t.appIdIpad} />
+    <MetadataField data={t.appUrlIpad} />
+    <Separator />
+    <MetadataField data={t.appNameGoogleplay} />
+    <MetadataField data={t.appIdGoogleplay} />
+    <MetadataField data={t.appUrlGoogleplay} />
+  </>)
 }
 
 function IconMetadata(props: {
