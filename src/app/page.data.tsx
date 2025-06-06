@@ -4,7 +4,7 @@ import { parseUrlFromQuery } from "./lib/parse-url"
 import { fetchRoot, getMetadataValues } from "./lib/get-metadata"
 import { getResolvedMetadata } from "./lib/get-resolved-metadata"
 
-export const getSiteMetadata = cache(async (urlinput: string) => {
+export const getSiteMetadata = async (urlinput: string) => {
   try {
     const url = parseUrlFromQuery(urlinput)
     const { root, html } = await fetchRoot(url)
@@ -14,6 +14,5 @@ export const getSiteMetadata = cache(async (urlinput: string) => {
   } catch (error) {
     throw new AppError('getPageData', undefined, undefined, undefined, error)
   }
-})
 
 export type SiteMetadata = Awaited<ReturnType<typeof getSiteMetadata>>

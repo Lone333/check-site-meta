@@ -11,13 +11,13 @@ import { LinkPreviewPanel } from "./components/LinkPreviewPanel"
 import { InputForm } from "./components/inputs/InputForm"
 import { RecentSuggestions } from "./components/inputs/InputSuggestions"
 import { AdvancedPanel } from "./components/advanced/AdvancedPanel"
-import { isDev, isHosted } from "./lib/env"
 import { $ } from "./util"
 import { MetaInfoPanel } from "./components/SummaryPanel"
 import { getSiteMetadata } from "./page.data"
 import { LocalContextProvider } from "./context"
 import { registerContext, searchParams } from "./lib/page-context"
 import { AppDescription } from "./components/home/AppDescription"
+import { silence } from "./lib/silence"
 
 // Structure:
 // 
@@ -42,11 +42,12 @@ export default async function Home(context: NextPageProps) {
 
   const query = await searchParams()
   const hasURL = !!query.url
-  const searchId = isDev ? query.url + '' : Math.random()
+  const searchId = Math.random()
   const url = getUrlFromQuery(query.url)
 
   const userSettings = await getUserSettings()
-  const siteMetadata = url && getSiteMetadata(url)
+  const siteMetadata = url &&  silence(getSiteMetadata(url))
+  
 
   return (
     <>
@@ -64,7 +65,7 @@ export default async function Home(context: NextPageProps) {
           <RecentSuggestions hidden={hasURL} />
           {/* Detail Page */}
           <div className="fcol-8 pt-8">
-            <Suspense key={searchId + 'summary'} fallback={<Loading />}>
+            <Suspense key={searchId} fallback={<Loading />}>
               <$ truthy
                 await={siteMetadata}
                 then={metadata => <MetaInfoPanel metadata={metadata} />}
@@ -81,7 +82,7 @@ export default async function Home(context: NextPageProps) {
           </div>
 
           {/* Detail Page */}
-          <Suspense key={searchId + 'linkpreview'}>
+          <Suspense key={searchId}>
             <$ truthy
               await={siteMetadata}
               then={metadata => <LinkPreviewPanel metadata={metadata} />}
@@ -90,7 +91,7 @@ export default async function Home(context: NextPageProps) {
         </div>
         <div className="col-span-2">
           {/* Detail Page */}
-          <Suspense key={searchId + 'advanced'}>
+          <Suspense key={searchId}>
             <$ truthy
               await={siteMetadata}
               then={metadata =>
@@ -105,6 +106,22 @@ export default async function Home(context: NextPageProps) {
       <Footer />
     </>
   )
+}
+
+async function WithPageData(props: {
+  url: string,
+  children: (metadata: Awaited<ReturnType<typeof getSiteMetadata>>) => React.JSX.Element | null,
+  fallback?: (err: unknown) => React.JSX.Element | null,
+}) {
+  if (!props.url) return
+  try {
+    const metadata = await getSiteMetadata(props.url)
+    if (!metadata) 
+      return <HomeErrorCard error={new Error("No metadata found")} />
+    return props.children(metadata)
+  } catch (error) {
+    return props.fallback?.(error)
+  }
 }
 
 // Components -----------------------------
