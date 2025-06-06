@@ -63,6 +63,7 @@ export class AppError extends Error {
   readonly detail?: string
   readonly context: string[]
   readonly error: unknown | undefined | null
+  readonly allMessage?: string
 
   constructor(
     /** Custom-made stack implementation */
@@ -121,10 +122,18 @@ export class AppError extends Error {
     this.who = _who
     this.error = error
 
-    if (!error) this.error = this
+    // if (!error) this.error = this // Do NOT do this.
     this.name = "AppError"
     this.stack = error instanceof Error
       ? error.stack
       : this.stack
+    
+    this.allMessage = [
+      `Sum: ` + this.summary,
+      `Det: ` + this.detail,
+      this.context.length > 0 ? `Ctx: ${this.context.join(', ')}` : '',
+      `Stk: ${this.stack}`,
+      `Who: ${this.who.join(' > ')}`
+    ].join('\n')
   }
 }
