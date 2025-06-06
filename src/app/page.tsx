@@ -140,7 +140,7 @@ function Footer(props: ComponentProps<"footer">) {
             {getVersion()} ({getEnvironment()})
           </div>
           <div className="text-xs mt-4 max-w-120">
-            check-site-meta (CSM) is a free, open-source npx executable that extracts metadata from
+            <span className="font-bold">check-site-meta</span> is a free, open-source npx executable that extracts metadata from
             web pages, including those served on localhost, and displays the results in a browser-based
             interface for review.
           </div>
