@@ -42,7 +42,7 @@ export async function MetaInfoPanel(props: { metadata: SiteMetadata }) {
         {
           isHosted && (
             <HostedLimitationAlert
-              show={metadata.general.title.value?.includes('Access Denied') || metadata.general.description.value?.includes('Access Denied')}
+              show={metadata.general.title.value?.toLowerCase().includes('access denied') || metadata.general.description.value?.toLowerCase().includes('access denied')}
               searchId={props.metadata.url}
             />
           )
