@@ -1,9 +1,8 @@
 import { AppError } from "../module/error/error-primitives";
-import { isDev } from "./env";
+import { eachEnv, isDev, isHosted } from "./env";
 import { getUserSettings } from "./get-settings";
 
 const fetchInstance = fetch;
-
 
 export async function appFetch(...args: Parameters<typeof fetchInstance>) {
   const settings = await getUserSettings()
@@ -21,7 +20,19 @@ export async function appFetch(...args: Parameters<typeof fetchInstance>) {
         ...args[1]?.headers
       },
       redirect: "follow",
-      cache: isDev ? undefined : "no-store"
+      // cache: 'force-cache',
+      cache: eachEnv<RequestCache>({
+        dev: 'force-cache',
+        hosted: 'force-cache',
+        prod: 'no-store',
+      }),
+      next: {
+        revalidate: eachEnv({
+          dev: 30,
+          hosted: 60 * 60 * 24,
+          prod: undefined, // No caching in production
+        })
+      }
     })
     return res
   } catch (error) {
