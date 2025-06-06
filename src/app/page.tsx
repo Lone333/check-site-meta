@@ -151,6 +151,11 @@ function Footer(props: ComponentProps<"footer">) {
             web pages, including those served on localhost, and displays the results in a browser-based
             interface for review.
           </div>
+          <div className="text-xs mt-4">
+            Links:<br />
+            https://checksitemeta.vercel.app/<br />
+            https://checksitemeta.alfon.dev/<br />
+          </div>
           <div className="mt-10 flex flex-wrap gap-6">
             {[
               ['npm', 'https://www.npmjs.com/package/check-site-meta'],
