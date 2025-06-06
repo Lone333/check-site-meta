@@ -324,12 +324,12 @@ export function getResolvedMetadata(m: Metadata) {
         }),
       }
     },
-    jsonld: {
-      data: {
-        label: "json-ld",
-        values: m.jsonld.data,
-      }
-    }
+    // jsonld: {
+    //   data: {
+    //     label: "json-ld",
+    //     values: m.jsonld.data,
+    //   }
+    // }
   } satisfies {
     [X in string]: { [Y in string]: MetadataMetadataItem & { description?: string } }
   }
@@ -362,9 +362,9 @@ export type FieldDataItem = MetadataMetadataItem
 
 
 export const descriptions = {
-  jsonld: {
-    data: "Structured data in JSON-LD format, used for search engine optimization and rich results.",
-  },
+  // jsonld: {
+  //   data: "Structured data in JSON-LD format, used for search engine optimization and rich results.",
+  // },
   general: {
     title: "The title of the page, typically displayed in the browser tab and search results.",
     description: "A brief summary of the page's content, often shown in search engine results.",

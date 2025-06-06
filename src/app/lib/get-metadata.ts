@@ -146,21 +146,21 @@ export function getMetadataValues(root: HTMLElement, rawUrl: string) {
         appleMobileWebAppTitle: get('content')(from('meta[name="apple-mobile-web-app-title"]')),
         appleMobileWebAppStatusBarStyle: get('content')(from('meta[name="apple-mobile-web-app-status-bar-style"]')),
       },
-      jsonld: {
-        data: root.querySelectorAll("script[type='application/ld+json']").map(e => {
-          // Move this to a separate module
-          try {
-            return JSON.parse(e.text)
-          } catch (error) {
-            throw new AppError(
-              'getMetadataValues',
-              'JSON Parse Failed', error instanceof Error ? error.message : "Unknown Error",
-              [],
-              error
-            )
-          }
-        })
-      },
+      // jsonld: {
+      //   data: root.querySelectorAll("script[type='application/ld+json']").map(e => {
+      //     // Move this to a separate module
+      //     try {
+      //       return JSON.parse(e.text)
+      //     } catch (error) {
+      //       throw new AppError(
+      //         'getMetadataValues',
+      //         'JSON Parse Failed', error instanceof Error ? error.message : "Unknown Error",
+      //         [],
+      //         error
+      //       )
+      //     }
+      //   })
+      // },
       crawler: {
         robots: root.querySelector("meta[name=robots]")?.getAttribute("content"),
       }
