@@ -55,7 +55,7 @@ body {
   --color-background-muted: light-dark(#eaeff5, #121312);
   --color-background-muted-2: light-dark(
     var(--color-gray-100),
-    --alpha(var(--color-red-700) / 0.5)
+    --alpha(var(--color-neutral-700) / 0.5)
   );
 
   --color-background-card: light-dark(#fff, #232424);

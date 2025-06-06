@@ -11,12 +11,13 @@ import { LinkPreviewPanel } from "./components/LinkPreviewPanel"
 import { InputForm } from "./components/inputs/InputForm"
 import { RecentSuggestions } from "./components/inputs/InputSuggestions"
 import { AdvancedPanel } from "./components/advanced/AdvancedPanel"
-import { isDev } from "./lib/env"
+import { isDev, isHosted } from "./lib/env"
 import { $ } from "./util"
 import { MetaInfoPanel } from "./components/SummaryPanel"
 import { getSiteMetadata } from "./page.data"
 import { LocalContextProvider } from "./context"
 import { registerContext, searchParams } from "./lib/page-context"
+import { AppDescription } from "./components/home/AppDescription"
 
 // Structure:
 // 
@@ -60,6 +61,7 @@ export default async function Home(context: NextPageProps) {
           {/* Home Page */}
           <Header hidden={hasURL} />
           <InputForm query={query} settings={userSettings} />
+          <AppDescription closed={hasURL} version={getVersion()} />
           <RecentSuggestions hidden={hasURL} />
           {/* Detail Page */}
           <div className="fcol-8 pt-8">
@@ -74,7 +76,9 @@ export default async function Home(context: NextPageProps) {
         </div>
         <div className="fcol-8/center pt-15 pb-12">
           {/* Home Page */}
+          <div className="">
           <Changelog hidden={hasURL} />
+          </div>
 
           {/* Detail Page */}
           <Suspense key={searchId + 'linkpreview'}>
@@ -126,6 +130,7 @@ async function Header(props: {
     </header>
   )
 }
+
 
 function Footer(props: ComponentProps<"footer">) {
   return (
@@ -180,9 +185,9 @@ function Changelog(props: {
   hidden?: boolean
 }) {
   return (
-    <div className="w-full grid grid-rows-[1fr] closed:grid-rows-[0fr] overflow-hidden group transition-[grid-template-rows] duration-700" data-closed={props.hidden ? "" : undefined}>
+    <div className="pt-15 w-full grid grid-rows-[1fr] closed:grid-rows-[0fr] overflow-hidden group transition-[grid-template-rows] duration-700" data-closed={props.hidden ? "" : undefined}>
       <div className="min-h-0 closed:opacity-0 transition-all duration-300 delay-100" data-closed={props.hidden ? "" : undefined}>
-        <div className="pt-20 pb-4 text-foreground-muted-3 font-medium">
+        <div className=" pb-4 text-foreground-muted-3 font-medium">
           changelog
         </div>
         <div className="grid grid-cols-[6rem_1fr] gap-y-4 text-foreground-muted text-base">
