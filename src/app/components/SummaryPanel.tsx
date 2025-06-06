@@ -16,6 +16,7 @@ import { getSitemap } from "../lib/get-sitemap"
 import { getRobots } from "../lib/get-robots"
 import { CollapsibleRow } from "../lib/Collapsible"
 import { HostedLimitationAlert } from "./HostedLimitationAlert"
+import { isHosted } from "../lib/env"
 
 export async function MetaInfoPanel(props: { metadata: SiteMetadata }) {
   const metadata = props.metadata.resolved
@@ -38,11 +39,14 @@ export async function MetaInfoPanel(props: { metadata: SiteMetadata }) {
           )
         ]}
       >
-        <HostedLimitationAlert
-          // show={true}
-          show={metadata.general.title.value?.includes('Access Denied') || metadata.general.description.value?.includes('Access Denied')}
-          searchId={props.metadata.url}
-        />
+        {
+          isHosted && (
+            <HostedLimitationAlert
+              show={metadata.general.title.value?.includes('Access Denied') || metadata.general.description.value?.includes('Access Denied')}
+              searchId={props.metadata.url}
+            />
+          )
+        }
         <MetaCard>
           <TabContent />
         </MetaCard>
