@@ -6,18 +6,22 @@ import { fileURLToPath } from "url";
 import readline from "readline";
 import { program } from "commander";
 import { readFileSync } from "fs";
+// Configs
+const DEFAULT_PORT = 3050;
+const DEFAULT_HOST = "localhost";
 // Get the directory of the current module (equivalent to __dirname in CommonJS)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 // Read version from package.json using import
 const packageJson = JSON.parse(readFileSync(path.join(__dirname, "../package.json"), "utf-8"));
-const NAME = packageJson['name'];
-const VERSION = packageJson['version'];
-const DESCRIPTION = packageJson['description'];
+const appName = packageJson['name'];
+const appVersion = packageJson['version'];
+const appDescription = packageJson['description'];
+// Initialize CLI setup (arguments, options, parsing)
 program
-    .name(NAME)
-    .version(VERSION)
-    .description(DESCRIPTION)
+    .name(appName)
+    .version(appVersion)
+    .description(appDescription)
     .argument("[input]", "URL to check, or localhost port to check (optional)")
     .option("-p, --port <number>", "Specify port number", (value) => parseInt(value, 10))
     .option("-b, --bind <address>", "Specify address to bind", "localhost")
@@ -33,37 +37,41 @@ if (!skipAnalytics) {
         body: JSON.stringify({
             p: 'check-site-meta',
             e: 'command-run',
-            m: { version: VERSION }
+            m: { version: appVersion }
         })
     }).catch(() => { });
 }
+// --showdir
 if (options.showdir) {
     console.log(`\n → Running from directory: ${__dirname}\n`);
     process.exit();
 }
-const HOST = options.bind ?? "localhost";
-const PORT = options.port ?? 3050;
-function isPositiveInteger(str) {
-    return /^[1-9]\d*$/.test(str);
-}
+const HOST = options.bind ?? DEFAULT_HOST;
+const PORT = options.port ?? DEFAULT_PORT;
+// Input inference
 const URLorPORT = program.args[0];
 const URL = isPositiveInteger(URLorPORT) ? `http://localhost:${URLorPORT}` : URLorPORT;
-console.log(`\n   ▲ Check Site Meta ${VERSION}`);
-const rl = readline.createInterface({
+console.log(`\n   ▲ Check Site Meta ${appVersion}`);
+// Setting up for IO
+const io = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
+const env = {
+    ...process.env,
+    HOSTNAME: HOST,
+    PORT: String(PORT),
+    DISABLE_ANALYTICS: !options.analytics ? "true" : undefined,
+    CSM_VERSION: appVersion,
+    LOCAL: 'true',
+    USING_NPX: 'true',
+};
+// Setting up process
 const nextProcess = spawn("node", [path.join(__dirname, "./standalone/server.js")], {
     stdio: ["ignore", "pipe", "pipe"],
-    env: {
-        ...process.env,
-        HOSTNAME: HOST,
-        PORT: String(PORT),
-        DISABLE_ANALYTICS: !options.analytics ? "true" : undefined,
-        CSM_VERSION: VERSION,
-        LOCAL: 'true',
-    },
+    env,
 });
+// Register io hooks, listen to input output.
 nextProcess.stdout.on("data", (data) => {
     const message = String(data);
     if (message.startsWith("   ▲ Next.js ")) {
@@ -77,7 +85,7 @@ nextProcess.stdout.on("data", (data) => {
     }
     process.stdout.write(`${data}`);
     if (message.includes(`✓ Ready in`)) {
-        rl.question(' ? Do you want to open the browser? (Y/n) ', (answer) => {
+        io.question(' ? Do you want to open the browser? (Y/n) ', (answer) => {
             if (answer.toLowerCase() === 'y' || answer === '') {
                 console.log(` → Opening browser at http://${HOST}:${PORT}`);
                 open(`http://${HOST}:${PORT}${URL ? `/?url=${URL}` : ""}`);
@@ -88,7 +96,7 @@ nextProcess.stdout.on("data", (data) => {
                     console.log(' → Found any bugs? Be sure to DM me on X: @alfonsusac or create an issue in the check-site-meta github repo.');
                 }, 2000);
             }
-            rl.close();
+            io.close();
         });
     }
 });
@@ -112,3 +120,7 @@ const cleanup = () => {
 };
 process.on("SIGINT", cleanup); // Ctrl + C
 process.on("SIGTERM", cleanup); // Kill command
+// Util
+function isPositiveInteger(str) {
+    return /^[1-9]\d*$/.test(str);
+}

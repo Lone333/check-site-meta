@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs"
+import { isDev } from "./env"
 
 export function getVersion() {
   if (process.env.NODE_ENV === 'development') {
@@ -10,6 +11,9 @@ export function getVersion() {
 
 export function getEnvironment() {
   if (process.env.USING_NPX === 'true') {
-    
+    return 'npx' as const
+  } else {
+    if (isDev) return 'development' as const
+    return 'hosted' as const
   }
 }

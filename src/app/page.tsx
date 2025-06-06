@@ -2,7 +2,7 @@ import { Fragment, Suspense, type ComponentProps } from "react"
 import { getUrlFromQuery } from "./lib/parse-url"
 import type { NextPageProps } from "./lib/next-types"
 import { cn } from "lazy-cn"
-import { getVersion } from "./lib/version"
+import { getEnvironment, getVersion } from "./lib/version"
 import { ThemeSwitcher } from "./theme-switch"
 import { changelog } from "../../changelog"
 import { HomeErrorCard } from "./module/error/ErrorCard"
@@ -137,7 +137,7 @@ function Footer(props: ComponentProps<"footer">) {
             npx check-site-meta
           </div>
           <div className="text-xs">
-            {getVersion()}
+            {getVersion()} ({getEnvironment()})
           </div>
           <div className="text-xs mt-4 max-w-120">
             check-site-meta (CSM) is a free, open-source npx executable that extracts metadata from
