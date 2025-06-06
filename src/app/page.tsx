@@ -14,9 +14,9 @@ import { AdvancedPanel } from "./components/advanced/AdvancedPanel"
 import { isDev } from "./lib/env"
 import { $ } from "./util"
 import { MetaInfoPanel } from "./components/SummaryPanel"
-import { registerContext, searchParams } from "./lib/page-context"
 import { getSiteMetadata } from "./page.data"
 import { LocalContextProvider } from "./context"
+import { registerContext, searchParams } from "./lib/page-context"
 
 // Structure:
 // 

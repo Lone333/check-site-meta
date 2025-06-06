@@ -1,7 +1,6 @@
 import { cache } from "react"
 import { AppError } from "./module/error/error-primitives"
-import { searchParams } from "./lib/page-context"
-import { getUrlFromQuery, parseUrlFromQuery } from "./lib/parse-url"
+import { parseUrlFromQuery } from "./lib/parse-url"
 import { fetchRoot, getMetadataValues } from "./lib/get-metadata"
 import { getResolvedMetadata } from "./lib/get-resolved-metadata"
 
