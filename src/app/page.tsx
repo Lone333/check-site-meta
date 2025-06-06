@@ -48,8 +48,6 @@ export default async function Home(context: NextPageProps) {
   const userSettings = await getUserSettings()
   const siteMetadata = url && getSiteMetadata(url)
 
-  const appDesc = <AppDescription closed={hasURL} version={getVersion()} />
-
   return (
     <>
       <main className={cn(
