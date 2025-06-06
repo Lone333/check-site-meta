@@ -7,3 +7,9 @@ export function getVersion() {
     return process.env['CSM_VERSION'] + ` ${ process.env['DISABLE_ANALYTICS'] ? "(Analytics Disabled)" : "" }`
   }
 }
+
+export function getEnvironment() {
+  if (process.env.USING_NPX === 'true') {
+    
+  }
+}

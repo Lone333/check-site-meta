@@ -1,5 +1,5 @@
 import { tab } from "@/app/module/tab/tab-primitives";
-import { TabsWithContent } from "@/app/module/tab/Tabs";
+import { TabContent, TabsWithContent } from "@/app/module/tab/Tabs";
 import type { SiteMetadata } from "@/app/page.data";
 import { RobotsDetails } from "./Robots";
 import { SitemapDetails } from "./Sitemap";
@@ -12,7 +12,6 @@ import { MetaCard } from "../SummaryPanel"
 export function AdvancedPanel(props: {
   metadata: SiteMetadata
 }) {
-
   const Robots = async () =>
     getRobots(props.metadata.url)
       .then(res => <RobotsDetails data={res} url={props.metadata.url} />)
@@ -65,6 +64,7 @@ export function AdvancedPanel(props: {
         )
       ]}
     >
+      <TabContent />
     </TabsWithContent>
   )
 }

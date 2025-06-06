@@ -15,11 +15,10 @@ export function logEvent(ev: string) {
           e: ev,
           m: { version: version, falseReferer: true }
         })
-      }).catch(() => { })
+      }).catch()
     }
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'development')
       console.log('analytics', ev)
-    }
   } catch { }
 }
 

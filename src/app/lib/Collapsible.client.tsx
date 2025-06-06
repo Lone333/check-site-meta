@@ -6,12 +6,10 @@ import { useEffect, useRef, useState, type ComponentProps, type CSSProperties, t
 import { CollapsibleRow } from "./Collapsible"
 import { px } from "./unit"
 
-export function useExpandableList(arr: boolean[], opts?: {
-  onChange?: (arr: boolean[]) => void
-  // onToggle?: (index: number, arr: boolean[]) => void
-  // onExpandAll?: (arr: boolean[]) => void
-  // onCollapseAll?: (arr: boolean[]) => void
-}) {
+export function useExpandableList(
+  arr: boolean[],
+  opts?: { onChange?: (arr: boolean[]) => void }
+) {
   const [expandedList, setExpandedList] = useState([...Array.from(arr)])
   const isExpanded = (index: number) => expandedList[index]
   const toggaleExpanse = (index: number) => {
@@ -19,7 +17,6 @@ export function useExpandableList(arr: boolean[], opts?: {
       const copy = [...prev]
       copy[index] = !copy[index]
       opts?.onChange?.(copy)
-      // opts?.onToggle?.(index, copy)
       return copy
     })
   }
@@ -27,22 +24,18 @@ export function useExpandableList(arr: boolean[], opts?: {
     const newArr = [...Array.from(arr, () => true)]
     setExpandedList(newArr)
     opts?.onChange?.(newArr)
-    // opts?.onExpandAll?.(newArr)
   }
   const collapseAll = () => {
     const newArr = [...Array.from(arr, () => false)]
     setExpandedList(newArr)
     opts?.onChange?.(newArr)
-    // opts?.onCollapseAll?.(newArr)
   }
-
   return {
     isExpanded,
     toggaleExpanse,
     expandAll,
     collapseAll,
   }
-
 }
 
 export function ExpandableAdvancedCard({ expanded, toggleExpanse, Label, Content, headerProps, zIndex, className, ...props }: ComponentProps<"div"> & {
@@ -134,10 +127,10 @@ export function useContentHeighTransition(
       easing: 'ease-out',
       fill: 'both',
     })
-    
 
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps)
 
   function saveContentRect() {

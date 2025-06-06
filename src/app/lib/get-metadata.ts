@@ -5,6 +5,7 @@ import "server-only"
 import { AppError } from "../module/error/error-primitives"
 import { appFetch, ensureCorrectContentType, getUTF8Text } from "./fetch"
 import { extractAuthorData } from "./metadata/+author"
+import type { OpenGraphImageMetadataValue } from "./metadata/opengraph"
 
 export const fetchRoot = cache(async (url: string) => {
   const res = await appFetch(url)
@@ -22,64 +23,63 @@ export const fetchRoot = cache(async (url: string) => {
  * It is not meant to 
  */
 export function getMetadataValues(root: HTMLElement, rawUrl: string) {
-
-  const from = (s: string) => root.querySelector(s)
-  const fromAll = (s: string) => root.querySelectorAll(s)
-  const get = (attributeKey: string, from: HTMLElement | null) => from?.getAttribute(attributeKey)
-  const getMany = (attributeKey: string, from: HTMLElement[]) => from.map(element => element.getAttribute(attributeKey))
-
-  const getOg = (p: `og:${string}`) => get('content', from(`meta[property='og:${p}']`))
-
-
   try {
+    const from = (s: string) => root.querySelector(s)
+    const fromAll = (s: string) => root.querySelectorAll(s)
+    const get = (attributeKey: string) => (from: HTMLElement | null) => from?.getAttribute(attributeKey)
+
+    const getOg = (p: `og:${ string }`) => get('content')(from(`meta[property='${ p }']`))
+    const getOgAll = (p: `og:${ string }`) => fromAll(`meta[property='${ p }']`).map(get('content'))
+
+    const getTwitter = (p: `twitter:${ string }`) =>
+      get('content')(from(`meta[name='${ p }']`))
+      ?? get('content')(from(`meta[property='${ p }']`))
+
     return {
       rawUrl,
       general: {
         title: from("title")?.text,
-        description: get('content', from("meta[name=description]")),
-        url: get('content', from("link[rel=canonical]")),
-        favicons: fromAll("link[rel~=icon]").map(element => ({
-          rel: get('rel', element),
-          type: get("type", element),
-          sizes: get("sizes", element),
-          href: get("href", element)
-        })),
+        description: get('content')(from("meta[name=description]")),
+        url: get('content')(from("link[rel=canonical]")),
+        favicons: fromAll("link[rel~=icon]").map(element => {
+          return {
+            rel: get('rel')(element),
+            type: get("type")(element),
+            sizes: get("sizes")(element),
+            href: get("href")(element)
+          }
+        }),
         author: extractAuthorData(fromAll("link[rel=author], meta[name=author]")),
-        robots: get('content', from("meta[name=robots]")),
-        keywords: get('content', from("meta[name=keywords]")),
-        generator: get('content', from("meta[name=generator]")),
-        license: get('content', from("meta[name=license]")),
-        viewport: get('content', from("meta[name=viewport]")),
-        themeColor: fromAll("meta[name='theme-color']").map(element => ({
-          media: get("media", element),
-          value: get("content", element)
-        })),
-        colorScheme: get('content', from("meta[name='color-scheme']")),
-        formatDetection: get('content', from("meta[name='format-detection']")),
-        applicationName: get('content', from("meta[name='application-name']")),
+        robots: get('content')(from("meta[name=robots]")),
+        keywords: get('content')(from("meta[name=keywords]")),
+        generator: get('content')(from("meta[name=generator]")),
+        license: get('content')(from("meta[name=license]")),
+        viewport: get('content')(from("meta[name=viewport]")),
+        themeColor: fromAll("meta[name='theme-color']").map(element => {
+          return {
+            media: get("media")(element),
+            value: get("content")(element)
+          }
+        }),
+        colorScheme: get('content')(from("meta[name='color-scheme']")),
+        formatDetection: get('content')(from("meta[name='format-detection']")),
+        applicationName: get('content')(from("meta[name='application-name']")),
       },
       og: {
-        // Basic Metadata
-        title: getOg('og:title'),
+        title: getOg('og:title'), // Basic Metadata
         type: getOg('og:type'),
-        image: getOg('og:image'),
         url: getOg('og:url'),
-
-        // Optional Metadata
-        audio: getOg('og:audio'),
+        audio: getOg('og:audio'),   // Optional Metadata
         description: getOg('og:description'),
         determiner: getOg('og:determiner'),
         locale: getOg('og:locale'),
-        localeAlternate: fromAll('meta[property="og:locale:alternate"]').map(e => e.getAttribute("content")),
-
+        localeAlternate: fromAll('meta[property="og:locale:alternate"]').map(get('content')),
         siteName: getOg('og:site_name'),
         video: getOg('og:video'),
-
         imageAlt: getOg('og:image:alt'),
         keywords: getOg('og:keywords'),
-
-        // Structured Properties
-        images: root.querySelectorAll("meta[property*='og:image']").reduce((acc, e) => {
+        image: getOg('og:image'), // Structured Properties
+        images: fromAll("meta[property*='og:image']").reduce<OpenGraphImageMetadataValue[]>((acc, e) => {
           const property = e.getAttribute("property")
           const content = e.getAttribute("content")
           if (!content || !property) return acc
@@ -89,51 +89,50 @@ export function getMetadataValues(root: HTMLElement, rawUrl: string) {
             acc[acc.length - 1][attr] = content
           } else { acc.push({ url: content }) }
           return acc
-        }, [] as { url: string, secure_url?: string, type?: string, width?: string, height?: string, alt?: string }[]),
-
-        articlePublishedTime: fromMetaTagWithProperty(root, 'article:published_time'),
-        articleModifiedTime: fromMetaTagWithProperty(root, 'article:modified_time'),
-        articleExpirationTime: fromMetaTagWithProperty(root, 'article:expiration_time'),
-        articleAuthor: fromMetaTagWithPropertyArray(root, 'article:author').map(e => e.getAttribute("content")),
-        articleSection: fromMetaTagWithProperty(root, 'article:section'),
-        articleTag: fromMetaTagWithPropertyArray(root, 'article:tag').map(e => e.getAttribute("content")),
+        }, []),
+        articlePublishedTime: getOg('og:article:published_time'),
+        articleModifiedTime: getOg('og:article:modified_time'),
+        articleExpirationTime: getOg('og:article:expiration_time'),
+        articleAuthor: getOgAll('og:article:author'),
+        articleSection: getOg('og:article:section'),
+        articleTag: getOgAll('og:article:tag'),
       },
       twitter: {
-        title: getTwitterMeta(root, 'twitter:title'),
-        card: getTwitterMeta(root, 'twitter:card'),
-        description: getTwitterMeta(root, 'twitter:description'),
-        image: getTwitterMeta(root, 'twitter:image'),
-        imageAlt: getTwitterMeta(root, 'twitter:image:alt'),
+        title: getTwitter('twitter:title'),
+        card: getTwitter('twitter:card'),
+        description: getTwitter('twitter:description'),
+        image: getTwitter('twitter:image'),
+        imageAlt: getTwitter('twitter:image:alt'),
 
-        site: getTwitterMeta(root, 'twitter:site'),
-        siteId: getTwitterMeta(root, 'twitter:site:id'),
-        creator: getTwitterMeta(root, 'twitter:creator'),
-        creatorId: getTwitterMeta(root, 'twitter:creator:id'),
+        site: getTwitter('twitter:site'),
+        siteId: getTwitter('twitter:site:id'),
+        creator: getTwitter('twitter:creator'),
+        creatorId: getTwitter('twitter:creator:id'),
 
-        player: getTwitterMeta(root, 'twitter:player'),
-        playerWidth: getTwitterMeta(root, 'twitter:player:width'),
-        playerHeight: getTwitterMeta(root, 'twitter:player:height'),
-        playerStream: getTwitterMeta(root, 'twitter:player:stream'),
+        player: getTwitter('twitter:player'),
+        playerWidth: getTwitter('twitter:player:width'),
+        playerHeight: getTwitter('twitter:player:height'),
+        playerStream: getTwitter('twitter:player:stream'),
 
-        appCountry: getTwitterMeta(root, 'twitter:app:country'),
+        appCountry: getTwitter('twitter:app:country'),
 
-        appNameIphone: getTwitterMeta(root, 'twitter:app:name:iphone'),
-        appIdIphone: getTwitterMeta(root, 'twitter:app:id:iphone'),
-        appUrlIphone: getTwitterMeta(root, 'twitter:app:url:iphone'),
+        appNameIphone: getTwitter('twitter:app:name:iphone'),
+        appIdIphone: getTwitter('twitter:app:id:iphone'),
+        appUrlIphone: getTwitter('twitter:app:url:iphone'),
 
-        appNameIpad: getTwitterMeta(root, 'twitter:app:name:ipad'),
-        appIdIpad: getTwitterMeta(root, 'twitter:app:id:ipad'),
-        appUrlIpad: getTwitterMeta(root, 'twitter:app:url:ipad'),
+        appNameIpad: getTwitter('twitter:app:name:ipad'),
+        appIdIpad: getTwitter('twitter:app:id:ipad'),
+        appUrlIpad: getTwitter('twitter:app:url:ipad'),
 
-        appNameGoogleplay: getTwitterMeta(root, 'twitter:app:name:googleplay'),
-        appIdGoogleplay: getTwitterMeta(root, 'twitter:app:id:googleplay'),
-        appUrlGoogleplay: getTwitterMeta(root, 'twitter:app:url:googleplay'),
+        appNameGoogleplay: getTwitter('twitter:app:name:googleplay'),
+        appIdGoogleplay: getTwitter('twitter:app:id:googleplay'),
+        appUrlGoogleplay: getTwitter('twitter:app:url:googleplay'),
       },
       mobile: {
-        appleTouchIcons: Array.from(root.querySelectorAll("link[rel='apple-touch-icon']")).map(e => {
+        appleTouchIcons: fromAll("link[rel='apple-touch-icon']").map(e => {
           return {
-            sizes: e.getAttribute("sizes"),
-            href: e.getAttribute("href")
+            sizes: get("sizes")(e),
+            href: get("href")(e)
           }
         }),
         appleTouchIconsPrecomposed: Array.from(root.querySelectorAll("link[rel='apple-touch-icon-precomposed']")).map(e => {
@@ -142,10 +141,10 @@ export function getMetadataValues(root: HTMLElement, rawUrl: string) {
             href: e.getAttribute("href")
           }
         }),
-        mobileWebAppCapable: fromMetaTagWithName(root, 'apple-mobile-web-app-capable'),
-        appleMobileWebAppCapable: fromMetaTagWithName(root, 'apple-mobile-web-app-capable'),
-        appleMobileWebAppTitle: fromMetaTagWithName(root, 'apple-mobile-web-app-title'),
-        appleMobileWebAppStatusBarStyle: fromMetaTagWithName(root, 'apple-mobile-web-app-status-bar-style'),
+        mobileWebAppCapable: get('content')(from('meta[name="mobile-web-app-capable"]')),
+        appleMobileWebAppCapable: get('content')(from('meta[name="apple-mobile-web-app-capable"]')),
+        appleMobileWebAppTitle: get('content')(from('meta[name="apple-mobile-web-app-title"]')),
+        appleMobileWebAppStatusBarStyle: get('content')(from('meta[name="apple-mobile-web-app-status-bar-style"]')),
       },
       jsonld: {
         data: root.querySelectorAll("script[type='application/ld+json']").map(e => {
@@ -166,10 +165,12 @@ export function getMetadataValues(root: HTMLElement, rawUrl: string) {
         robots: root.querySelector("meta[name=robots]")?.getAttribute("content"),
       }
     }
+
   } catch (error) {
     throw new AppError(
       'getMetadataValues',
-      'Metadata Parse Failed', error instanceof Error ? error.message : "Unknown Error",
+      'Metadata Parse Failed',
+      undefined,
       [],
       error
     )
@@ -182,13 +183,6 @@ function getTwitterMeta(root: HTMLElement, key: string) {
 function fromMetaTagWithName(root: HTMLElement, key: string) {
   return root.querySelector(`meta[name='${ key }']`)?.getAttribute("content")
 }
-function fromMetaTagWithProperty(root: HTMLElement, key: string) {
-  return root.querySelector(`meta[property='${ key }']`)?.getAttribute("content")
-}
-function fromMetaTagWithPropertyArray(root: HTMLElement, key: string) {
-  return root.querySelectorAll(`meta[property='${ key }']`)
-}
-
 
 export type Metadata = ReturnType<typeof getMetadataValues>
 

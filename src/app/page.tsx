@@ -1,8 +1,6 @@
-import { cache, Fragment, Suspense, type ComponentProps, type ReactElement } from "react"
-import { getMetadataValues, fetchRoot } from "./lib/get-metadata"
-import { getUrlFromQuery, parseUrlFromQuery } from "./lib/parse-url"
+import { Fragment, Suspense, type ComponentProps } from "react"
+import { getUrlFromQuery } from "./lib/parse-url"
 import type { NextPageProps } from "./lib/next-types"
-import { getResolvedMetadata } from "./lib/get-resolved-metadata"
 import { cn } from "lazy-cn"
 import { getVersion } from "./lib/version"
 import { ThemeSwitcher } from "./theme-switch"
@@ -13,14 +11,12 @@ import { LinkPreviewPanel } from "./components/LinkPreviewPanel"
 import { InputForm } from "./components/inputs/InputForm"
 import { RecentSuggestions } from "./components/inputs/InputSuggestions"
 import { AdvancedPanel } from "./components/advanced/AdvancedPanel"
-import { AppError } from "./module/error/error-primitives"
 import { isDev } from "./lib/env"
-import { LocalContextProvider } from "./context"
 import { $ } from "./util"
 import { MetaInfoPanel } from "./components/SummaryPanel"
-import { headers } from "next/headers"
 import { registerContext, searchParams } from "./lib/page-context"
 import { getSiteMetadata } from "./page.data"
+import { LocalContextProvider } from "./context"
 
 // Structure:
 // 
@@ -65,10 +61,8 @@ export default async function Home(context: NextPageProps) {
           <Header hidden={hasURL} />
           <InputForm query={query} settings={userSettings} />
           <RecentSuggestions hidden={hasURL} />
-
           {/* Detail Page */}
           <div className="fcol-8 pt-8">
-
             <Suspense key={searchId + 'summary'} fallback={<Loading />}>
               <$ truthy
                 await={siteMetadata}
@@ -76,10 +70,8 @@ export default async function Home(context: NextPageProps) {
                 catch={error => <HomeErrorCard error={error} />}
               />
             </Suspense>
-
           </div>
         </div>
-
         <div className="fcol-8/center pt-15 pb-12">
           {/* Home Page */}
           <Changelog hidden={hasURL} />
@@ -92,17 +84,19 @@ export default async function Home(context: NextPageProps) {
             />
           </Suspense>
         </div>
-
         <div className="col-span-2">
           {/* Detail Page */}
           <Suspense key={searchId + 'advanced'}>
             <$ truthy
               await={siteMetadata}
-              then={metadata => <AdvancedPanel metadata={metadata} />}
+              then={metadata =>
+                <LocalContextProvider>
+                  <AdvancedPanel metadata={metadata} />
+                </LocalContextProvider>
+              }
             />
           </Suspense>
         </div>
-
       </main>
       <Footer />
     </>
@@ -118,7 +112,6 @@ async function Header(props: {
     <header className="grid-rows-animate-data-closed duration-700 group no-overflow-anchor fadeIn-0"
       data-closed={props.hidden ? "" : undefined}>
       <div className="min-h-0">
-
         {/* Header Content */}
         <div className="mb-12 mt-20 lg:text-start fcol-0 lg:block g-closed:opacity-0 g-closed:translate-y-10 transition duration-700">
           <div className="text-5xl md:text-6xl lg:text-5xl xl:text-6xl tracking-[-0.08em] font-mono header-fill font-bold">
@@ -145,6 +138,11 @@ function Footer(props: ComponentProps<"footer">) {
           </div>
           <div className="text-xs">
             {getVersion()}
+          </div>
+          <div className="text-xs mt-4 max-w-120">
+            check-site-meta (CSM) is a free, open-source npx executable that extracts metadata from
+            web pages, including those served on localhost, and displays the results in a browser-based
+            interface for review.
           </div>
           <div className="mt-10 flex flex-wrap gap-6">
             {[

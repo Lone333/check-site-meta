@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import type { Metadata } from "./get-metadata";
+import type { Metadata } from "./get-metadata"
 
 export type MetadataMetadataItem = {
   value?: string | undefined,
@@ -77,9 +76,7 @@ export function getResolvedMetadata(m: Metadata) {
             }
           ]
         }
-        return {
-          favicons
-        }
+        return { favicons }
       })(),
       author: {
         value: m.general.author[0]?.name,
@@ -169,7 +166,6 @@ export function getResolvedMetadata(m: Metadata) {
       images: {
         label: "og:image",
         values: m.og.images.map(e => {
-
           return {
             value: e.url,
             label: '',

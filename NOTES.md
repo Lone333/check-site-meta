@@ -1,15 +1,24 @@
 ## TODO
 
-- [ ] Favicon
+- [v] Favicon
 - [ ] JSON-LD
 - [ ] LLM.txt
 - [ ] ROBOT.txt
 
+------------------------------
+
+## Next Time You're Here
+
+- the current code optimises for mental overhead.
+- it is already the best code without adding abstractions
+- only refactor after you've implemented a feature
+
+------------------------------
 
 ## Script Explanations
 
 - `dev` 
-    - Runs the website
+    - Runs the website in :3000 dev mode
     
 - `build`
     - Deletes .next folder
@@ -24,8 +33,9 @@
 
 - `test`
     - Build the project (npm run build)
-    - Transpile the index.ts into index.js
-    - Run the index.js file
+    - Transpile the check-site-meta.ts into .js
+    - Run the .js file
+    - use :skipbuild to skip build process
 
 - Before publishing (prepublishOnly), it will:
     - Build the project
@@ -33,11 +43,17 @@
 
 ## Difference in Development modes
 
-1.  `npm run dev` - to only try the website
-2.  `npm run test` - to try the finished build + script
-3.  `npx check-site-meta` - to try the published build
+1.  `pnpm dev` - to only try the website
+2.  `pnpm test` - to try the finished build + script
+3.  `pnpx check-site-meta` - to try the published build
 
-## How to Make the NPX Runnable
+
+
+------------------------------
+
+## Extra Resources
+
+### How to Make the NPX Runnable
 
 1.  In package.json, add `"bin": { "<command-name>": "<location>" }`
     

@@ -7,9 +7,8 @@
     "check-site-meta": "./bin/check-site-meta.js"
   },
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev --turbopack -p 3050",
     "build": "rm -rf .next && rm -rf .next/standalone && next build && rm -rf .next/cache && cp -r .next/static .next/standalone/.next/ && cp -r .next/standalone bin",
-    "start": "next start",
     "lint": "next lint",
     "test": "npm run build; tsc --p ./bin && node ./bin/check-site-meta.js",
     "test:skipbuild": "tsc --p ./bin && node ./bin/check-site-meta.js",

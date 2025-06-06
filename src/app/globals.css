@@ -223,27 +223,25 @@ body {
   --justify-content-unset: unset;
 }
 
-@utility frow {
-  display: flex;
-  flex-direction: row;
-}
-@utility fcol-* {
-  display: flex;
-  flex-direction: column;
-  align-items: start;
-  align-items: --modifier(--align-items-*);
-  justify-content: --value(--justify-content-*);
-  gap: calc(--value(number) * var(--spacing))
-}
-
 @utility fcol {
   display: flex;
   flex-direction: column;
 }
+@utility fcol-* {
+  display: flex;
+  flex-direction: column;
+  align-items: --modifier(--align-items-*);
+  justify-content: --value(--justify-content-*);
+  gap: calc(--value(number) * var(--spacing))
+}
+@utility frow {
+  display: flex;
+  flex-direction: row;
+}
+
 @utility frow-* {
   display: flex;
   flex-direction: row;
-  align-items: start;
   align-items: --modifier(--align-items-*);
   justify-content: --value(--justify-content-*);
   gap: calc(--value(number) * var(--spacing))
