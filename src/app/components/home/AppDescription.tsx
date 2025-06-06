@@ -4,7 +4,7 @@ import { getVersion } from "@/app/lib/version"
 import { cn } from "lazy-cn"
 import { useEffect, useState, type ComponentProps } from "react"
 import { FormButton, MaterialSymbolsCloseRounded } from "../inputs/InputForm"
-import { isHosted } from "@/app/lib/env"
+import { isDev, isHosted } from "@/app/lib/env"
 
 
 export function AppDescription({ closed, version, ...props}: ComponentProps<"section"> & { closed: boolean, version: string }) {
@@ -34,7 +34,7 @@ export function AppDescription({ closed, version, ...props}: ComponentProps<"sec
     localStorage.setItem("app-description-closed", "true")
   }
 
-  const isClosed = ignored || closed || ignored === null || !isHosted
+  const isClosed = ignored || closed || ignored === null || (!isHosted && !isDev)
 
   return (
     <section {...props} className={cn("grid-rows-animate-data-closed duration-700 group no-overflow-anchor fadeIn-0 self-stretch")}
@@ -80,6 +80,8 @@ export function AppDescription({ closed, version, ...props}: ComponentProps<"sec
           </div>
           <div className={cn("min-w-0 text-start py-1.5 text-foreground-muted/80 font-medium max-w-full text-pretty mt-1")}>
             Run locally for full and offline access — including localhost. Requires <a className="underline" target="_blank" href="https://nodejs.org/en/download">Node.js</a>.
+            {/* <br /> */}
+            {/* *Hosted version is available for quick checks and may not work properly. */}
           </div>
         </div>
       </div>

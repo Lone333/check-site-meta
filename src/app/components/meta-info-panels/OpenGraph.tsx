@@ -1,5 +1,5 @@
 import type { ResoledMetadata } from "@/app/lib/get-resolved-metadata"
-import { AppImage } from "@/app/module/image/Image"
+import { AppImage } from "@/app/module/image/AppImage"
 import { Fragment } from "react"
 import { MetadataField } from "../SummaryPanelField"
 

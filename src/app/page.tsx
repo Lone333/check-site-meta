@@ -48,6 +48,8 @@ export default async function Home(context: NextPageProps) {
   const userSettings = await getUserSettings()
   const siteMetadata = url && getSiteMetadata(url)
 
+  const appDesc = <AppDescription closed={hasURL} version={getVersion()} />
+
   return (
     <>
       <main className={cn(
@@ -61,7 +63,6 @@ export default async function Home(context: NextPageProps) {
           {/* Home Page */}
           <Header hidden={hasURL} />
           <InputForm query={query} settings={userSettings} />
-          <AppDescription closed={hasURL} version={getVersion()} />
           <RecentSuggestions hidden={hasURL} />
           {/* Detail Page */}
           <div className="fcol-8 pt-8">
@@ -77,7 +78,8 @@ export default async function Home(context: NextPageProps) {
         <div className="fcol-8/center pt-15 pb-12">
           {/* Home Page */}
           <div className="">
-          <Changelog hidden={hasURL} />
+            <AppDescription closed={hasURL} version={getVersion()} />
+            <Changelog hidden={hasURL} />
           </div>
 
           {/* Detail Page */}

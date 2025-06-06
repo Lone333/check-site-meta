@@ -1,4 +1,9 @@
 export const changelog = {
+  "0.4.0": [
+    "Added more information for hosted page.",
+    "Added support for multiple authors.",
+    "Added LLMs.txt checker and token counter.",
+  ],
   "0.3.5": [
     "Removed bloat from previous version."
   ], 

@@ -2,7 +2,7 @@
 
 import { useState, type ComponentProps, type ReactNode, type SVGProps } from "react"
 import { type FieldDataItem } from "../lib/get-resolved-metadata"
-import { AppImage } from "../module/image/Image"
+import { AppImage } from "../module/image/AppImage"
 import { cn } from "lazy-cn"
 import { CollapsibleRow } from "../lib/Collapsible"
 

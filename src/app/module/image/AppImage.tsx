@@ -1,8 +1,8 @@
+"use client"
 /* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable @next/next/no-img-element */
-"use client"
 
-import { useEffect, useRef, useState, type ComponentProps, type ReactNode } from "react";
+import React, { useEffect, useRef, useState, type ComponentProps, type ReactNode } from "react";
 
 export function AppImage(
   { firstFrameGif, src, onErrorFallback, ...props }: ComponentProps<'img'> & {
@@ -10,11 +10,21 @@ export function AppImage(
     onErrorFallback?: ReactNode
   }
 ) {
-  const [error, setError] = useState(false)
+
+  /*
+    If `?.` and `React?.` is removed: Nothing would change. 
+    This error would always appear after a hot reload:
+    ---
+    Error: Switched to client rendering because the server rendering errored:
+
+    Cannot read properties of null (reading 'useState')
+    ---
+  */
+  const [error, setError] = React?.useState?.(false)
 
   const usingProxyRef = useRef(false)
 
-  // if (!src) return null
+  if (!src) return null
   if (src instanceof Blob) {
     // If the src is a Blob, we can use it directly
     return <img

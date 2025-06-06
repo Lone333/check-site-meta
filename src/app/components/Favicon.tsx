@@ -1,6 +1,6 @@
 import { cn } from "lazy-cn";
 import type { ComponentProps } from "react";
-import { AppImage } from "../module/image/Image";
+import { AppImage } from "../module/image/AppImage";
 import { ExternalIcon, MetadataField } from "./SummaryPanelField";
 import type { ResoledMetadata } from "../lib/get-resolved-metadata";
 import { px } from "../lib/unit";

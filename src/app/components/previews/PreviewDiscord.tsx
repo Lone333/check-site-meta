@@ -6,7 +6,7 @@ import { PreviewFrame, PreviewThemeSwitcher } from "./Preview.client";
 import { appFetch } from "@/app/lib/fetch";
 import type { ResoledMetadata } from "@/app/lib/get-resolved-metadata";
 import { validateHex } from "@/app/lib/hex";
-import { AppImage } from "@/app/module/image/Image";
+import { AppImage } from "@/app/module/image/AppImage";
 import { MaterialSymbolsDarkModeOutline, MaterialSymbolsLightModeOutline } from "@/app/theme-switch";
 
 export async function PreviewDiscord(

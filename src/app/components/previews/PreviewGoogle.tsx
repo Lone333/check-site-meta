@@ -3,7 +3,7 @@ import { MessageList, PreviewMenu, PreviewPanelContent, type PreviewMessages } f
 import { cn } from "lazy-cn";
 import { PreviewFrame, PreviewThemeSwitcher } from "./Preview.client";
 import type { ResoledMetadata } from "@/app/lib/get-resolved-metadata";
-import { AppImage } from "@/app/module/image/Image";
+import { AppImage } from "@/app/module/image/AppImage";
 import { MaterialSymbolsLightModeOutline, MaterialSymbolsDarkModeOutline } from "@/app/theme-switch";
 
 export async function PreviewGoogle({ metadata, className, ...props }: ComponentProps<"div"> & {
