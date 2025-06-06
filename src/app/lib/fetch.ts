@@ -9,7 +9,7 @@ export async function appFetch(...args: Parameters<typeof fetchInstance>) {
 
   try {
 
-    const res = await fetchInstance(args[0], {
+    const res = await fetch(args[0], {
       ...args[1],
       headers: {
         'User-Agent': settings.userAgent,
@@ -56,6 +56,9 @@ export async function ensureCorrectContentType(res: Response, expected: string) 
   const contentType = res.headers.get("content-type")
   if (!contentType?.includes(expected)) {
     const text = await res.clone().text()
+    if (isDev) {
+      console.log("Mismatch Content-Type. URL:", res.url)
+    }
     throw new AppError(
       'ensureCorrectContentType',
       "Incorrect Content-Type",
