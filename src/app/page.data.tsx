@@ -14,5 +14,6 @@ export const getSiteMetadata = async (urlinput: string) => {
   } catch (error) {
     throw new AppError('getPageData', undefined, undefined, undefined, error)
   }
+}
 
 export type SiteMetadata = Awaited<ReturnType<typeof getSiteMetadata>>
