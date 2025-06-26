@@ -13,11 +13,11 @@ export const metadata: Metadata = {
   title: "Check Site Meta",
   description: "Check the metadata of any site.",
   authors: [{
-    name: "Alfonsus Ardani",
-    // url: "https://alfon.dev",
+    name: "Meta.Magi.app",
+    // url: "https://meta.magi.app",
   }, {
     name: "Check Site Meta",
-    url: "https://checksite.meta",
+    url: "https://meta.magi.app",
   }],
 }
 export const viewport: Viewport = {
