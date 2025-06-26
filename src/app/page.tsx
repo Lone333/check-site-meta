@@ -4,7 +4,7 @@ import type { NextPageProps } from "./lib/next-types"
 import { cn } from "lazy-cn"
 import { getEnvironment, getVersion } from "./lib/version"
 import { ThemeSwitcher } from "./theme-switch"
-import { changelog } from "../../changelog"
+
 import { HomeErrorCard } from "./module/error/ErrorCard"
 import { getUserSettings } from "./lib/get-settings"
 import { LinkPreviewPanel } from "./components/LinkPreviewPanel"
@@ -78,7 +78,7 @@ export default async function Home(context: NextPageProps) {
           {/* Home Page */}
           <div className="">
             <AppDescription closed={hasURL} version={getVersion()} />
-            <Changelog hidden={hasURL} />
+
           </div>
 
           {/* Detail Page */}
@@ -203,26 +203,3 @@ function Loading() {
   )
 }
 
-function Changelog(props: {
-  hidden?: boolean
-}) {
-  return (
-    <div className="pt-15 w-full grid grid-rows-[1fr] closed:grid-rows-[0fr] overflow-hidden group transition-[grid-template-rows] duration-700" data-closed={props.hidden ? "" : undefined}>
-      <div className="min-h-0 closed:opacity-0 transition-all duration-300 delay-100" data-closed={props.hidden ? "" : undefined}>
-        <div className=" pb-4 text-foreground-muted-3 font-medium">
-          changelog
-        </div>
-        <div className="grid grid-cols-[6rem_1fr] gap-y-4 text-foreground-muted text-base">
-          {Object.entries(changelog).map(([version, changes]) => (
-            <Fragment key={version}>
-              <div className="text-foreground-muted-3">{version}</div>
-              <ul className="">
-                {changes.map((change, i) => <li key={i} className="text-foreground-muted-2/80 py-0.5 list-['-___']">{change}</li>)}
-              </ul>
-            </Fragment>
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-}
