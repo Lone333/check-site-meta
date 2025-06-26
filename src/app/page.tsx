@@ -156,33 +156,31 @@ function Footer(props: ComponentProps<"footer">) {
       <div className="flex flex-wrap gap-y-8 container-md lg:container-2xl px-8 lg:px-12 xl:px-24 text-foreground-body  ">
         <div className="fcol grow font-mono">
           <div className="text-[1rem]/none font-semibold tracking-tight">
-            npx check-site-meta
+            check site meta
           </div>
-          <div className="text-xs">
-            {getVersion()} ({getEnvironment()})
-          </div>
+
           <div className="text-xs mt-4 max-w-120">
-            <span className="font-bold">check-site-meta</span> is a free, open-source npx executable that extracts metadata from
+            <span className="font-bold">check site meta</span> is a free, that extracts metadata from
             web pages, including those served on localhost, and displays the results in a browser-based
             interface for review.
           </div>
           <div className="text-xs mt-4">
             Links:<br />
-            https://checksitemeta.vercel.app/<br />
-            https://checksitemeta.alfon.dev/<br />
+            https://meta.magi.app/<br />
+
           </div>
           <div className="mt-10 flex flex-wrap gap-6">
             {[
-              ['npm', 'https://www.npmjs.com/package/check-site-meta'],
-              ['github', 'https://github.com/alfonsusac/check-site-meta'],
-              ['twitter', 'https://x.com/alfonsusac/status/1899798175512412648'],
-              ['discord', 'https://discord.gg/DCNgFtCm'],
+              ['npm', '#'],
+              ['github', '#'],
+              ['twitter', '#'],
+              ['discord', '#'],
             ].map(e => (
               <a key={e[0]} className="button transition underline" href={e[1]} target="_blank">{e[0]}</a>
             ))}
           </div>
           <div className="mt-4">
-            Made by <a href="https://alfon.dev">alfonsusac</a> • ©{new Date().getFullYear()} alfonsusac. All rights reserved.
+            Made by <a href="https://Magi.App">Magi.App</a> • ©{new Date().getFullYear()} Magi App. All rights reserved.
           </div>
         </div>
         <div className="shrink-0">
